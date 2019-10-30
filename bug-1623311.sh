@@ -1,0 +1,34 @@
+
+MAC=9a:1e:1f:20:21:66
+/usr/libexec/qemu-kvm \
+    -name 'avocado-vt-vm1'  \
+    -sandbox off  \
+    -machine pc  \
+    -nodefaults \
+    -device VGA,bus=pci.0,addr=0x2  \
+    -chardev socket,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmpmonitor1-20180822-083928-y8PRqUqd,server,nowait \
+    -mon chardev=qmp_id_qmpmonitor1,mode=control  \
+    -chardev socket,id=qmp_id_catch_monitor,path=/var/tmp/monitor-catch_monitor-20180822-083928-y8PRqUqd,server,nowait \
+    -mon chardev=qmp_id_catch_monitor,mode=control \
+    -device pvpanic,ioport=0x505,id=idVmd181  \
+    -chardev socket,id=serial_id_serial0,path=/var/tmp/serial-serial0-20180822-083928-y8PRqUqd,server,nowait \
+    -device isa-serial,chardev=serial_id_serial0  \
+    -chardev socket,id=seabioslog_id_20180822-083928-y8PRqUqd,path=/var/tmp/seabios-20180822-083928-y8PRqUqd,server,nowait \
+    -device isa-debugcon,chardev=seabioslog_id_20180822-083928-y8PRqUqd,iobase=0x402 \
+    -device nec-usb-xhci,id=usb1,bus=pci.0,addr=0x3 \
+    -object iothread,id=iothread0,poll-max-ns=1125899906842624 \
+    -device virtio-scsi-pci,id=scsi0,iothread=iothread0 \
+    -drive id=drive_image1,if=none,snapshot=off,aio=threads,cache=directsync,format=qcow2,file=/home/images/rhel810-1623311.qcow2 \
+    -device scsi-hd,drive=drive_image1,bus=scsi0.0,id=image1 \
+    -device virtio-net-pci,mac=${MAC},id=idVobBWE,vectors=4,netdev=idH1zOQ2,bus=pci.0,addr=0x6  \
+    -netdev tap,id=idH1zOQ2,vhost=on \
+    -m 4096  \
+    -smp 8,maxcpus=8,cores=4,threads=1,sockets=2  \
+    -cpu host \
+    -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
+    -vnc :5  \
+    -rtc base=utc,clock=host,driftfix=slew  \
+    -boot menu=off,strict=off,order=cdn,once=d \
+    -enable-kvm \
+    -monitor stdio \
+    -spice disable-ticketing,port=5000 \
