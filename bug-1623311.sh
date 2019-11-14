@@ -1,4 +1,4 @@
-
+#poll-max-ns
 MAC=9a:1e:1f:20:21:66
 /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1'  \
