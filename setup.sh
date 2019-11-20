@@ -1,5 +1,5 @@
 
-#This tools for install qemu 
+#This tools for install qemu
 src_dir=/home/workdir
 create_workdir(){
   echo "create_workdir"
