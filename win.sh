@@ -32,4 +32,3 @@
     -device pcie-root-port,id=pcie_extra_root_port_0,slot=6,chassis=6,addr=0x6,bus=pcie.0 \
     -monitor stdio \
     -qmp tcp:0:4445,server,nowait \
-   

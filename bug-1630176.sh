@@ -1,0 +1,36 @@
+/usr/libexec/qemu-kvm \
+    -S  \
+    -name 'avocado-vt-vm1' \
+    -machine q35  \
+    -nodefaults \
+    -device VGA,bus=pcie.0,addr=0x1  \
+    -chardev socket,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmpmonitor1-20191113-071146-LHHCjqi0,server,nowait \
+    -mon chardev=qmp_id_qmpmonitor1,mode=control  \
+    -chardev socket,id=qmp_id_catch_monitor,path=/var/tmp/monitor-catch_monitor-20191113-071146-LHHCjqi0,server,nowait \
+    -mon chardev=qmp_id_catch_monitor,mode=control \
+    -device pvpanic,ioport=0x505,id=idrq8D5t \
+    -chardev socket,nowait,path=/var/tmp/serial-serial0-20191113-071146-LHHCjqi0,id=chardev_serial0,server \
+    -device isa-serial,id=serial0,chardev=chardev_serial0  \
+    -chardev socket,id=seabioslog_id_20191113-071146-LHHCjqi0,path=/var/tmp//seabios-20191113-071146-LHHCjqi0,server,nowait \
+    -device isa-debugcon,chardev=seabioslog_id_20191113-071146-LHHCjqi0,iobase=0x402 \
+    -device pcie-root-port,id=pcie.0-root-port-2,slot=2,chassis=2,addr=0x2,bus=pcie.0 \
+    -device qemu-xhci,id=usb1,bus=pcie.0-root-port-2,addr=0x0 \
+    -object iothread,id=iothread0 \
+    -device pcie-root-port,id=pcie.0-root-port-3,slot=3,chassis=3,addr=0x3,bus=pcie.0 \
+    -device virtio-scsi-pci,id=virtio_scsi_pci0,iothread=iothread0,bus=pcie.0-root-port-3,addr=0x0 \
+    -drive id=drive_image1,if=none,snapshot=off,aio=threads,cache=none,format=raw,file=/home/kvm_autotest_root/images/rhel811-64-virtio-scsi.qcow2 \
+    -device scsi-hd,id=image1,drive=drive_image1,bootindex=0 \
+    -device pcie-root-port,id=pcie.0-root-port-4,slot=4,chassis=4,addr=0x4,bus=pcie.0 \
+    -device virtio-net-pci,mac=9a:ab:fa:09:62:1c,id=idLVRSKI,netdev=idfMN0PL,bus=pcie.0-root-port-4,addr=0x0  \
+    -netdev tap,id=idfMN0PL,vhost=on \
+    -m 30720  \
+    -smp 20,maxcpus=20,cores=10,threads=1,sockets=2  \
+    -cpu 'Cascadelake-Server',hv_stimer,hv_synic,hv_vpindex,hv_reset,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,hv-tlbflush,+kvm_pv_unhalt \
+    -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/windows/winutils.iso \
+    -device scsi-cd,id=cd1,drive=drive_cd1 \
+    -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
+    -vnc :0  \
+    -rtc base=localtime,clock=host,driftfix=slew  \
+    -boot order=cdn,once=c,menu=off,strict=off \
+    -enable-kvm \
+    -device pcie-root-port,id=pcie_extra_root_port_0,slot=5,chassis=5,addr=0x5,bus=pcie.0
