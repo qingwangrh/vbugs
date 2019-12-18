@@ -9,7 +9,7 @@ fi
 os_img="rhel820-${idx}.qcow2"
 MAC="9a:b5:b6:b1:b2:b${idx}"
 port="595${idx}"
-vnc="${idx}"
+vnc="1${idx}"
 data1_img="data${idx}-1.qcow2"
 data2_img="data${idx}-2.qcow2"
 img_dir=/home/kvm_autotest_root/images
@@ -50,6 +50,6 @@ fi
         -netdev tap,id=idxgXAlm \
         -chardev file,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp${idx}.log,server,nowait \
         -mon chardev=qmp_id_qmpmonitor1,mode=control  \
-        -qmp tcp:localhost:${port},server,nowait  \
+        -qmp tcp:0:${port},server,nowait  \
         -chardev file,path=/var/tmp/monitor-serial${idx}.log,id=serial_id_serial0 \
         -device isa-serial,chardev=serial_id_serial0  \
