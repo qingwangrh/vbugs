@@ -1,3 +1,5 @@
+# This is for deploy win debug tools vm
+
 /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1' \
     -machine q35  \
