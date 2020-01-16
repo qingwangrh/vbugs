@@ -1,4 +1,4 @@
-
+#!/bin/sh
 qemu-img create -f qcow2 /home/images/data1.qcow2 1G
 ls -lt /home/images/data1.qcow2
 
@@ -17,11 +17,10 @@ ls -lt /home/images/data1.qcow2
   -device virtio-scsi-pci,id=scsi0,iothread=iothread0 \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-5,iothread=iothread0 \
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel810-64-virtio-scsi.qcow2,node-name=drive_image1 \
-  -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
+  -device virtio-blk-pci,id=os1,drive=drive_image1,bootindex=0 \
   \
-  -blockdev driver=file,snapshot=on,cache.direct=on,cache.no-flush=off,filename=/home/images/data1.qcow2,node-name=protocol_node1 \
-  -blockdev driver=qcow2,readonly=on,node-name=format_node1,file=protocol_node1 \
-  -device virtio-blk-pci,id=blk_data1,drive=format_node1,bus=pcie.0-root-port-3,bootindex=1 \
+  -drive file=/home/images/data1.qcow2,format=qcow2,if=none,id=drive-virtio-blk1,werror=stop,rerror=stop,readonly=on,snapshot=on \
+  -device virtio-blk-pci,id=blk_data1,drive=drive-virtio-blk1,bus=pcie.0-root-port-3,ioeventfd=off,bootindex=1 \
   \
   -vnc :5 \
   -monitor stdio \
@@ -37,7 +36,18 @@ ls -lt /home/images/data1.qcow2
   -device isa-serial,chardev=serial_id_serial0 \
 
 
-steps(){
+steps()
+{
   echo
+  #snapshot=on not support on blockdev so give up
+  #-blockdev driver=file,read-only=on,cache.direct=on,cache.no-flush=off,filename=/home/images/data1.qcow2,node-name=protocol_node1 \
+  #-blockdev driver=qcow2,read-only=on,node-name=format_node1,file=protocol_node1 \
 
+   dd if=/dev/urandom of=/dev/vdb bs=1M count=1000
+   ls -lt data1.qcow2
+
+   {"execute": "qmp_capabilities"}
+   {"execute": "block-commit", "arguments": { "device": "drive-virtio-blk1" } }
+   {"execute": "block-commit", "arguments": { "device": "virtio-blk1" } }
 }
+
