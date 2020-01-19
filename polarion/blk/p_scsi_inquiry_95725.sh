@@ -13,12 +13,11 @@
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel810-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device virtio-blk-pci,id=os1,drive=drive_image1,addr=0x3,bootindex=0 \
   \
-  -blockdev driver=host_device,cache.direct=on,cache.no-flush=off,filename=/dev/mapper/mpatha \
+  -blockdev driver=host_device,cache.direct=on,cache.no-flush=off,filename=/dev/sdb,node-name=protocol_node1 \
   -blockdev driver=raw,node-name=drive-virtio-disk0,file=protocol_node1 \
   -device virtio-blk-pci,id=data1,drive=drive-virtio-disk0,scsi=on,disable-modern=on,rerror=stop,werror=stop,addr=0x4,bootindex=1 \
   \
-  -drive file=/dev/sde,if=none,id=drive-virtio-disk1,format=raw,cache=none \
-  -device virtio-blk-pci,drive=drive-virtio-disk1,scsi=on,disable-modern=on,rerror=stop,werror=stop,addr=0x5,id=data2 \
+  \
   \
   -vnc :5 \
   -qmp tcp:0:5955,server,nowait \
@@ -30,6 +29,16 @@
 
 test_steps(){
   echo
+# slow train work, fast train not work
+
+-blockdev driver=host_device,cache.direct=on,cache.no-flush=off,filename=/dev/mapper/mpatha,node-name=protocol_node1 \
+  -blockdev driver=raw,node-name=drive-virtio-disk0,file=protocol_node1 \
+  -device virtio-blk-pci,id=data1,drive=drive-virtio-disk0,scsi=on,disable-modern=on,rerror=stop,werror=stop,addr=0x4,bootindex=1 \
+
+-drive file=/dev/sdg,if=none,id=drive-virtio-disk1,format=raw,cache=none \
+  -device virtio-blk-pci,drive=drive-virtio-disk1,scsi=on,disable-modern=on,rerror=stop,werror=stop,addr=0x5,id=data2 \
+
+  modprobe -r scsi_debug;modprobe scsi_debug add_host=1 sector_size=512 dev_size_mb=512
 
   sg_inq /dev/mapper/mpatha
 
