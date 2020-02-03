@@ -161,6 +161,7 @@ def run(test, params, env):
         :return: True, if equal to the given status or False
         """
         status_dict = get_multipath_disks_status(mpath_name)
+        logging.debug("compare_onepath_status disk:",disk,status_dict,status)
         if disk in status_dict.keys() and status == status_dict[disk]:
             return True
         else:
@@ -177,6 +178,7 @@ def run(test, params, env):
         :return: True, if equal to the given status or False
         """
         status_dict = get_multipath_disks_status(mpath_name)
+        logging.debug("compare_multipath_status mpath_name:", mpath_name, status_dict, status)
         if len(set(status_dict.values())) == 1 and status in status_dict.values():
             return True
         else:

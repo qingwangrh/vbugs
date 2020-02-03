@@ -198,6 +198,7 @@ def run(test, params, env):
     error_context.context("Get FC disk serial name:", logging.info)
     stg_serial_name = params["stg_serial_name"]
     image_name_stg = params["image_name_stg"].split("/")[-1]
+    logging.info("image_name_stg " + image_name_stg)
     if "mpath" not in image_name_stg:
         query_cmd = "udevadm info -q property -p /sys/block/%s" % image_name_stg
         outputs = process.run(query_cmd, shell=True).stdout.decode().splitlines()
@@ -214,8 +215,8 @@ def run(test, params, env):
             if stg_serial_name in output and image_name_stg in output:
                 break
         else:
-            test.cancel("The special disk is not '%s', cancel the test."
-                        % stg_serial_name)
+            test.cancel("The special disk is not '%s' %s, cancel the test."
+                        % (stg_serial_name, image_name_stg))
         mpath_name = image_name_stg
         multi_disks = get_multipath_disks(mpath_name)
         error_context.context("Get all disks for '%s': %s"

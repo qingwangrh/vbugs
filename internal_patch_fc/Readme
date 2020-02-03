@@ -1,0 +1,1 @@
+git apply --whitespace=fix qemu_vm.patch
