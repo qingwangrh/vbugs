@@ -1,5 +1,7 @@
 #Test point:scsi+
 
+#qemu-img create -f qcow2 /home/kvm_autotest_root/images/data0.qcow2 1G
+
 source common.sh
 
 common_env "$@"

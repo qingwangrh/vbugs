@@ -1,5 +1,5 @@
 #Test point:scsi+
-
+#-device discard=on works on fast train only
 source common.sh
 
 common_env "$@"
@@ -20,9 +20,9 @@ env_print
 -device virtio-scsi-pci,disable-legacy=on,disable-modern=off,id=scsi0,bus=pci.0 \
 -device scsi-hd,bus=scsi0.0,drive=drive_image1,id=virtio-disk0,bootindex=1 \
 -drive file=${img_dir}/${data1_img},format=qcow2,if=none,id=drive-virtio-disk0,discard=off \
--device virtio-blk-pci,bus=pcie.0-root-port-4,drive=drive-virtio-disk0,id=blk_data1,bootindex=2,discard=off \
+-device virtio-blk-pci,bus=pcie.0-root-port-4,drive=drive-virtio-disk0,id=blk_data1,bootindex=2 \
 -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=${img_dir}/${data2_img},node-name=data_image2 \
--device virtio-blk-pci,id=blk_data2,drive=data_image2,bus=pcie.0-root-port-5,addr=0x0,discard=off,bootindex=3,discard=on \
+-device virtio-blk-pci,id=blk_data2,drive=data_image2,bus=pcie.0-root-port-5,addr=0x0,bootindex=3 \
 -drive file=${img_dir}/${data3_img},format=qcow2,if=none,id=drive-virtio-disk3 \
 -device virtio-blk-pci,bus=pcie.0-root-port-6,drive=drive-virtio-disk3,id=blk_data3,bootindex=4 \
 \
