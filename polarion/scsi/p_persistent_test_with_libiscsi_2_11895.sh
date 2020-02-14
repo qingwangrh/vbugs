@@ -22,7 +22,7 @@
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
   \
   -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
-  -blockdev driver=iscsi,pr-manager=helper0,cache.direct=on,cache.no-flush=off,node-name=protocol_node1,transport=tcp,portal=10.66.8.105,target=iqn.2016-06.qing.server:a,initiator-name=iqn.1994-05.com.redhat:dell-per740xd-01 \
+  -blockdev driver=iscsi,cache.direct=on,cache.no-flush=off,node-name=protocol_node1,transport=tcp,portal=10.66.8.105,target=iqn.2016-06.qing.server:a,initiator-name=iqn.1994-05.com.redhat:dell-per740xd-01 \
   -blockdev driver=raw,node-name=drive-virtio-disk0,file=protocol_node1 \
   -device scsi-block,id=data1,drive=drive-virtio-disk0,rerror=stop,werror=stop,bootindex=1 \
   \
@@ -40,6 +40,11 @@
   -device isa-serial,chardev=serial_id_serial0
 
 steps() {
+
+#? pr-manager=helper0 not support in driver=iscsi
+ #   -blockdev driver=iscsi,pr-manager=helper0,cache.direct=on,cache.no-flush=off,node-name=protocol_node1,transport=tcp,portal=10.66.8.105,target=iqn.2016-06.qing.server:a,initiator-name=iqn.1994-05.com.redhat:dell-per740xd-01 \ ?
+ #drive
+
   -iscsi initiator-name=iqn.1994-05.com.redhat:dell-per740xd-01 \
   -drive file=iscsi://10.66.8.105:3260/iqn.2016-06.qing.server:b/0,if=none,id=drive-virtio-disk1,format=raw,cache=none \
   -device scsi-block,drive=drive-virtio-disk1,rerror=stop,werror=stop,id=data2,bootindex=2  \
