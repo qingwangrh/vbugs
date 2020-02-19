@@ -1,13 +1,13 @@
 
-
+#there are on one server,it depend on libvirt virbr0
 vm1(){
 /usr/libexec/qemu-kvm -name server1 \
- -M pc -enable-kvm -m 2G -smp 4 \
+ -M pc -enable-kvm -m 4G -smp 4 \
  -uuid ea78071a-f6e4-4347-8077-9cb9f7959e88 \
  -boot order=cd,menu=on \
--device qemu-xhci,id=usb1,bus=pci.0 \
+  -device qemu-xhci,id=usb1,bus=pci.0 \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
- -drive file=/home/images/win2019-64-virtio-scsi.qcow2,if=none,id=drive-ide0-0-0,format=qcow2,cache=none \
+ -drive file=/home/images/win2019-node1.qcow2,if=none,id=drive-ide0-0-0,format=qcow2,cache=none \
  -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0 \
  -drive file=/home/kvm_autotest_root/iso/windows/virtio-win-prewhql-0.1-176.iso,media=cdrom,id=cdrom,if=none \
  -device ide-cd,drive=cdrom,bootindex=1 \
@@ -18,21 +18,19 @@ vm1(){
  -device e1000,netdev=hostnet0,id=net0,mac=00:52:5a:30:4e:60,bus=pci.0 \
  -netdev tap,script=/etc/qemu-ifup1,downscript=no,id=hostnet2 \
  -device e1000,netdev=hostnet2,id=net2,mac=00:52:5a:30:4e:62,bus=pci.0 \
- -device virtio-scsi-pci,id=scsi-hotadd \
- -drive file=iscsi://10.66.8.105:3260/iqn.2016-06.qing.server:5g/0,if=none,media=disk,format=raw,rerror=stop,werror=stop,readonly=off,aio=threads,cache=none,cache.direct=on,id=drive-hotadd \
- -device scsi-block,drive=drive-hotadd,bus=scsi-hotadd.0
+
 
 }
  #-device ide-drive,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0
 #-device scsi-hd,drive=drive-ide0-0-0,id=ide0-0-0,bus=scsi0.0 \
 vm2(){
 /usr/libexec/qemu-kvm -name server2 \
- -M pc -enable-kvm -m 2G -smp 4 \
+ -M pc -enable-kvm -m 4G -smp 4 \
  -uuid ea78071a-f6e4-4347-8077-9cb9f7959e66 \
  -boot order=cd,menu=on \
   -device qemu-xhci,id=usb1,bus=pci.0 \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
- -drive file=/home/images/win2019-2.qcow2,if=none,id=drive-ide0-0-0,format=qcow2,cache=none \
+ -drive file=/home/images/win2019-node2.qcow2,if=none,id=drive-ide0-0-0,format=qcow2,cache=none \
  -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0 \
  -drive file=/home/kvm_autotest_root/iso/windows/virtio-win-prewhql-0.1-176.iso,media=cdrom,id=cdrom,if=none \
  -device ide-cd,drive=cdrom,bootindex=1 \
@@ -43,9 +41,6 @@ vm2(){
  -device e1000,netdev=hostnet0,id=net0,mac=00:52:5a:30:4e:50,bus=pci.0 \
  -netdev tap,script=/etc/qemu-ifup1,downscript=no,id=hostnet2 \
  -device e1000,netdev=hostnet2,id=net2,mac=00:52:5a:30:4e:52,bus=pci.0 \
- -device virtio-scsi-pci,id=scsi-hotadd \
- -drive file=iscsi://10.66.8.105:3260/iqn.2016-06.qing.server:5g/0,if=none,media=disk,format=raw,rerror=stop,werror=stop,readonly=off,aio=threads,cache=none,cache.direct=on,id=drive-hotadd \
- -device scsi-block,drive=drive-hotadd,bus=scsi-hotadd.0
 
 }
 
@@ -139,7 +134,7 @@ vm2(){
 #
 #}
 
-echo "ready libiscsi run $1"
+echo "ready fc run $1"
 if [[ "X$1" == "X" ]];then
  echo "default vm1"
  vm1

@@ -1,8 +1,10 @@
 
+#there are on one server
+
 vm1(){
 
 /usr/libexec/qemu-kvm \
-  -name src_vm1 \
+  -name wqvm1 \
   -machine q35 \
   -nodefaults \
   -vga qxl \
@@ -22,12 +24,12 @@ vm1(){
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2-2,addr=0x0,iothread=iothread0 \
   \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-domain-node1.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,bus=scsi0.0,drive=drive_image1,bootindex=0 \
   \
--object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
+  -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
-  -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=/dev/sde,node-name=drive2,file.pr-manager=helper0 \
+  -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=/dev/sdb,node-name=drive2,file.pr-manager=helper0 \
   -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive2,id=scsi0-0-0-0,bootindex=2 \
   \
   -vnc :5 \
@@ -35,17 +37,20 @@ vm1(){
   -monitor stdio \
   -m 4096 \
   -smp 8 \
-  -device virtio-net-pci,mac=9a:b5:b6:b1:b2:b5,id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie.0-root-port-5,addr=0x0 \
-  -netdev tap,id=idxgXAlm \
+  \
   -netdev tap,script=/etc/qemu-ifup1,downscript=no,id=hostnet1 \
   -device e1000,netdev=hostnet1,id=net1,mac=00:1a:4a:12:13:55,bus=pcie.0-root-port-6,addr=0x0 \
 
+
+
+#-device virtio-net-pci,mac=9a:b5:b6:b1:b2:b5,id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie.0-root-port-5,addr=0x0 \
+#  -netdev tap,id=idxgXAlm \
 }
 
 vm2(){
 
 /usr/libexec/qemu-kvm \
-  -name src_vm2 \
+  -name wqvm2 \
   -machine q35 \
   -nodefaults \
   -vga qxl \
@@ -65,27 +70,29 @@ vm2(){
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2-2,addr=0x0,iothread=iothread0 \
   \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-domain-node2.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,bus=scsi0.0,drive=drive_image1,bootindex=0 \
   \
--object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
+  -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
   -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=/dev/sdc,node-name=drive2,file.pr-manager=helper0 \
   -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive2,id=scsi0-0-0-0,bootindex=2 \
   \
-  -vnc :5 \
-  -qmp tcp:0:5955,server,nowait \
+  -vnc :6 \
+  -qmp tcp:0:5956,server,nowait \
   -monitor stdio \
   -m 4096 \
   -smp 8 \
-  -device virtio-net-pci,mac=9a:b5:b6:b1:b2:b6,id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie.0-root-port-5,addr=0x0 \
-  -netdev tap,id=idxgXAlm \
+  \
   -netdev tap,script=/etc/qemu-ifup1,downscript=no,id=hostnet1 \
   -device e1000,netdev=hostnet1,id=net1,mac=00:1a:4a:12:13:56,bus=pcie.0-root-port-6,addr=0x0 \
 
+
+#-device virtio-net-pci,mac=9a:b5:b6:b1:b2:b6,id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie.0-root-port-5,addr=0x0 \
+#  -netdev tap,id=idxgXAlm \
 }
 
-echo "ready run $1"
+echo "ready fc run $1"
 if [[ "X$1" == "X" ]];then
  echo "default vm1"
  vm1
@@ -95,12 +102,17 @@ else
 fi
 
 steps() {
-#both hosts
-    systemctl status qemu-pr-helper
-    systemctl start qemu-pr-helper
-    iscsiadm -m discovery -t sendtargets -p 10.66.8.105:3260
-    iscsiadm -m node -T iqn.2016-06.local.server:sas -p 10.66.8.105 --login
-    #test
+######################
+## ****run vms on one host
+ systemctl start qemu-pr-helper
+ systemctl status qemu-pr-helper
+    # multipath -l
+
+     -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
+     -device virtio-scsi-pci,id=scsi-hotadd \
+     -drive file=/dev/sdc,if=none,media=disk,format=raw,rerror=stop,werror=stop,readonly=off,aio=threads,cache=none,cache.direct=on,id=drive-hotadd,serial=sas-test,file.pr-manager=helper0 \
+      -device scsi-block,drive=drive-hotadd,bus=scsi-hotadd.0
+
     #register /release/read
     sg_persist -v -v --out --register-ignore --param-sark '0019469D7466734D' /dev/sdc
     sg_persist --out --register --param-rk=0x3edc9b807466734d /dev/sdc
