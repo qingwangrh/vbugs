@@ -222,7 +222,7 @@ wmount() {
 	[ -d /mnt/bug_nfs ] || mkdir -p /mnt/bug_nfs
 	[ -d /mnt/gluster ] || mkdir -p /mnt/gluster
 	[ -d /mnt/logs ] || mkdir -p /mnt/logs
-	echo "mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/vol  /mnt/gluster"
+	echo "mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0  /mnt/gluster"
 	echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /mnt/iso"
 	echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /home/kvm_autotest_root/iso"
 	echo "mount 10.73.194.27:/vol/S4/virtlablogs /mnt/logs"
@@ -240,7 +240,7 @@ wbug(){
 	fi
 	bugid=$1
 	bugdir=/workdir/exports/bug/${bugid}
-	logdir="$2 $3 $4"
+	logdir="$2 $3 $4 $5 $6"
 	
 	T=`date  "+%F-%H%M"`
 	mkdir -p /workdir/exports/bug/${bugid}
