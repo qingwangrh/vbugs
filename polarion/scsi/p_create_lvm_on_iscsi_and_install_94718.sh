@@ -35,6 +35,8 @@
 
 
 steps() {
+
+#windows need to delete partition first due to window need to install partition ntfs
 -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/ISO/Win2019/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso \
 -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/linux/RHEL7.8-Server-x86_64.iso \
 #host
@@ -46,8 +48,8 @@ steps() {
     iscsiadm --mode node --targetname iqn.2016-06.local.server:30  --portal 10.66.8.105:3260 --login
     systemctl restart iscsid iscsi
 
-    pvcreate /dev/sdg1
-    vgcreate vgtest /dev/sdg1
+    pvcreate /dev/sdg
+    vgcreate vgtest /dev/sdg
     lvcreate -n lvtest -L 28G vgtest
 
     # work on scsi-hd
