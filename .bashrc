@@ -96,6 +96,7 @@ wenv() {
 	for target in $@;do
 	echo "==>$target"
 	scp ~/.bashrc $target:~/
+	scp ~/.gitconfig $target:~/
 	scp /etc/hosts $target:/etc/hosts
 	done
 
@@ -217,6 +218,17 @@ wsetup(){
 	fi
 
 }
+wyumsed(){
+	if [[ "x$1" == "x" ]];then
+		rp=RHEL-8.2.0-20200202.n.0
+	else
+		rp=$1
+	fi
+		
+	cmd="sed -i s/${rp}/latest-RHEL-8.2.0/g /etc/yum.repos.d/*.repo"
+	echo "$cmd"
+}
+
 wmount() {
 	[ -d /mnt/iso ] || mkdir -p /mnt/iso
 	[ -d /mnt/bug_nfs ] || mkdir -p /mnt/bug_nfs

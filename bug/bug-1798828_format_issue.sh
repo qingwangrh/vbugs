@@ -26,9 +26,6 @@ qemu-img create -f qcow2 /home/images/data4.qcow2 5.4G
     -m 14336  \
     -smp 2,maxcpus=4 \
     -cpu 'Skylake-Server',hv_stimer,hv_synic,hv_vpindex,hv_reset,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,hv-tlbflush,+kvm_pv_unhalt \
-    -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/ISO/Win10/en_windows_10_business_editions_version_1903_x86_dvd_ca4f0f49.iso  \
-    -device ide-cd,id=cd2,drive=drive_cd1,bus=ide.0,unit=0 \
-    -cdrom /home/kvm_autotest_root/iso/windows/virtio-win-prewhql-0.1-176.iso \
     -device piix3-usb-uhci,id=usb -device usb-tablet,id=input0 \
     -vnc :7  \
     -rtc base=localtime,clock=host,driftfix=slew  \
@@ -37,17 +34,17 @@ qemu-img create -f qcow2 /home/images/data4.qcow2 5.4G
     -qmp tcp:0:5957,server,nowait \
     -monitor stdio \
     -device virtio-scsi-pci,id=scsi0,bus=pci.4 \
-    -blockdev node-name=file_stg1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/data1.qcow2,aio=threads,discard=unmap \
-    -blockdev node-name=drive_stg1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg1,discard=unmap \
+    -blockdev node-name=file_stg1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/data1.qcow2 \
+    -blockdev node-name=drive_stg1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg1 \
     -device virtio-blk-pci,id=data1,drive=drive_stg1,addr=0x0,serial=lucky,bus=pci.5,addr=0x0    \
     \
-    -blockdev node-name=file_stg2,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/data2.qcow2,aio=threads,discard=unmap \
-    -blockdev node-name=drive_stg2,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg2,discard=unmap \
+    -blockdev node-name=file_stg2,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/data2.qcow2 \
+    -blockdev node-name=drive_stg2,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg2 \
     -device scsi-hd,id=scsi_data2,drive=drive_stg2,bus=scsi0.0 \
     \
-    -drive file=/home/images/data3.qcow2,format=qcow2,if=none,cache=none,id=drive-virtio-disk0 \
+    -drive file=/home/images/data3.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 \
     -device virtio-blk-pci,bus=pci.6,drive=drive-virtio-disk0,id=blk_data3 \
-    -drive file=/home/images/data4.qcow2,format=qcow2,if=none,cache=none,id=drive-virtio-disk1 \
+    -drive file=/home/images/data4.qcow2,format=qcow2,if=none,id=drive-virtio-disk1 \
     -device scsi-hd,id=scsi_data4,drive=drive-virtio-disk1,bus=scsi0.0 \
 
 
@@ -55,6 +52,9 @@ qemu-img create -f qcow2 /home/images/data4.qcow2 5.4G
 #just work on drive+scsi-hd,blockdev+blk
 steps(){
 
+-blockdev node-name=file_os_stg1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/win10-32.qcow2,aio=threads \
+-blockdev node-name=file_os_stg1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/rhel820-64-virtio-scsi.qcow2,aio=threads \
+
     -blockdev node-name=file_stg1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/images/data1.qcow2,aio=threads,discard=unmap \
     -blockdev node-name=drive_stg1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg1,discard=unmap \
     -device virtio-blk-pci,id=data1,drive=drive_stg1,addr=0x0,serial=lucky,bus=pci.5,addr=0x0    \
@@ -63,9 +63,9 @@ steps(){
     -blockdev node-name=drive_stg2,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg2,discard=unmap \
     -device scsi-hd,id=scsi_data2,drive=drive_stg2,bus=scsi0.0 \
     \
-    -drive file=/home/images/data3.qcow2,format=qcow2,if=none,cache=none,id=drive-virtio-disk0,discard=on \
+    -drive file=/home/images/data3.qcow2,format=qcow2,if=none,id=drive-virtio-disk0,discard=on \
     -device virtio-blk-pci,bus=pci.6,drive=drive-virtio-disk0,id=blk_data3 \
-    -drive file=/home/images/data4.qcow2,format=qcow2,if=none,cache=none,id=drive-virtio-disk1,discard=on \
+    -drive file=/home/images/data4.qcow2,format=qcow2,if=none,id=drive-virtio-disk1,discard=on \
     -device scsi-hd,id=scsi_data4,drive=drive-virtio-disk1,bus=scsi0.0 \
 
 
