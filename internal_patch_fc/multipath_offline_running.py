@@ -103,9 +103,10 @@ def run(test, params, env):
         :param mpath_name: multi-path name.
         :return: a list. if get disks successfully or raise a error
         """
+        logging.info("get_multipath_disks:"+mpath_name)
         disks = []
         disk_str = []
-        outputs = process.run("multipath -ll", shell=True).stdout.decode()
+        outputs = process.run("multipath -ll "+mpath_name, shell=True).stdout.decode()
         outputs = outputs.split(mpath_name)[-1]
         disk_str.append("active ready running")
         disk_str.append("active faulty offline")
@@ -137,7 +138,7 @@ def run(test, params, env):
         """
         disks = get_multipath_disks(mpath_name)
         disks_status = {}
-        outputs = process.run("multipath -ll", shell=True).stdout.decode()
+        outputs = process.run("multipath -ll " + mpath_name, shell=True).stdout.decode()
         outputs = outputs.split(mpath_name)[-1]
         for line in outputs.splitlines():
             for i in range(len(disks)):

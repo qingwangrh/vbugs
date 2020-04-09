@@ -15,7 +15,7 @@ fi
 
 iso=${iso_source}/linux/RHEL7.8-Server-x86_64.iso
 disk=/home/images/base.img
-disk=/root/x/images/base.img
+#disk=/root/x/images/base.img
 
 
  /usr/libexec/qemu-kvm \

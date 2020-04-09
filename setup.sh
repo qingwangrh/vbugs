@@ -35,6 +35,7 @@ create_repo7(){
   curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo' -o /etc/yum.repos.d/rcm-tools-rhel-7.repo
   rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   yum install python3 brewkoji git vim net-tools screen -y
+  pip install --upgrade pip;pip install Jinja2
 }
 
 create_repo8(){
@@ -77,9 +78,16 @@ usage_help(){
   fi
 }
 
+open_coredump(){
+sed -i -e '1,$s/#ProcessSizeMax=2G/ProcessSizeMax=32G/g' -e '1,$s/#ExternalSizeMax=2G/ExternalSizeMax=32G/g' /etc/systemd/coredump.conf
+ulimit -a
+sed -i '$a\*          soft     core   unlimited' /etc/security/limits.conf
+cat /etc/security/limits.conf
+}
 
 create_workdir
 create_cert
 create_repo
 create_kar
+open_coredump
 usage_help

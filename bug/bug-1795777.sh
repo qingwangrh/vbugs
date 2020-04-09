@@ -2,7 +2,7 @@
 -name guest=ELKLC01,debug-threads=on \
 -machine pc-i440fx-rhel7.6.0,accel=kvm,usb=off,dump-guest-core=off \
 -cpu Haswell-noTSX \
--m size=4096m,slots=16,maxmem=31220m \
+-m size=3100m,slots=16,maxmem=31220m \
 -realtime mlock=off \
 -smp 8,maxcpus=16,sockets=16,cores=1,threads=1 \
 -object iothread,id=iothread1 \
@@ -24,21 +24,21 @@
 -drive file=/home/kvm_autotest_root/images/rhel77-64-virtio-scsi.qcow2,format=qcow2,if=none,id=drive-1,serial=drive-1,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0x6,drive=drive-1,id=disk1,bootindex=1,write-cache=on \
 \
--drive file=/home/kvm_autotest_root/images/data1.raw,format=raw,if=none,id=drive-data1,serial=data1,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data1.raw,format=raw,if=none,id=drive-data1,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0xe,drive=drive-data1,id=data1,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data2.raw,format=raw,if=none,id=drive-data2,serial=data2,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data2.raw,format=raw,if=none,id=drive-data2,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0x7,drive=drive-data2,id=data2,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data3.raw,format=raw,if=none,id=drive-data3,serial=data3,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data3.raw,format=raw,if=none,id=drive-data3,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0x9,drive=drive-data3,id=data3,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data4.raw,format=raw,if=none,id=drive-data4,serial=data4,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data4.raw,format=raw,if=none,id=drive-data4,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0xa,drive=drive-data4,id=data4,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data5.raw,format=raw,if=none,id=drive-data5,serial=data5,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data5.raw,format=raw,if=none,id=drive-data5,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0xb,drive=drive-data5,id=data5,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data6.raw,format=raw,if=none,id=drive-data6,serial=data6,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data6.raw,format=raw,if=none,id=drive-data6,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0xc,drive=drive-data6,id=data6,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data7.raw,format=raw,if=none,id=drive-data7,serial=data7,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data7.raw,format=raw,if=none,id=drive-data7,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0xd,drive=drive-data7,id=data7,write-cache=on \
--drive file=/home/kvm_autotest_root/images/data8.raw,format=raw,if=none,id=drive-data8,serial=data8,werror=stop,rerror=stop,cache=none,aio=native \
+-drive file=/home/kvm_autotest_root/images/data8.raw,format=raw,if=none,id=drive-data8,werror=stop,rerror=stop,cache=none,aio=native \
 -device virtio-blk-pci,iothread=iothread1,scsi=off,bus=pci.0,addr=0xf,drive=drive-data8,id=data8,write-cache=on \
 \
 -device virtio-net-pci,mac=fa:f7:f8:5f:fa:5b,id=idn0VnaA,vectors=4,netdev=id8xJhp7,bus=pci.0 \
@@ -49,10 +49,10 @@
 -device virtio-rng-pci,rng=objua-8dd7cf36-22a6-49bf-8552-fc8769ee1e7e,id=ua-8dd7cf36-22a6-49bf-8552-fc8769ee1e7e,bus=pci.0,addr=0x8 \
 -device vmcoreinfo \
 -vnc :6 \
-        -rtc base=localtime,clock=host,driftfix=slew \
-        -enable-kvm \
-        -qmp tcp:0:5956,server,nowait \
-        -monitor stdio \
+ -rtc base=localtime,clock=host,driftfix=slew \
+ -enable-kvm \
+ -qmp tcp:0:5956,server,nowait \
+ -monitor stdio \
 
 
 old(){
@@ -123,6 +123,9 @@ steps(){
 D:\Iozone\iozone.exe -azR -r 64k -n 125M -g 512M -M -i 0 -i 1 -b E:\iozone_test -f E:\testfile
 
 {"execute": "device_del", "arguments": {"id": "stg0"}, "id": "XVosfhHr"}
+{"execute": "device_del", "arguments": {"id": "stg1"}, "id": "XVosfhHr"}
+{"execute": "device_del", "arguments": {"id": "stg2"}, "id": "XVosfhHr"}
+{"execute": "device_del", "arguments": {"id": "stg3"}, "id": "XVosfhHr"}
 
 #q35 should have two event,but only one event. pc looks like good
 #for pc ok

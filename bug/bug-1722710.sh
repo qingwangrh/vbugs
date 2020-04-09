@@ -9,8 +9,8 @@
   -device pvpanic,ioport=0x505,id=idWW4fRE \
   -device qemu-xhci,id=usb1,bus=pci.0,addr=0x3 \
   -device virtio-scsi-pci,id=virtio_scsi_pci0,bus=pci.0,addr=0x4 \
-  -blockdev node-name=file_image1,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/win2019-3-64-virtio-scsi.raw,cache.direct=on,cache.no-flush=off \
-  -blockdev node-name=drive_image1,driver=raw,cache.direct=on,cache.no-flush=off,file=file_image1 \
+  -blockdev node-name=file_image1,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/win2019-3-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
+  -blockdev node-name=drive_image1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_image1 \
   -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,write-cache=on \
   -device virtio-net-pci,mac=9a:7f:65:c9:ec:b8,id=idCBhCiy,netdev=id1uqNcV,bus=pci.0,addr=0x5 \
   -netdev tap,id=id1uqNcV,vhost=on \
@@ -19,7 +19,7 @@
   -blockdev node-name=drive_cd1,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd1 \
   -device scsi-cd,id=cd1,drive=drive_cd1,write-cache=on \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
-  -vnc :10 \
+  -vnc :6 \
   -rtc base=localtime,clock=host,driftfix=slew \
   -boot menu=off,order=cdn,once=c,strict=off \
   -enable-kvm -monitor stdio \
@@ -33,8 +33,9 @@ func() {
   {"execute": "blockdev-add", "arguments": {"node-name": "drive_stg0", "driver": "qcow2", "cache": {"direct": true, "no-flush": false}, "file": "file_stg0"}}
   {"execute": "device_add", "arguments": {"driver": "virtio-blk-pci", "id": "stg0", "drive": "drive_stg0", "write-cache": "on", "bus": "pci.0", "addr": "0x8"}}
 
+  #wait 10s in guest then guest crash
   #ok
-  -drive id=drive_image1,if=none,format=raw,file=/home/kvm_autotest_root/images/win2019-3-64-virtio-scsi.raw \
+  -drive id=drive_image1,if=none,format=raw,file=/home/kvm_autotest_root/images/win2019-3-64-virtio-scsi.qcow2 \
   -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,write-cache=on
 
   #ok
