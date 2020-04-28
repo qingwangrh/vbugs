@@ -48,9 +48,16 @@ fi
 
 wscreen()
 {
+    if (( $#<1));then	
+   	idx=1
+    else
+	idx=$1
+    fi
+   echo "wscreen $idx" 
     cd workspace/job-results
-    screen -S kar$1 python3 -m http.server 800$1 &
+    screen -dmS kar$idx python3 -m http.server 800$idx
     cd -
+    screen -ls kar$idx
 }
 
 wdu() {
