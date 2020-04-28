@@ -294,8 +294,9 @@ wsetup() {
 
 wyumsed() {
     if [[ "x$1" == "x" ]]; then
-    if cat /etc/yum.repos.d/beaker-BaseOS.repo|egrep RHEL-[0-9].[0-9].[0-9];then
-	rp=`cat /etc/yum.repos.d/beaker-BaseOS.repo|egrep -o RHEL-[0-9].[0-9].[0-9]`
+	[[ -f /etc/yum.repos.d/beaker-Server.repo ]] && file=beaker-Server.repo || file=beaker-BaseOS.repo
+    if cat /etc/yum.repos.d/$file|egrep "RHEL-[0-9.]{3,}";then
+	rp=`cat /etc/yum.repos.d/$file|egrep -o "RHEL-[0-9.]{3,}"`
     fi
     else
         rp=$1

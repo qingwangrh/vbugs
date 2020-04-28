@@ -1,5 +1,5 @@
 #!/bin/sh
-
+iscsiadm --mode node --targetname iqn.2016-06.local.server:sas  --portal 10.66.8.105:3260 --logout
 iscsiadm --mode node --targetname iqn.2016-06.local.server:sas  --portal 10.66.8.105:3260 --login
 dev=`lsscsi |grep disk2G|awk '{ print $6 }'`
 
@@ -14,13 +14,13 @@ echo "$dev"
 
 /usr/libexec/qemu-kvm \
   -name manual_vm1 \
-  -machine pc \
+  -machine pc-i440fx-rhel7.6.0 \
   -nodefaults \
   -vga qxl \
   -device qemu-xhci,id=usb1,addr=0x9 \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
   \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel820-64-virtio.qcow2,node-name=drive_image1 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel76-64-virtio.qcow2,node-name=drive_image1 \
   -device virtio-blk-pci,id=os1,drive=drive_image1,addr=0x3,bootindex=0 \
   \
   -drive file=$dev,if=none,id=drive-virtio-disk0,format=raw,cache=none \
@@ -38,8 +38,8 @@ echo "$dev"
 
 test_steps(){
   echo
-# only works on pc+guest RHEL7
-#
+# slow train work, fast train not work
+
 host:
 iscsiadm --mode node --targetname iqn.2016-06.local.server:sas  --portal 10.66.8.105:3260 --login
 dev=`lsscsi |grep scsi|awk '{ print $6 }'`

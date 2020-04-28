@@ -14,17 +14,20 @@ echo "$dev"
 
 /usr/libexec/qemu-kvm \
   -name manual_vm1 \
-  -machine pc \
+  -machine q35 \
   -nodefaults \
   -vga qxl \
   -device qemu-xhci,id=usb1,addr=0x9 \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
   \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel820-64-virtio.qcow2,node-name=drive_image1 \
-  -device virtio-blk-pci,id=os1,drive=drive_image1,addr=0x3,bootindex=0 \
+  -device pcie-root-port,id=pcie.0-root-port-2,slot=2,bus=pcie.0,multifunction=on \
+  -device pcie-root-port,id=pcie.0-root-port-3,slot=3,bus=pcie.0 \
+  -device pcie-root-port,id=pcie.0-root-port-4,slot=4,bus=pcie.0 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel76-64-virtio.qcow2,node-name=drive_image1 \
+  -device virtio-blk-pci,id=os1,drive=drive_image1,addr=6,bootindex=0 \
   \
   -drive file=$dev,if=none,id=drive-virtio-disk0,format=raw,cache=none \
-  -device virtio-blk-pci,id=data1,drive=drive-virtio-disk0,scsi=on,disable-modern=on,rerror=stop,werror=stop,addr=0x4,bootindex=1 \
+  -device virtio-blk-pci,id=data1,drive=drive-virtio-disk0,scsi=on,disable-modern=on,rerror=stop,werror=stop,addr=0x7,bootindex=1 \
   \
   \
   \
@@ -38,8 +41,8 @@ echo "$dev"
 
 test_steps(){
   echo
-# only works on pc+guest RHEL7
-#
+# not work os disk on pcie-root-port ,data disk can not attach pcie-root-port
+
 host:
 iscsiadm --mode node --targetname iqn.2016-06.local.server:sas  --portal 10.66.8.105:3260 --login
 dev=`lsscsi |grep scsi|awk '{ print $6 }'`

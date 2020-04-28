@@ -14,30 +14,22 @@
     -device pcie-root-port,id=pcie.0-root-port-6,slot=6,chassis=6,addr=0x6,bus=pcie.0 \
     -device pcie-root-port,id=pcie.0-root-port-7,slot=7,chassis=7,addr=0x7,bus=pcie.0 \
     -device pcie-root-port,id=pcie.0-root-port-8,slot=8,chassis=8,addr=0x8,bus=pcie.0 \
-    -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-3,addr=0x0,iothread=iothread0 \
-    -device virtio-scsi-pci,id=scsi2,bus=pcie.0-root-port-4,addr=0x0 \
+    -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-3,addr=0x0 \
+    -device virtio-scsi-pci,id=scsi2,bus=pcie.0-root-port-4,addr=0x0,iothread=iothread0 \
     \
     -blockdev driver=file,cache.direct=off,cache.no-flush=on,filename=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi.qcow2,node-name=os_img \
     -blockdev driver=qcow2,node-name=os_drive,file=os_img \
     -device scsi-hd,drive=os_drive,bus=scsi0.0,id=os_disk \
     \
-    -object throttle-group,id=foo,x-iops-total=100 \
-    -object throttle-group,id=g_foo2,x-bps-total=1024000,x-iops-total=50 \
-    -object throttle-group,id=g_foo3 \
+    -object throttle-group,id=foo,x-iops-read=100,x-bps-read=512000,x-iops-write=50 \
     -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg1,filename=/home/kvm_autotest_root/images/stg1.raw \
     -blockdev driver=raw,node-name=drive_stg1,file=file_stg1 \
     -blockdev driver=throttle,throttle-group=foo,node-name=foo1,file=drive_stg1 \
     -device virtio-blk-pci,drive=foo1,id=data,bus=pcie.0-root-port-6,addr=0x0,iothread=iothread0 \
     \
-    -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg2,filename=/home/kvm_autotest_root/images/stg2.raw \
-    -blockdev driver=raw,node-name=drive_stg2,file=file_stg2 \
-    -blockdev driver=throttle,throttle-group=foo,node-name=foo2,file=drive_stg2 \
-    -device virtio-blk-pci,drive=foo2,id=data2,bus=pcie.0-root-port-7,addr=0x0,iothread=iothread0 \
-    \
--blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg3,filename=/home/kvm_autotest_root/images/stg3.raw \
-    -blockdev driver=raw,node-name=drive_stg3,file=file_stg3 \
-    -blockdev driver=throttle,throttle-group=g_foo3,node-name=foo3,file=drive_stg3 \
-    -device virtio-blk-pci,drive=foo3,id=data3,bus=pcie.0-root-port-8,addr=0x0,iothread=iothread0 \
+    -object throttle-group,id=foo2,x-iops-total=100,x-bps-total=409600 \
+    -drive driver=throttle,throttle-group=foo2,id=drive_foo2,file.driver=raw,if=none,file.file.filename=/home/kvm_autotest_root/images/stg2.raw \
+    -device virtio-blk-pci,drive=drive_foo2,id=data2,bus=pcie.0-root-port-7,addr=0x0,iothread=iothread0 \
     \
     \
     -device pcie-root-port,id=pcie.0-root-port-5,slot=5,chassis=5,addr=0x5,bus=pcie.0 \
@@ -55,7 +47,9 @@
 
 steps() {
 
-    -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/ISO/Win2019/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso  \
+echo
+
+       -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/ISO/Win2019/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso  \
  -device ide-cd,id=cd1,drive=drive_cd1,bootindex=2,bus=ide.0,unit=0  \
  -drive id=drive_virtio,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/windows/virtio-win-prewhql-0.1-176.iso  \
  -device ide-cd,id=virtio,drive=drive_virtio,bootindex=3,bus=ide.1,unit=0  \
@@ -72,17 +66,16 @@ steps() {
     -device virtio-blk-pci,drive=foo1,id=data,bus=pcie.0-root-port-6,addr=0x0,iothread=iothread0
 
     {"execute": "qmp_capabilities"}
-    {"execute":"x-blockdev-reopen","arguments":{"driver":"throttle","node-name":"foo2","file":"drive_stg2","throttle-group":"foo2"}}
-
-    #{"execute": "query-block"}
+    {"execute": "query-block"}
     {"execute":"qom-get","arguments":{"path":"foo","property":"limits"}}
-    #{"execute":"qom-set","arguments":{"path":"foo", "property":"limits", "value":{"iops-total": 120}}}
 
-    {"execute": "qmp_capabilities"}
-    {"execute":"qom-set","arguments":{"path":"foo", "property":"limits", "value":{"bps-total": 0,"iops-total": 0}}}
-    {"execute":"qom-set","arguments":{"path":"foo", "property":"limits", "value":{"iops-write": 50,"iops-write-max":400 }}}
-{"execute":"qom-set","arguments":{"path":"foo", "property":"limits", "value":{"iops-read": 50,"iops-read-max":400 }}}
 
-    fio --filename=/dev/vdb --direct=1 --rw=randrw --bs=4k --size=100M --name=test --iodepth=1 --runtime=10
+    fio --filename=/dev/vda --direct=1 --rw=randrw --bs=4k --size=100M --name=test --iodepth=1 --runtime=30
+
+    fio --filename=/dev/vda --direct=1 --rw=read --bs=4k --size=100M --name=test --iodepth=1 --runtime=10
+    fio --filename=/dev/vda --direct=1 --rw=randrw --bs=4k --size=1000M --name=test --iodepth=1 --runtime=300
+    fio --filename=/dev/vdb --direct=1 --rw=randrw --bs=4k --size=1000M --name=test --iodepth=1 --runtime=300
+
+    #stop
 
 }

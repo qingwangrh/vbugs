@@ -38,8 +38,37 @@ steps(){
 dd if=/dev/urandom of=orig.iso bs=1M count=100
 mkisofs -o /home/kvm_autotest_root/images/orig.iso orig.iso
 
+dd if=/dev/urandom of=orig2.iso bs=1M count=200
+mkisofs -o /home/kvm_autotest_root/images/orig2.iso orig2.iso
+
 {"execute": "qmp_capabilities"}
 {'execute': 'blockdev-change-medium', 'arguments': {'id': 'none', 'filename': '/home/kvm_autotest_root/images/orig.iso'}, 'id': 'RoCZe4QL'}
+
+/usr/libexec/qemu-kvm -enable-kvm -m 1G -device virtio-scsi -drive file=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi.qcow2,if=none -device scsi-hd,drive=none0 -cdrom /home/kvm_autotest_root/images/orig.iso -qmp stdio -monitor vc -vnc :0
+
+{"execute": "qmp_capabilities"}
+{'execute': 'blockdev-change-medium', 'arguments': {'device':'ide1-cd0','filename': '/home/kvm_autotest_root/images/orig2.iso'}, 'id': 'RoCZe4QL'}
+
+{"execute": "qmp_capabilities"}
+{"execute": "query-block"}
+
+#start
+{"io-status": "ok", "device": "ide1-cd0", "locked": false, "removable": true
+#after mount in guest  mount /dev/cdrom /mnt
+{"io-status": "ok", "device": "ide1-cd0", "locked": true, "removable": true
+#then
+{'execute': 'blockdev-change-medium', 'arguments': {'device':'ide1-cd0','filename': '/home/kvm_autotest_root/images/orig2.iso'}, 'id': 'RoCZe4QL'}
+{"id": "RoCZe4QL", "error": {"class": "GenericError", "desc": "Device 'ide1-cd0' is locked and force was not specified, wait for tray to open and try again"}}
+#guest
+ls /mnt (nothing)
+#then do again -->success
+{'execute': 'blockdev-change-medium', 'arguments': {'device':'ide1-cd0','filename': '/home/kvm_autotest_root/images/orig2.iso'}, 'id': 'RoCZe4QL'}
+#change to orig.iso
+{'execute': 'blockdev-change-medium', 'arguments': {'device':'ide1-cd0','filename': '/home/kvm_autotest_root/images/orig.iso'}, 'id': 'RoCZe4QL'}
+
+mount /dev/cdrom /mnt
+#
+
 
 
 }
