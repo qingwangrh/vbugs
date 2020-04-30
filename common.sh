@@ -3,8 +3,8 @@ set -x
 src_dir=/home/workdir
 create_workdir() {
   echo "create_workdir"
-  [ -d /workdir ] || mkdir -p /workdir
-  [ -d ${src_dir} ] || mkdir -p ${src_dir}
+  [[ -d /workdir ]] || mkdir -p /workdir
+  [[ -d ${src_dir} ]] || mkdir -p ${src_dir}
 
   if mount | grep ' /workdir'; then
     echo "Already mount workdir"

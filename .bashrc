@@ -48,6 +48,7 @@ fi
 
 wscreen()
 {
+    echo "usage:create screen session"
     if (( $#<1));then	
    	idx=1
     else
@@ -144,6 +145,7 @@ EOF
 }
 
 winit() {
+    echo "create passwordless env for $1"
     host=$1
     if (($# < 1)); then
         echo "Usage winit host"
@@ -285,9 +287,10 @@ wloopl() {
 }
 
 wsetup() {
+    echo "setup the basic workdir env"
     if [[ "x$1" == "x" ]]; then
         echo "setup"
-        mkdir -p {/home/workdir/exports,/workdir,/workdir/rworkdir}
+        mkdir -p {/home/workdir/{exports,rworkdir},/workdir,/home/rworkdir/}
         mount -o bind /home/workdir /workdir
         mount qing:/home/exports /workdir/exports
         mount qing:/home/workdir /workdir/rworkdir
@@ -409,6 +412,7 @@ wlog() {
 }
 
 wrdesktop() {
+    echo "create windows remote desktop"
     rdesktop -g 1600x900 10.73.74.245 -u administrator -p Assentor01
 }
 

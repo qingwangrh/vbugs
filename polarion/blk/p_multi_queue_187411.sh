@@ -9,14 +9,18 @@ qemu-img create -f qcow2 /home/images/data4.qcow2 6G
   -machine q35 \
   -nodefaults \
   -vga qxl \
- -m 2048 \
+  -m 2048 \
   -smp 8 \
-  -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=unsafe,media=cdrom,file=/home/kvm_autotest_root/iso/linux/RHEL-7.7-20190723.1-Server-x86_64-dvd1.iso \
-  -device ide-cd,id=cd1,drive=drive_cd1,bus=ide.0,unit=0 \
-  -device pcie-root-port,id=pcie.0-root-port-2,slot=2,bus=pcie.0 \
-  -device pcie-root-port,id=pcie.0-root-port-3,slot=3,bus=pcie.0 \
-  -device pcie-root-port,id=pcie.0-root-port-4,slot=4,bus=pcie.0 \
-  -device pcie-root-port,id=pcie.0-root-port-5,slot=5,bus=pcie.0 \
+  -device pcie-root-port,id=pcie-root-port-0,multifunction=on,bus=pcie.0,addr=0x2,chassis=1 \
+  -device pcie-root-port,id=pcie.0-root-port-1,port=0x1,addr=0x2.0x1,bus=pcie.0,chassis=2 \
+  -device pcie-root-port,id=pcie.0-root-port-2,port=0x2,addr=0x2.0x2,bus=pcie.0,chassis=3 \
+  -device pcie-root-port,id=pcie.0-root-port-3,port=0x3,addr=0x2.0x3,bus=pcie.0,chassis=4 \
+  -device pcie-root-port,id=pcie.0-root-port-4,port=0x4,addr=0x2.0x4,bus=pcie.0,chassis=5 \
+  -device pcie-root-port,id=pcie.0-root-port-5,port=0x5,addr=0x2.0x5,bus=pcie.0,chassis=6 \
+  -device pcie-root-port,id=pcie.0-root-port-6,port=0x6,addr=0x2.0x6,bus=pcie.0,chassis=7 \
+  -device pcie-root-port,id=pcie.0-root-port-7,port=0x7,addr=0x2.0x7,bus=pcie.0,chassis=8 \
+  -device qemu-xhci,id=usb1,bus=pcie.0-root-port-1,addr=0x0 \
+  -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2,iothread=iothread0  \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-3,num_queues=8,iothread=iothread0  \

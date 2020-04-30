@@ -1,24 +1,7 @@
 
 #This tools for install qemu
 source ./common.sh
-#src_dir=/home/workdir
-#create_workdir(){
-#  echo "create_workdir"
-#  [ -d /workdir ] || mkdir -p /workdir
-#  [ -d ${src_dir} ] || mkdir -p ${src_dir}
-#
-#  if mount|grep workdir;then
-#    echo "Already mount workdir"
-#  else
-#    echo "mount ${src_dir}"
-#    if mount -o bind ${src_dir} /workdir ;then
-#      sed -i '$a\/home/workdir           /workdir                none    rw,bind         0 0' /etc/fstab
-#    else
-#        echo "ERROR on mount ${src_dir}"
-#        exit 1
-#    fi
-#  fi
-#}
+
 
 create_cert(){
   echo "create_cert"
