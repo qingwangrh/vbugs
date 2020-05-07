@@ -132,8 +132,8 @@ wsshx() {
     set timeout 3
     spawn ssh root@${host}
     expect {
-    	"*IDENTIFICATION HAS CHANGED" { send "rm -rf ~/.ssh/known_hosts\r" }
-        "*yes/no" { send "yes\r" }
+    	"*IDENTIFICATION HAS CHANGED" { send "rm -rf ~/.ssh/known_hosts\r";spawn ssh root@${host};exp_continue }
+        "*yes/no" { send "yes\r";exp_continue }
         "*password:" { send "kvmautotest\r" }
     }
     expect -re ".*\[\$#\]"
