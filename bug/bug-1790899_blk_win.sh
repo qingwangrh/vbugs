@@ -8,7 +8,7 @@
     -object iothread,id=iothread0 \
     -device pcie-root-port,id=pcie.0-root-port-3,slot=3,chassis=3,addr=0x3,bus=pcie.0 \
     -device virtio-scsi-pci,id=virtio_scsi_pci,iothread=iothread0,bus=pcie.0-root-port-3,addr=0x0 \
-    -drive id=drive_image1,if=none,snapshot=off,aio=threads,cache=none,format=qcow2,file=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi.qcow2 \
+    -drive id=drive_image1,if=none,snapshot=off,aio=threads,cache=none,format=qcow2,file=/home/kvm_autotest_root/images/win2019-64-virtio.qcow2 \
     -device scsi-hd,id=image1,drive=drive_image1,bootindex=0 \
     -device pcie-root-port,id=pcie.0-root-port-4,slot=4,chassis=4,addr=0x4,bus=pcie.0 \
     -device virtio-net-pci,mac=9a:ab:fa:09:62:1c,id=idLVRSKI,netdev=idfMN0PL,bus=pcie.0-root-port-4,addr=0x0  \

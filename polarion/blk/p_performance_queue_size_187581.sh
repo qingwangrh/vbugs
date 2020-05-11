@@ -1,8 +1,8 @@
 
-qemu-img create -f qcow2 /home/images/data1.qcow2 11G
-qemu-img create -f qcow2 /home/images/data2.qcow2 12G
-qemu-img create -f qcow2 /home/images/data3.qcow2 13G
-qemu-img create -f qcow2 /home/images/data4.qcow2 14G
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/data1.qcow2 11G
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/data2.qcow2 12G
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/data3.qcow2 13G
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/data4.qcow2 14G
 
 /usr/libexec/qemu-kvm \
   -name copy_read_vm1 \
@@ -23,19 +23,20 @@ qemu-img create -f qcow2 /home/images/data4.qcow2 14G
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2,iothread=iothread0  \
-  -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-3,num_queues=8,iothread=iothread0  \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-3,virtqueue_size=128,iothread=iothread0  \
+  -device virtio-scsi-pci,id=scsi2,bus=pcie.0-root-port-4,virtqueue_size=1024,iothread=iothread0  \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0,bus=scsi0.0 \
   \
-  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/data1.qcow2,node-name=node1 \
-  -device virtio-blk-pci,id=blk_data1,drive=node1,bus=pcie.0-root-port-4,addr=0x0,bootindex=1,iothread=iothread0  \
-  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/data2.qcow2,node-name=node2 \
-  -device virtio-blk-pci,id=blk_data2,drive=node2,bus=pcie.0-root-port-5,addr=0x0,bootindex=2,iothread=iothread0,num-queues=8 \
+  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/data1.qcow2,node-name=node1 \
+  -device virtio-blk-pci,id=blk_data1,drive=node1,bus=pcie.0-root-port-5,addr=0x0,bootindex=1,iothread=iothread0,queue-size=128  \
+  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/data2.qcow2,node-name=node2 \
+  -device virtio-blk-pci,id=blk_data2,drive=node2,bus=pcie.0-root-port-6,addr=0x0,bootindex=2,iothread=iothread0,queue-size=1024 \
   \
-  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/data3.qcow2,node-name=node3 \
-  -device scsi-hd,id=blk_data3,drive=node3,bus=scsi0.0,bootindex=3 \
-  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/data4.qcow2,node-name=node4 \
-  -device scsi-hd,id=blk_data4,drive=node4,bus=scsi1.0,bootindex=4 \
+  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/data3.qcow2,node-name=node3 \
+  -device scsi-hd,id=blk_data3,drive=node3,bus=scsi1.0,bootindex=3 \
+  -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/data4.qcow2,node-name=node4 \
+  -device scsi-hd,id=blk_data4,drive=node4,bus=scsi2.0,bootindex=4 \
   \
   -vnc :5 \
   -monitor stdio \

@@ -1,0 +1,1 @@
+../../bug/bug-1790899_scsi_win.sh
