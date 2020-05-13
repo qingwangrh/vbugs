@@ -1,3 +1,5 @@
+#/usr/bin/env bash
+
 #mount qing:/home/kvm_autotest_root/images /home/images
 /usr/libexec/qemu-kvm \
   -name migrate_vm1 \

@@ -1,5 +1,6 @@
 #q35 and pc have same issue
-
+#same as 1708490 (hotplug)
+#This bus hot-unplug then hotplug
 q35(){
 
  /usr/libexec/qemu-kvm \
@@ -19,12 +20,11 @@ q35(){
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0,addr=0x4,iothread=iothread0 \
   -blockdev node-name=file_image1,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/win2019-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
   -blockdev node-name=drive_image1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_image1 \
-  -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,write-cache=on,serial=osdisk000\
+  -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,write-cache=on,serial=osdisk0 \
   \
   -blockdev node-name=data_image1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/kvm_autotest_root/images/stg1.qcow2,aio=threads \
   -blockdev node-name=data1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=data_image1 \
   -device scsi-hd,id=disk1,drive=data1,write-cache=on,bus=scsi0.0  \
-  \
   \
   -blockdev node-name=data_image2,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/kvm_autotest_root/images/stg2.qcow2,aio=threads \
   -blockdev node-name=data2,driver=qcow2,cache.direct=on,cache.no-flush=off,file=data_image2 \
@@ -94,24 +94,33 @@ steps() {
   qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg3.qcow2 3G
   qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg4.qcow2 4G
 #q35
+#1708490
 
 {'execute':'qmp_capabilities'}
 
 {"execute":"blockdev-add","arguments":{"node-name":"data3","driver":"qcow2","file":{"driver":"file","filename":"/home/kvm_autotest_root/images/stg3.qcow2"}}}
 {"execute":"blockdev-add","arguments":{"node-name":"data4","driver":"qcow2","file":{"driver":"file","filename":"/home/kvm_autotest_root/images/stg4.qcow2"}}}
 
-{'execute':'device_add','arguments':{'driver':'scsi-hd','drive':'data3','bus':'scsi0.0','id':'data3',"serial":"data3"}}
-{"execute": "device_add", "arguments": {"driver": "virtio-blk-pci", "id": "disk4", "drive": "data4", "write-cache": "on", "bus": "pcie_port_8","serial":"data4"}}
+{'execute':'device_add','arguments':{'driver':'scsi-hd','id':'disk3','drive':'data3','bus':'scsi0.0',"serial":"data3"}}
+{"execute": "device_add", "arguments": {"driver": "virtio-blk-pci", "id": "disk4", "drive": "data4", "bus": "pcie_port_8","serial":"data4"}}
 
 #no serial will hit hang bug when execute quit command
 
-{'execute':'device_add','arguments':{'driver':'scsi-hd','drive':'data3','bus':'scsi0.0','id':'data3'}}
+{'execute':'device_add','arguments':{'driver':'scsi-hd','id':'disk3','drive':'data3','bus':'scsi0.0'}}
 
 {"execute": "device_add", "arguments": {"driver": "virtio-blk-pci", "id": "disk4", "drive": "data4", "bus": "pcie_port_8"}}
 
 
 {"execute":"device_del","arguments":{"id":"disk3"}}
 {"execute":"device_del","arguments":{"id":"disk4"}}
+
+#1722710
+
+{'execute':'qmp_capabilities'}
+
+{"execute":"device_del","arguments":{"id":"disk1"}}
+
+{'execute':'device_add','arguments':{'driver':'scsi-hd','id':'disk1','drive':'data1','bus':'scsi0.0'}}
 
 #pc
   {'execute': 'qmp_capabilities'}
