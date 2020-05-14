@@ -19,7 +19,7 @@ alias lsf="ls -p|grep [^/]$|xargs ls -lh --color"
 #alias lsd="ls -d */|sed 's/\///g'"
 alias wfind='find ./ -not \( -name .svn -a -prune \) -name'
 #alias wssh='ssh -o StrictHostKeyChecking=no '
-alias wmqing='mkdir -p /home/rworkdir;mount 10.66.8.105:/home/workdir /home/rworkdir'
+alias wmqing='mkdir -p /home/rworkdir;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir /home/rworkdir; fi'
 alias wconsole='console -l qinwang -M conserver-01.eng.pek2.redhat.com '
 if [[ -f /usr/bin/vim ]]; then
     alias vi=vim
@@ -128,14 +128,17 @@ wsshx() {
     shift
     cmd="$@"
     echo "cmd=$cmd"
+    	#"*IDENTIFICATION HAS CHANGED*" { send "rm -rf ~/.ssh/known_hosts\r";spawn ssh root@${host};exp_continue }
     expect << EOF
     set timeout 3
-    spawn ssh root@${host}
+    set rmflag 0
+    spawn ssh -o "StrictHostKeyChecking=no" root@${host}
     expect {
-    	"*IDENTIFICATION HAS CHANGED" { send "rm -rf ~/.ssh/known_hosts\r";spawn ssh root@${host};exp_continue }
+    	"*IDENTIFICATION HAS CHANGED" { exit 168 }
         "*yes/no" { send "yes\r";exp_continue }
-        "*password:" { send "kvmautotest\r" }
+        "*password:" { send "kvmautotest\r"; }
     }
+    
     expect -re ".*\[\$#\]"
     send "${cmd}\r"
     expect -re ".*\[\$#\]"
@@ -179,8 +182,13 @@ Rzz2vGzyq98rAIReBgIza4UIA4tjd5SnAT/cdu0FRED7RaUTUAAACBAMKT+ClP/Gx2IMgz
 PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
 -----END OPENSSH PRIVATE KEY-----"
     id_rsa_pub="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC65vxd+hJjI21Mb/Dsvs8lIohQRaUT+v9mo/GCTPOdHXe81Qefw3a2HOoLJmz+zUof4MwaoPJ0uo0nCKs9ggKdhTlMk88hTsBYvT3yh1FVcg/rADF30mzo+3MyaiYznYnVOV9I2/1jcblKDTonohEa8n5qxOVav8lFIyMCKs0ioZu6/6XATqEMzJAxWUnrOtmHmjtz1Q3/5vRBAb+MAZTY1cZ5nfiGRJqz4OsGSX72PhPqPXvUqE9OtuvmSJ7sxDmiJD2NazFGpupssr1XO0T9s2qSExmxb6Z6nY8nq+whAf+U3DdMMDRLPqEEfTJAAjwXdyfwT65/SKwcWDyNDGBb"
+    wsshx ${host} "echo"
+    ret=$?
+    if [[ $ret == 168 ]] ;then
+	  rm -rf /root/.ssh/known_hosts
+    fi
     wsshx ${host} "mkdir -p .ssh;echo '${id_rsa}' > .ssh/id_rsa;echo '${id_rsa_pub}' > .ssh/id_rsa.pub;yes|cp .ssh/id_rsa.pub .ssh/authorized_keys;chmod 600 .ssh/*"
-    wenv ${host}
+    [[ $? == 0 ]] && wenv ${host}
 }
 
 wkarsync() {
@@ -341,16 +349,53 @@ wbug() {
         echo -e "Usage: wbug 123 job-xxx\nrsync -avh /workdir/exports/bug/ /workdir/bug/"
         return
     fi
-    bugid=$1
-    bugdir=/workdir/exports/bug/${bugid}
-    logdir="$2 $3 $4 $5 $6"
 
+    if ! mount | grep '/workdir/exports';then
+        echo "mount 10.66.8.105:/home/exports /workdir/exports"
+        if mount 10.66.8.105:/home/exports /workdir/exports;then
+		target_dir=/workdir/exports/bug/
+	fi
+    fi
+    if ! mount | grep 's2images294422';then
+	[[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
+	echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
+        if mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/; then
+                target_dir="${target_dir} /mnt/bug_nfs/buglogs/"
+	fi
+    fi
+   
+
+    bugid=$1
+    shift
+    logdir="$@"
+    
     T=`date "+%F-%H%M"`
-    mkdir -p /workdir/exports/bug/${bugid}
-    [[ -f ${bugdir}/${bugid}.tar.gz ]] && mv ${bugdir}/${bugid}.tar.gz ${bugdir}/${bugid}.tar.gz.$T
-    cmd="tar zcvf ${bugdir}/${bugid}.tar.gz ${logdir}"
-    echo "$cmd"
-    $cmd
+
+    for d in $target_dir
+    do
+	    bugdir=$d/${bugid}/${T}/
+	    mkdir -p ${bugdir}
+	    for l in $logdir
+	    do
+		   [[ "x$l" != "x"  ]] && cp -rf $l ${bugdir}
+	    done
+	    if echo "$d"|grep exports;then 
+	      echo "http://10.66.8.105:8000/bug/$bugid/$T"
+	    elif echo "$d"|grep bug_nfs;then
+	      echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup/buglogs/$bugid/$T"
+	    else
+		    echo "nothing"
+            fi
+    done
+    
+    #logdir="$2 $3 $4 $5 $6"
+
+    #T=`date "+%F-%H%M"`
+    #mkdir -p /workdir/exports/bug/${bugid}
+    #[[ -f ${bugdir}/${bugid}.tar.gz ]] && mv ${bugdir}/${bugid}.tar.gz ${bugdir}/${bugid}.tar.gz.$T
+    #cmd="tar zcvf ${bugdir}/${bugid}.tar.gz ${logdir}"
+    #echo "$cmd"
+    #$cmd
 
 }
 

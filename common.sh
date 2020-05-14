@@ -1,12 +1,12 @@
 #This tools for new host to setup basic env
-set -x
+#set -x
 src_dir=/home/workdir
 create_workdir() {
   echo "create_workdir"
   [[ -d /workdir ]] || mkdir -p /workdir
   [[ -d ${src_dir} ]] || mkdir -p ${src_dir}
 
-  if mount | grep '/workdir '; then
+  if mount | grep 'on */workdir '; then
     echo "Already mount workdir"
   else
     echo "mount ${src_dir}"
@@ -29,10 +29,10 @@ mount_resource() {
 	echo "mount 10.73.194.27:/vol/s2kvmauto/iso /home/kvm_autotest_root/iso"
 	mount 10.73.194.27:/vol/s2kvmauto/iso /home/kvm_autotest_root/iso
   fi
-  if ! mount | grep '/workdir/exports';then
-	echo "mount 10.66.8.105:/home/exports /workdir/exports"
-	mount 10.66.8.105:/home/exports /workdir/exports
-  fi
+  #if ! mount | grep '/workdir/exports';then
+  #	echo "mount 10.66.8.105:/home/exports /workdir/exports"
+  #	mount 10.66.8.105:/home/exports /workdir/exports
+  #fi
 
 }
 

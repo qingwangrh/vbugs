@@ -1,3 +1,6 @@
+
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg1.qcow2 1G
+
 /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1' \
     -machine q35  \
@@ -14,6 +17,9 @@
     -blockdev driver=qcow2,node-name=disk_2,file=host_disk2 \
     -device scsi-hd,drive=disk_2,bus=scsi0.0,id=host_disk_2 \
     \
+    -blockdev node-name=data_image1,driver=file,cache.direct=on,cache.no-flush=off,filename=/home/kvm_autotest_root/images/stg1.qcow2,aio=threads \
+    -blockdev node-name=data1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=data_image1 \
+    -device scsi-hd,id=disk1,drive=data1,bus=scsi0.0 \
     -device pcie-root-port,id=pcie.0-root-port-5,slot=5,chassis=5,addr=0x5,bus=pcie.0 \
     -device virtio-net-pci,mac=9a:55:56:57:58:59,id=id18Xcuo,netdev=idGRsMas,bus=pcie.0-root-port-5,addr=0x0  \
     -netdev tap,id=idGRsMas,vhost=on \
@@ -34,3 +40,20 @@
     -device pcie-root-port,id=pcie_extra_root_port_0,slot=6,chassis=6,addr=0x6,bus=pcie.0 \
     -monitor stdio \
     -qmp tcp:0:5955,server,nowait \
+
+
+
+steps(){
+#run diskmanager->rescan or device management, do "Scan for hardware changed" in guest then do rescan
+
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg1.qcow2 1G
+
+{'execute':'qmp_capabilities'}
+
+{"execute":"device_del","arguments":{"id":"disk1"}}
+
+{'execute':'device_add','arguments':{'driver':'scsi-hd','id':'disk1','drive':'data1','bus':'scsi0.0'}}
+
+{"execute":"device_del","arguments":{"id":"disk1"}}
+
+}

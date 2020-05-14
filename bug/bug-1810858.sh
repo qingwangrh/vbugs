@@ -129,9 +129,10 @@ case2(){
     -device isa-serial,chardev=serial_id_serial0  \
 
 
-{"execute": "blockdev-add", "arguments": {"node-name": "file_stg0", "driver": "file", "aio": "native", "filename": "/home/kvm_autotest_root/images/storage0.qcow2", "cache": {"direct": true, "no-flush": false}} }
+#add 2 disks then del them
+{"execute": "blockdev-add", "arguments": {"node-name": "file_stg0", "driver": "file", "aio": "native", "filename": "/home/kvm_autotest_root/images/stg0.qcow2", "cache": {"direct": true, "no-flush": false}} }
 {"execute": "blockdev-add", "arguments": {"node-name": "drive_stg0", "driver": "qcow2", "cache": {"direct": true, "no-flush": false}, "file": "file_stg0"} }
-{"execute": "blockdev-add", "arguments": {"node-name": "file_stg1", "driver": "file", "aio": "native", "filename": "/home/kvm_autotest_root/images/storage1.qcow2", "cache": {"direct": true, "no-flush": false}} }
+{"execute": "blockdev-add", "arguments": {"node-name": "file_stg1", "driver": "file", "aio": "native", "filename": "/home/kvm_autotest_root/images/stg1.qcow2", "cache": {"direct": true, "no-flush": false}} }
 {"execute": "blockdev-add", "arguments": {"node-name": "drive_stg1", "driver": "qcow2", "cache": {"direct": true, "no-flush": false}, "file": "file_stg1"} }
 
 
@@ -148,12 +149,12 @@ case2(){
 
 test_step() {
 
-qemu-img create -f raw /home/kvm_autotest_root/images/data0.raw 1G
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg0.qcow2 1G
 
   {"execute": "qmp_capabilities"}
 
-  {"execute": "blockdev-add", "arguments": {"node-name": "file_stg0", "driver": "file", "aio": "threads", "filename": "/home/kvm_autotest_root/images/data0.raw", "cache": {"direct": true, "no-flush": false}}}
-  {"execute": "blockdev-add", "arguments": {"node-name": "drive_stg0", "driver": "raw", "cache": {"direct": true, "no-flush": false}, "file": "file_stg0"}}
+  {"execute": "blockdev-add", "arguments": {"node-name": "file_stg0", "driver": "file", "aio": "threads", "filename": "/home/kvm_autotest_root/images/stg0.qcow2", "cache": {"direct": true, "no-flush": false}}}
+  {"execute": "blockdev-add", "arguments": {"node-name": "drive_stg0", "driver": "qcow2", "cache": {"direct": true, "no-flush": false}, "file": "file_stg0"}}
 
   {"execute": "device_add", "arguments": {"driver": "virtio-blk-pci", "id": "stg0", "drive": "drive_stg0", "write-cache": "on", "iothread": "iothread1", "bus": "pcie_extra_root_port_0", "addr": "0x0"}}
 
