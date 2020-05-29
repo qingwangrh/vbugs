@@ -70,7 +70,10 @@
 
 steps(){
 echo
-
+ qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg1.qcow2 1G
+  qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg2.qcow2 2G
+  qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg3.qcow2 3G
+  qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg4.qcow2 4G
 #host
 qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg1.qcow2 1G
 

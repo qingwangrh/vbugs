@@ -1,0 +1,1 @@
+../../bug/bug-hotunplug-in-pause-win.sh

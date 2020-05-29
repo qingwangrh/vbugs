@@ -17,7 +17,8 @@ create_repo7(){
   echo "create_repo7"
   curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo' -o /etc/yum.repos.d/rcm-tools-rhel-7.repo
   rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  yum install python3 brewkoji git vim net-tools screen -y
+  yum install python2-pip python3 brewkoji git vim net-tools screen mlocate -y
+  updatedb
   pip install --upgrade pip;pip install Jinja2
 }
 
@@ -26,7 +27,8 @@ create_repo8(){
   curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
 #  dnf install python3 brewkoji  git -y
   yum install http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/screen/4.6.2/4.el8/x86_64/screen-4.6.2-4.el8.x86_64.rpm -y
-  yum install python3 brewkoji git vim net-tools -y
+  yum install python3 brewkoji git vim net-tools mlocate -y
+  updatedb
 }
 #  curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
 #  dnf install python3 brewkoji  git -y

@@ -25,7 +25,7 @@ vm1(){
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,bus=scsi0.0,drive=drive_image1,bootindex=0 \
   \
--object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
+  -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
   -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=/dev/sde,node-name=drive2,file.pr-manager=helper0 \
   -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive2,id=scsi0-0-0-0,bootindex=2 \
@@ -68,7 +68,7 @@ vm2(){
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/win2019-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,bus=scsi0.0,drive=drive_image1,bootindex=0 \
   \
--object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
+  -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
   -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=/dev/sdc,node-name=drive2,file.pr-manager=helper0 \
   -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive2,id=scsi0-0-0-0,bootindex=2 \

@@ -1,5 +1,6 @@
 # This is win domain server depend on virbr0
-
+#192.168.122.100
+#WQTEST\Administrator Kvm_autotest
 
 /usr/libexec/qemu-kvm \
     -name 'wq-domain-server' \

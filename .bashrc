@@ -7,7 +7,7 @@ alias cp='cp -i'
 alias mv='mv -i'
 
 # Source global definitions
-if [ -f /etc/bashrc ]; then
+if [[ -f /etc/bashrc ]]; then
     . /etc/bashrc
 fi
 alias wtree='tree --charset ASCII'
@@ -49,16 +49,22 @@ fi
 wscreen()
 {
     echo "usage:create screen session"
-    if (( $#<1));then	
-   	idx=1
+    if (($# < 1)); then
+        idx=1
     else
-	idx=$1
+        idx=$1
     fi
-   echo "wscreen $idx" 
-    cd workspace/job-results
-    screen -dmS kar$idx python3 -m http.server 800$idx
-    cd -
-    screen -ls kar$idx
+    echo "wscreen $idx"
+    if [[ -d workspace/job-results ]]; then
+        cd workspace/job-results
+        screen -dmS kar$idx python3 -m http.server 800$idx
+        screen -ls kar$idx
+        cd -
+    else
+        screen -dmS log$idx python3 -m http.server 800$idx
+        screen -ls log$idx
+    fi
+
 }
 
 wdu() {
@@ -111,15 +117,16 @@ wview() {
 wenv() {
     for target in $@; do
         echo "==>$target"
-        scp  -o StrictHostKeyChecking=no ~/.bashrc $target:~/
-        scp  -o StrictHostKeyChecking=no ~/.gitconfig $target:~/
-        scp  -o StrictHostKeyChecking=no /etc/hosts $target:/etc/hosts
+        scp -o StrictHostKeyChecking=no ~/.bashrc $target:~/
+        scp -o StrictHostKeyChecking=no ~/.gitconfig $target:~/
+        scp -o StrictHostKeyChecking=no /etc/hosts $target:/etc/hosts
     done
 
 
 }
 
 wsshx() {
+
     if (($# < 2)); then
         echo "Usage wssh host cmd"
         return
@@ -128,7 +135,7 @@ wsshx() {
     shift
     cmd="$@"
     echo "cmd=$cmd"
-    	#"*IDENTIFICATION HAS CHANGED*" { send "rm -rf ~/.ssh/known_hosts\r";spawn ssh root@${host};exp_continue }
+    #"*IDENTIFICATION HAS CHANGED*" { send "rm -rf ~/.ssh/known_hosts\r";spawn ssh root@${host};exp_continue }
     expect << EOF
     set timeout 3
     set rmflag 0
@@ -184,8 +191,8 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
     id_rsa_pub="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC65vxd+hJjI21Mb/Dsvs8lIohQRaUT+v9mo/GCTPOdHXe81Qefw3a2HOoLJmz+zUof4MwaoPJ0uo0nCKs9ggKdhTlMk88hTsBYvT3yh1FVcg/rADF30mzo+3MyaiYznYnVOV9I2/1jcblKDTonohEa8n5qxOVav8lFIyMCKs0ioZu6/6XATqEMzJAxWUnrOtmHmjtz1Q3/5vRBAb+MAZTY1cZ5nfiGRJqz4OsGSX72PhPqPXvUqE9OtuvmSJ7sxDmiJD2NazFGpupssr1XO0T9s2qSExmxb6Z6nY8nq+whAf+U3DdMMDRLPqEEfTJAAjwXdyfwT65/SKwcWDyNDGBb"
     wsshx ${host} "echo"
     ret=$?
-    if [[ $ret == 168 ]] ;then
-	  rm -rf /root/.ssh/known_hosts
+    if [[ ${ret} == 168 ]]; then
+        rm -rf /root/.ssh/known_hosts
     fi
     wsshx ${host} "mkdir -p .ssh;echo '${id_rsa}' > .ssh/id_rsa;echo '${id_rsa_pub}' > .ssh/id_rsa.pub;yes|cp .ssh/id_rsa.pub .ssh/authorized_keys;chmod 600 .ssh/*"
     [[ $? == 0 ]] && wenv ${host}
@@ -312,26 +319,26 @@ wsetup() {
 
 wyumsed() {
     if [[ "x$1" == "x" ]]; then
-	[[ -f /etc/yum.repos.d/beaker-Server.repo ]] && file=beaker-Server.repo || file=beaker-BaseOS.repo
-    if cat /etc/yum.repos.d/$file|egrep "RHEL-[0-9.]{3,}";then
-	rp=`cat /etc/yum.repos.d/$file|egrep -o "RHEL-[0-9.]{3,}"`
-    fi
+        [[ -f /etc/yum.repos.d/beaker-Server.repo ]] && file=beaker-Server.repo || file=beaker-BaseOS.repo
+        if cat /etc/yum.repos.d/${file} | egrep "RHEL-[0-9.]{3,}"; then
+            rp=`cat /etc/yum.repos.d/${file} | egrep -o "RHEL-[0-9.]{3,}"`
+        fi
     else
         rp=$1
     fi
-	
-    if [[ "x${rp}" == "${rp}" ]];then
-	    echo "donothing"
+
+    if [[ "x${rp}" == "${rp}" ]]; then
+        echo "donothing"
     fi
     cmd="sed -i -e 's/${rp}-.*\../latest-${rp}/g' /etc/yum.repos.d/*.repo"
     echo "$cmd"
 }
 
 wmount() {
-    [ -d /mnt/iso ] || mkdir -p /mnt/iso
-    [ -d /mnt/bug_nfs ] || mkdir -p /mnt/bug_nfs
-    [ -d /mnt/gluster ] || mkdir -p /mnt/gluster
-    [ -d /mnt/logs ] || mkdir -p /mnt/logs
+    [[ -d /mnt/iso ]] || mkdir -p /mnt/iso
+    [[ -d /mnt/bug_nfs ]] || mkdir -p /mnt/bug_nfs
+    [[ -d /mnt/gluster ]] || mkdir -p /mnt/gluster
+    [[ -d /mnt/logs ]] || mkdir -p /mnt/logs
     echo "mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0  /mnt/gluster"
     echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /mnt/iso"
     echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /home/kvm_autotest_root/iso"
@@ -344,50 +351,52 @@ wmount() {
 }
 
 wbug() {
+    local target_dir
     #rsync -avh /workdir/exports/bug/ /workdir/bug/
     if (($# < 2)); then
         echo -e "Usage: wbug 123 job-xxx\nrsync -avh /workdir/exports/bug/ /workdir/bug/"
-        return
+        return 1
     fi
 
-    if ! mount | grep '/workdir/exports';then
+    if ! mount | grep '/workdir/exports' > /dev/null; then
         echo "mount 10.66.8.105:/home/exports /workdir/exports"
-        if mount 10.66.8.105:/home/exports /workdir/exports;then
-		target_dir=/workdir/exports/bug/
-	fi
+        if mount 10.66.8.105:/home/exports /workdir/exports; then
+            target_dir=/workdir/exports/qbugs/
+        fi
     fi
-    if ! mount | grep 's2images294422';then
-	[[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
-	echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
-        if mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/; then
-                target_dir="${target_dir} /mnt/bug_nfs/buglogs/"
-	fi
+
+    if ! mount | grep 's2images294422' > /dev/null; then
+        [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
+        echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
+        if mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then
+            target_dir="${target_dir} /mnt/bug_nfs/qbugs/"
+        fi
     fi
-   
+
 
     bugid=$1
     shift
-    logdir="$@"
-    
+    log_dir="$@"
+
     T=`date "+%F-%H%M"`
 
     for d in $target_dir
     do
-	    bugdir=$d/${bugid}/${T}/
-	    mkdir -p ${bugdir}
-	    for l in $logdir
-	    do
-		   [[ "x$l" != "x"  ]] && cp -rf $l ${bugdir}
-	    done
-	    if echo "$d"|grep exports;then 
-	      echo "http://10.66.8.105:8000/bug/$bugid/$T"
-	    elif echo "$d"|grep bug_nfs;then
-	      echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup/buglogs/$bugid/$T"
-	    else
-		    echo "nothing"
-            fi
+        bugdir=$d/${bugid}/${T}/
+        mkdir -p ${bugdir}
+        for l in $log_dir
+        do
+            [[ "x$l" != "x" ]] && cp -rf $l ${bugdir}
+        done
+        if echo "$d" | grep exports; then
+            echo "http://10.66.8.105:8000/qbugs/$bugid/$T"
+        elif echo "$d" | grep bug_nfs; then
+            echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup/qbugs/$bugid/$T"
+        else
+            echo "nothing"
+        fi
     done
-    
+
     #logdir="$2 $3 $4 $5 $6"
 
     #T=`date "+%F-%H%M"`
@@ -400,13 +409,13 @@ wbug() {
 }
 
 wlog_clean() {
-    logdir=/workdir/exports/logs/
-    logid=$1
+    log_dir=/workdir/exports/qlogs/
+    log_id=$1
     if [[ "x$1" != "x" ]]; then
         echo "clean"
-        [[ -d ${logdir}/${logid}/test-results ]] || return 0
+        [[ -d ${log_dir}/${log_id}/test-results ]] || return 0
 
-        cd ${logdir}/${logid}/test-results
+        cd ${log_dir}/${log_id}/test-results
         for sublog in `ls -d */`; do
             if ((${#sublog} > 5)); then
                 echo "enter ${sublog}"
@@ -421,38 +430,74 @@ wlog_clean() {
                 cd -
             fi
         done
-        cd ${logdir}
+        cd ${log_dir}
     fi
 
 }
 
 wlog() {
-    logdir=/workdir/exports/logs/data/
-    if [[ ! -d ${logdir} ]]; then
-        echo "Need mount qing:/home/exports /workdir/exports"
-        return 0
-    fi
+
+    local target_dir
+
     if (($# < 2)); then
         echo "$# : Usage: wlog logdir alias"
-    fi
-    logid=$1
-    if [[ -d ${logdir}/${logid} ]]; then
-        echo "exist ${logdir}/${logid}"
-    else
-        cp -rf ${logid} ${logdir}
+        return 1
     fi
 
-    if [[ "x$2" != "x" ]]; then
-        logname=`echo "$2" | tr -d " "`
-        echo "create soft link:${logname}"
-        touch ${logdir}/${logid}/${logname}
-        ln -sf ${logid} ${logname}
-        cd ${logdir}../;
-        ln -sf ${logdir}/${logid} ${logname};
-        cd -
+    if ! mount | grep '/workdir/exports' > /dev/null; then
+        echo "mount 10.66.8.105:/home/exports /workdir/exports"
+        if ! mount 10.66.8.105:/home/exports /workdir/exports; then
+            echo "mount failed"
+            return 1
+        fi
     fi
+    target_dir="${target_dir} /workdir/exports/qlogs/data/"
+
+    if ! mount | grep 's2images294422' > /dev/null; then
+        [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
+        echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
+        if ! mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then
+            echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/ failed"
+            return 1
+        fi
+    fi
+    target_dir="${target_dir} /mnt/bug_nfs/qlogs/data/"
+
+    T=`date "+%Y%m%d"`
+    log_name=`echo "$2" | tr -d " "`
+
+    for log_dir in ${target_dir}
+    do
+        #log_dir=/workdir/exports/qlogs/data/
+        if [[ ! -d ${log_dir} ]]; then
+            echo "The mounted folder need data and history"
+            return 1
+        fi
+
+        log_id=$1
+        if [[ -d ${log_dir}/${log_id} ]]; then
+            echo "exist ${log_dir}/${log_id},skip cp..."
+        else
+            echo "cp -rf ${log_id} ${log_dir}"
+            cp -rf ${log_id} ${log_dir}
+        fi
+
+        #create soft link
+        echo "create soft link:${log_dir}/${log_id} ${log_name}"
+        touch ${log_dir}/${log_id}/${log_name}_${T}
+        ln -sf ${log_id} ${log_name}
+        cd ${log_dir}../;
+        ln -sf data/${log_id} ${log_name};
+        cd - > /dev/null
+        cd ${log_dir}../history/
+        ln -sf ../data/${log_id} ${log_name};
+        cd - > /dev/null
+    done
+    
+    echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup/qlogs/${log_name}"
+
     if [[ "x$3" != "x" ]]; then
-        wlog_clean ${logname}
+        wlog_clean ${log_name}
     fi
 }
 

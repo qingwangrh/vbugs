@@ -5,5 +5,7 @@
     <mapping directory="$PROJECT_DIR$/avocado-vt" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/kar" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/tp-qemu" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/aexpect" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/avocado" vcs="Git" />
   </component>
 </project>

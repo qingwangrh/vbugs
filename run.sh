@@ -118,6 +118,9 @@ echo ""
  -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0  \
  -device isa-serial,chardev=serial_id_serial0  \
  -D debug.log \
- -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/windows/winutils.iso \
+ -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso \
  -device ide-cd,id=cd1,drive=drive_cd1,bus=ide.0,unit=0 \
+ -drive id=drive_cd2,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/windows/winutils.iso \
+ -device ide-cd,id=cd2,drive=drive_cd2,bus=ide.1,unit=0 \
+
 
