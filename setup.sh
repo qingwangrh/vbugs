@@ -70,9 +70,19 @@ sed -i '$a\*          soft     core   unlimited' /etc/security/limits.conf
 cat /etc/security/limits.conf
 }
 
+run_kar(){
+cd /workdir/kar
+./Bootstrap.sh --venv --develop
+ ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
+cd -
+}
 create_workdir
 create_cert
 create_repo
-create_kar
+
 open_coredump
+
+create_network
+create_kar
+run_kar
 usage_help
