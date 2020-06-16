@@ -305,14 +305,14 @@ wsetup() {
     echo "setup the basic workdir env"
     if [[ "x$1" == "x" ]]; then
         echo "setup"
-        mkdir -p {/home/workdir/{exports,rworkdir},/workdir,/home/rworkdir/}
+        mkdir -p {/home/workdir,/workdir,/home/rworkdir/,/home/rexports/}
         mount -o bind /home/workdir /workdir
-        mount qing:/home/exports /workdir/exports
-        mount qing:/home/workdir /workdir/rworkdir
+        mount qing:/home/exports /home/rexports
+        mount qing:/home/workdir /home/rworkdir
     elif [[ "$1" == "-d" ]]; then
         echo "clean"
-        umount /workdir/rworkdir
-        umount /workdir/exports
+        umount /home/rworkdir
+        umount /home/rexports
     fi
 
 }
@@ -344,7 +344,7 @@ wmount() {
     echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /home/kvm_autotest_root/iso"
     echo "mount 10.73.194.27:/vol/S4/virtlablogs /mnt/logs"
     echo "mount -o bind /home/workdir /workdir"
-    echo "mount qing:/home/exports /workdir/exports"
+    echo "mount qing:/home/exports /home/rexports"
     echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
     echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup"
     echo " ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;"
@@ -354,15 +354,18 @@ wbug() {
     local target_dir
     #rsync -avh /workdir/exports/bug/ /workdir/bug/
     if (($# < 2)); then
-        echo -e "Usage: wbug 123 job-xxx\nrsync -avh /workdir/exports/bug/ /workdir/bug/"
+        echo -e "Usage: wbug 123 job-xxx"
         return 1
     fi
 
-    if ! mount | grep '/workdir/exports' > /dev/null; then
-        echo "mount 10.66.8.105:/home/exports /workdir/exports"
-        if mount 10.66.8.105:/home/exports /workdir/exports; then
-            target_dir=/workdir/exports/qbugs/
+    if ! mount | grep ' /home/rexports' > /dev/null; then
+        echo "mount 10.66.8.105:/home/exports /home/rexports"
+        if mount 10.66.8.105:/home/exports /home/rexports; then
+            target_dir=/home/rexports/qbugs/
         fi
+    else
+	    echo "already mount /home/rexports"
+            target_dir=/home/exports/qbugs/
     fi
 
     if ! mount | grep 's2images294422' > /dev/null; then
@@ -371,6 +374,9 @@ wbug() {
         if mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then
             target_dir="${target_dir} /mnt/bug_nfs/qbugs/"
         fi
+    else
+	    echo "already mount /mnt/bug_nfs/"
+            target_dir="${target_dir} /mnt/bug_nfs/qbugs/"
     fi
 
 
@@ -409,7 +415,7 @@ wbug() {
 }
 
 wlog_clean() {
-    log_dir=/workdir/exports/qlogs/
+    log_dir=/home/rexports/qlogs/
     log_id=$1
     if [[ "x$1" != "x" ]]; then
         echo "clean"
@@ -444,14 +450,14 @@ wlog() {
         return 1
     fi
 
-    if ! mount | grep '/workdir/exports' > /dev/null; then
-        echo "mount 10.66.8.105:/home/exports /workdir/exports"
-        if ! mount 10.66.8.105:/home/exports /workdir/exports; then
+    if ! mount | grep ' /home/rexports' > /dev/null; then
+        echo "mount 10.66.8.105:/home/exports /home/rexports"
+        if ! mount 10.66.8.105:/home/exports /home/rexports; then
             echo "mount failed"
             return 1
         fi
     fi
-    target_dir="${target_dir} /workdir/exports/qlogs/data/"
+    target_dir="${target_dir} /home/rexports/qlogs/data/"
 
     if ! mount | grep 's2images294422' > /dev/null; then
         [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
@@ -468,7 +474,6 @@ wlog() {
 
     for log_dir in ${target_dir}
     do
-        #log_dir=/workdir/exports/qlogs/data/
         if [[ ! -d ${log_dir} ]]; then
             echo "The mounted folder need data and history"
             return 1

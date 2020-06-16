@@ -5,8 +5,10 @@ create_workdir() {
   echo "create_workdir"
   [[ -d /workdir ]] || mkdir -p /workdir
   [[ -d ${src_dir} ]] || mkdir -p ${src_dir}
+  mkdir -p /home/rexports
+  mkdir -p /home/rworkdir
 
-  if mount | grep 'on */workdir '; then
+  if mount | grep ' /workdir '; then
     echo "Already mount workdir"
   else
     echo "mount ${src_dir}"
@@ -87,7 +89,7 @@ _setup_bridge()
     nmcli con add type bridge ifname "$BRIDGE_IFNAME" con-name "$BRIDGE_IFNAME" stp no
     nmcli con modify "$CONID" master "$BRIDGE_IFNAME"
     nmcli con up "$CONID"
-    [ $? -ne 0 ] && echo "NetworkManager Command failed" && exit 1
+    [ $? -ne 0 ] && echo "NetworkManager Command failed" && return 1
 }
 
 _chk_bridge_dev_ip()
@@ -140,6 +142,9 @@ create_network(){
 BRIDGE_IFNAME='switch'
 
 if ! nmcli -t device show switch;then
+echo "create bridge switch"
+# cp setup_bridge.sh ~/
+# /bin/sh ~/setup_bridge.sh
   _setup_bridge
   _chk_bridge_dev_ip
 fi

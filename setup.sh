@@ -79,10 +79,8 @@ cd -
 create_workdir
 create_cert
 create_repo
-
 open_coredump
-
-create_network
 create_kar
 run_kar
+create_network
 usage_help
