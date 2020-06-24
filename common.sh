@@ -152,5 +152,18 @@ fi
 [[ -f /etc/qemu-ifup ]] || _setup_qemu_if
 
 }
+
+create_component_manager(){
+ echo "create_component_manager"
+
+ #curl -Lk https://gitlab.cee.redhat.com/pingl/script_repo/raw/master/component_management.py -o /home/workdir/component_management.py
+ curl -Lk http://git.host.prod.eng.bos.redhat.com/git/kvmqe-ci.git/tree/utils/beaker-workflow/ks/el8.ks -o /home/workdir/el8.ks
+ sed -n '/base64 -d.*component_management/,/chmod .*component_management/p' /home/workdir/el8.ks >/tmp/create_component_manager_x.sh
+ sed -e 's/\/root/\/home\/workdir/' -e 's/&lt;/</g' -e 's/&gt;/>/' /tmp/create_component_manager_x.sh >/tmp/create_component_manager_y.sh
+ /bin/sh /tmp/create_component_manager_y.sh
+
+}
+
+
 #create_workdir
 #mount_resource

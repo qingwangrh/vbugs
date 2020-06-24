@@ -358,17 +358,17 @@ wbug() {
         return 1
     fi
 
-    if ! mount | grep ' /home/rexports' > /dev/null; then
-        echo "mount 10.66.8.105:/home/exports /home/rexports"
-        if mount 10.66.8.105:/home/exports /home/rexports; then
-            target_dir=/home/rexports/qbugs/
-        fi
-    else
-	    echo "already mount /home/rexports"
-            target_dir=/home/exports/qbugs/
-    fi
+#    if ! mount | grep ' /home/rexports' > /dev/null; then
+#        echo "mount 10.66.8.105:/home/exports /home/rexports"
+#        if mount 10.66.8.105:/home/exports /home/rexports; then
+#            target_dir=/home/rexports/qbugs/
+#        fi
+#    else
+#	    echo "already mount /home/rexports"
+#            target_dir=/home/exports/qbugs/
+#    fi
 
-    if ! mount | grep 's2images294422' > /dev/null; then
+    if ! mount | grep '/mnt/bug_nfs' > /dev/null; then
         [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
         echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
         if mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then
@@ -376,7 +376,7 @@ wbug() {
         fi
     else
 	    echo "already mount /mnt/bug_nfs/"
-            target_dir="${target_dir} /mnt/bug_nfs/qbugs/"
+        target_dir="${target_dir} /mnt/bug_nfs/qbugs/"
     fi
 
 
@@ -385,16 +385,17 @@ wbug() {
     log_dir="$@"
 
     T=`date "+%F-%H%M"`
-
+    echo "$log_dir"
     for d in $target_dir
     do
         bugdir=$d/${bugid}/${T}/
+	    echo "cp to ${bugdir}"
         mkdir -p ${bugdir}
         for l in $log_dir
         do
             [[ "x$l" != "x" ]] && cp -rf $l ${bugdir}
         done
-        if echo "$d" | grep exports; then
+        if echo "$d" | grep rexports; then
             echo "http://10.66.8.105:8000/qbugs/$bugid/$T"
         elif echo "$d" | grep bug_nfs; then
             echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup/qbugs/$bugid/$T"
@@ -415,7 +416,8 @@ wbug() {
 }
 
 wlog_clean() {
-    log_dir=/home/rexports/qlogs/
+#    log_dir=/home/rexports/qlogs/
+    log_dir=/mnt/bug_nfs/qlogs/
     log_id=$1
     if [[ "x$1" != "x" ]]; then
         echo "clean"
@@ -450,16 +452,16 @@ wlog() {
         return 1
     fi
 
-    if ! mount | grep ' /home/rexports' > /dev/null; then
-        echo "mount 10.66.8.105:/home/exports /home/rexports"
-        if ! mount 10.66.8.105:/home/exports /home/rexports; then
-            echo "mount failed"
-            return 1
-        fi
-    fi
-    target_dir="${target_dir} /home/rexports/qlogs/data/"
+#    if ! mount | grep ' /home/rexports' > /dev/null; then
+#        echo "mount 10.66.8.105:/home/exports /home/rexports"
+#        if ! mount 10.66.8.105:/home/exports /home/rexports; then
+#            echo "mount failed"
+#            return 1
+#        fi
+#    fi
+#    target_dir="${target_dir} /home/rexports/qlogs/data/"
 
-    if ! mount | grep 's2images294422' > /dev/null; then
+    if ! mount | grep '/mnt/bug_nfs' > /dev/null; then
         [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
         echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
         if ! mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then

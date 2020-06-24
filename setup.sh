@@ -3,9 +3,11 @@
 source ./common.sh
 
 
+
+
 create_cert(){
   echo "create_cert"
-  curl -Lk https://gitlab.cee.redhat.com/pingl/script_repo/raw/master/component_management.py -o /home/workdir/component_management.py
+
   curl -kL 'https://password.corp.redhat.com/RH-IT-Root-CA.crt' -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt
   curl -kL 'https://password.corp.redhat.com/legacy.crt' -o /etc/pki/ca-trust/source/anchors/legacy.crt
   curl -kL 'https://engineering.redhat.com/Eng-CA.crt' -o /etc/pki/ca-trust/source/anchors/Eng-CA.crt
@@ -72,12 +74,15 @@ cat /etc/security/limits.conf
 
 run_kar(){
 cd /workdir/kar
-./Bootstrap.sh --venv --develop
- ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
+#./Bootstrap.sh --venv --develop --verbose
+./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=b57378a9ab078c75a021f8b176dccd60ba676e60
+
+ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
 cd -
 }
 create_workdir
 create_cert
+create_component_manager
 create_repo
 open_coredump
 create_kar

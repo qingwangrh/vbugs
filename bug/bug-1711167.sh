@@ -11,7 +11,8 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg1.qcow2 1G
     -device qemu-xhci,id=usb1,bus=pcie.0-root-port-2,addr=0x0 \
     -device pcie-root-port,id=pcie.0-root-port-3,slot=3,chassis=3,addr=0x3,bus=pcie.0 \
     -device pcie-root-port,id=pcie.0-root-port-4,slot=4,chassis=4,addr=0x4,bus=pcie.0 \
-    -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-4,addr=0x0 \
+-device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-3,addr=0x0 \
+-device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-4,addr=0x0 \
     \
     -blockdev driver=file,cache.direct=off,cache.no-flush=on,filename=/home/kvm_autotest_root/images/win2019-64-virtio-scsi.qcow2,node-name=host_disk2 \
     -blockdev driver=qcow2,node-name=disk_2,file=host_disk2 \
