@@ -75,8 +75,13 @@ cat /etc/security/limits.conf
 run_kar(){
 cd /workdir/kar
 #./Bootstrap.sh --venv --develop --verbose
-./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=b57378a9ab078c75a021f8b176dccd60ba676e60
+#./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=b57378a9ab078c75a021f8b176dccd60ba676e60
 
+if uname -r |grep el7;then
+    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0 --stable
+  else
+    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0
+fi
 ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
 cd -
 }

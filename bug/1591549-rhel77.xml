@@ -1,0 +1,108 @@
+<domain type='kvm' id='2'>
+  <name>rhel77</name>
+  <memory unit='KiB'>1048576</memory>
+  <currentMemory unit='KiB'>1048576</currentMemory>
+  <vcpu placement='static'>1</vcpu>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-rhel7.6.0'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <iothreads>1</iothreads>
+  <iothreadids>
+    <iothread id='4'/>
+  </iothreadids>
+  <features>
+    <acpi/>
+    <apic/>
+    <vmport state='off'/>
+  </features>
+
+  <clock offset='utc'>
+    <timer name='rtc' tickpolicy='catchup'/>
+    <timer name='pit' tickpolicy='delay'/>
+    <timer name='hpet' present='no'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <input type='tablet' bus='usb'/>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/home/kvm_autotest_root/images/rhel77-64-virtio-scsi.qcow2'/>
+      <target dev='sda' bus='scsi'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='none'/>
+      <source file='/home/kvm_autotest_root/images/stg1.raw'/>
+      <target dev='sdb' bus='scsi'/>
+      <iotune>
+        <total_bytes_sec>10000000</total_bytes_sec>
+        <read_iops_sec>400000</read_iops_sec>
+        <write_iops_sec>100000</write_iops_sec>
+      </iotune>
+      <alias name='ua-fb00b3f4-ec4b-4f39-95e8-04b78b405571'/>
+      <address type='drive' controller='0' bus='0' target='2' unit='0'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='none'/>
+      <source file='/home/kvm_autotest_root/images/stg2.raw'/>
+      <target dev='sdc' bus='scsi'/>
+      <iotune>
+        <total_bytes_sec>10000000</total_bytes_sec>
+        <read_iops_sec>400000</read_iops_sec>
+        <write_iops_sec>100000</write_iops_sec>
+      </iotune>
+      <alias name='ua-fb00b3f4-ec4b-4f39-95e8-04b78b405572'/>
+      <address type='drive' controller='0' bus='0' target='3' unit='0'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='none' iothread='4'/>
+      <source file='/home/kvm_autotest_root/images/stg3.raw'/>
+      <target dev='sdd' bus='virtio'/>
+      <iotune>
+        <total_bytes_sec>10000000</total_bytes_sec>
+        <read_iops_sec>400000</read_iops_sec>
+        <write_iops_sec>100000</write_iops_sec>
+      </iotune>
+    </disk>
+    <controller type='scsi' index='0' model='virtio-scsi'>
+      <driver iothread='4'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x08' function='0x0'/>
+    </controller>
+     <controller type='pci' index='0' model='pci-root'>
+            <alias name='pci.9'/>
+     </controller>
+    <interface type='bridge'>
+      <mac address='52:54:10:a3:bc:54'/>
+      <source bridge='switch'/>
+      <target dev='vnet0'/>
+      <model type='rtl8139'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <serial type='pty'>
+      <source path='/dev/pts/3'/>
+      <target type='isa-serial' port='0'>
+        <model name='isa-serial'/>
+      </target>
+      <alias name='serial0'/>
+    </serial>
+     <graphics type='vnc' port='1' autoport='yes' listen='0.0.0.0'>
+      <listen type='address' address='0.0.0.0'/>
+     </graphics>
+  </devices>
+  <seclabel type='dynamic' model='dac' relabel='yes'>
+    <label>+107:+107</label>
+    <imagelabel>+107:+107</imagelabel>
+  </seclabel>
+</domain>
