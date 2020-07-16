@@ -1,0 +1,66 @@
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+  <name>testpoc</name>
+  <uuid>77777777-8888-9999-aaaa-bbbbbbbbbbbb</uuid>
+  <memory unit='KiB'>4194304</memory>
+  <currentMemory unit='KiB'>4194304</currentMemory>
+  <vcpu placement='static'>1</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-rhel7.6.0'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2'/>
+      <target dev='sda' bus='scsi'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+
+    <controller type='pci' index='0' model='pci-root'/>
+    <controller type='scsi' index='0' model='virtio-scsi'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x00'/>
+    </controller>
+
+    <controller type='usb' index='0' model='piix3-uhci'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x02'/>
+    </controller>
+
+   <interface type='network'>
+      <mac address='52:54:00:56:aa:fc'/>
+      <source network='default'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
+    </interface>
+
+	<input type='mouse' bus='ps2'/>
+    <input type='keyboard' bus='ps2'/>
+
+    <memballoon model='virtio'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </memballoon>
+  </devices>
+
+   <qemu:commandline>
+        <qemu:arg value='-fsdev'/>
+        <qemu:arg value='local,id=share,path=/home/tmp/share,security_model=none'/>
+        <qemu:arg value='-device'/>
+        <qemu:arg value='virtio-9p-pci,fsdev=share,mount_tag=share,addr=0xb'/>
+   </qemu:commandline>
+
+</domain>
+
+
