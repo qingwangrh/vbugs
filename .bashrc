@@ -19,8 +19,9 @@ alias lsf="ls -p|grep [^/]$|xargs ls -lh --color"
 #alias lsd="ls -d */|sed 's/\///g'"
 alias wfind='find ./ -not \( -name .svn -a -prune \) -name'
 #alias wssh='ssh -o StrictHostKeyChecking=no '
-alias wmqing='mkdir -p /home/rworkdir;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir /home/rworkdir; fi'
+alias wmqing='mkdir -p /home/rworkdir/vbugs;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir/vbugs /home/rworkdir/vbugs; fi'
 alias wconsole='console -l qinwang -M conserver-01.eng.pek2.redhat.com '
+alias wversion='uname -r;rpm -qa|grep kvm-core-[0-9];rpm -qa|grep seabios-[0-9]'
 if [[ -f /usr/bin/vim ]]; then
     alias vi=vim
 fi
@@ -347,7 +348,7 @@ wmount() {
     echo "mount qing:/home/exports /home/rexports"
     echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
     echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup"
-    echo " ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;"
+    echo " ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;"
 }
 
 wbug() {

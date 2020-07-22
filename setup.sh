@@ -82,7 +82,7 @@ if uname -r |grep el7;then
   else
     ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0
 fi
-ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s ./ kar; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
+ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
 cd -
 }
 create_workdir
