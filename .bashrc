@@ -21,7 +21,7 @@ alias wfind='find ./ -not \( -name .svn -a -prune \) -name'
 #alias wssh='ssh -o StrictHostKeyChecking=no '
 alias wmqing='mkdir -p /home/rworkdir/vbugs;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir/vbugs /home/rworkdir/vbugs; fi'
 alias wconsole='console -l qinwang -M conserver-01.eng.pek2.redhat.com '
-alias wversion='uname -r;rpm -qa|grep kvm-core-[0-9];rpm -qa|grep seabios-[0-9]'
+alias wversion='uname -r;rpm -qa|grep kvm-core-[0-9];rpm -qa|grep seabios-[0-9];readlink /home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso'
 if [[ -f /usr/bin/vim ]]; then
     alias vi=vim
 fi
@@ -421,7 +421,7 @@ wlog_clean() {
     log_dir=/mnt/bug_nfs/qlogs/
     log_id=$1
     if [[ "x$1" != "x" ]]; then
-        echo "clean"
+        echo "clean ${log_dir}/${log_id}"
         [[ -d ${log_dir}/${log_id}/test-results ]] || return 0
 
         cd ${log_dir}/${log_id}/test-results
@@ -491,14 +491,18 @@ wlog() {
         fi
 
         #create soft link
+	stamp_link="${log_name}_${T}"
         echo "create soft link:${log_dir}/${log_id} ${log_name}"
-        touch ${log_dir}/${log_id}/${log_name}_${T}
+        touch ${log_dir}/${log_id}/${stamp_link}
         ln -sf ${log_id} ${log_name}
         cd ${log_dir}../;
-        ln -sf data/${log_id} ${log_name};
+	[[ -L ${log_name} ]] && echo "delete exist link ${log_name}" && rm -rf ${log_name}
+        ln -s data/${log_id} ${log_name};ls -l ${log_name}
         cd - > /dev/null
+	echo "create history soft link:${log_dir}/${log_id} ${stamp_link}"
         cd ${log_dir}../history/
-        ln -sf ../data/${log_id} ${log_name};
+	[[ -L ${stamp_link} ]] && echo "delete exist link ${stamp_link}" && rm -rf ${stamp_link}
+        ln -sf ../data/${log_id} ${stamp_link};ls -l ${stamp_link}
         cd - > /dev/null
     done
     

@@ -6,11 +6,15 @@ fmt=qcow2
 drv=scsi
 mode=blockdev
 mac=9a:b5:b6:b1:b2:b7
-while getopts ":o:m:d:f:rh" opt
+params=
+while getopts ":o:m:p:d:f:rh" opt
 do
     case $opt in
-        h) echo "usage: -o <rhel820/win2019> -d <scsi/blk> -f<qcow2/raw> -m <drive/blockdev>"
+        h) echo "usage: -o <rhel820/win2019> -d <scsi/blk> -f<qcow2/raw> -m <drive/blockdev> -p <params>"
         exit 0
+        ;;
+        p) echo " $OPTARG"
+       	params="$OPTARG"
         ;;
         r) echo "using random mac address"
         mac=9a:b5:b6:b1:b2:$(($RANDOM%99))
@@ -40,10 +44,12 @@ do
         fi
         ;;
         ?) echo "unknown parameter"
-        exit 1 ;;
+        exit 1
+        ;;
     esac
 done
 
+[  "x$params" != "x" ] && params=",$params"
 
 data_img_name="data1.qcow2"
 img_dir=/home/kvm_autotest_root/images
@@ -73,15 +79,16 @@ fi
 
 if [[ "$drv" == "blk" ]]; then
     os_device="-device virtio-blk-pci,id=os_disk,drive=drive_image1,bus=pcie.0-root-port-2,addr=0x0,bootindex=0  "
-    data_device=" -device virtio-blk-pci,id=data_disk,drive=data_image1,bus=pcie.0-root-port-3,addr=0x0,bootindex=1  "
+    data_device="-device virtio-blk-pci,id=data_disk,drive=data_image1,bus=pcie.0-root-port-3,addr=0x0,bootindex=1${params}  "
 else
     os_device="-device scsi-hd,id=os_disk,drive=drive_image1,bootindex=0  "
-    data_device="-device scsi-hd,id=data_disk,drive=data_image1,bootindex=1  "
+    data_device="-device scsi-hd,id=data_disk,drive=data_image1,bootindex=1${params}  "
 fi
 
-echo ""
+echo "${params}"
 echo "${os_img}"
 echo "${os_device}"
+echo "${data_device}"
 echo "${mac}"
 echo ""
 

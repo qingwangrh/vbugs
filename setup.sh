@@ -63,6 +63,7 @@ usage_help(){
   else
     echo "Warning nothing to do"
   fi
+  efibootmgr -v
 }
 
 open_coredump(){
