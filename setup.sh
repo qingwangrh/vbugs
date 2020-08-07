@@ -63,10 +63,16 @@ usage_help(){
   else
     echo "Warning nothing to do"
   fi
-  efibootmgr -v
+  if which efibootmgr;then
+    efibootmgr -v
+  else
+    echo "Not found efibootmgr"
+  fi
 }
 
 open_coredump(){
+mkdir -p /home/core/
+echo "/home/core/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
 sed -i -e '1,$s/#ProcessSizeMax=2G/ProcessSizeMax=32G/g' -e '1,$s/#ExternalSizeMax=2G/ExternalSizeMax=32G/g' /etc/systemd/coredump.conf
 ulimit -a
 sed -i '$a\*          soft     core   unlimited' /etc/security/limits.conf

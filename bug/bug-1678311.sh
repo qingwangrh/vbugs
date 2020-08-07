@@ -50,7 +50,7 @@ pc_teststep() {
   {"execute": "device_add", "arguments": {"driver": "scsi-hd", "id": "stg0", "drive": "drive_stg0", "write-cache": "on"}}
 }
 
-pc
+#pc
 
 q35(){
 
@@ -110,6 +110,7 @@ teststep() {
 
 
 case2(){
+#hotplug 2 blk disks
 
   /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1' \
@@ -158,3 +159,63 @@ case2(){
 {"execute": "device_del", "arguments": {"id": "stg0"}, "id": "wZQGmQC4"}
 
 }
+
+case3(){
+  qemu-img create -f qcow2 /home/kvm_autotest_root/images/storage0.qcow2 1G
+  qemu-img create -f qcow2 /home/kvm_autotest_root/images/storage1.qcow2 2G
+
+  #hotplug 9 scsi disks
+  /usr/libexec/qemu-kvm \
+    -name 'avocado-vt-vm1'  \
+    -sandbox on  \
+    -machine pc  \
+    -nodefaults \
+    -device VGA,bus=pci.0,addr=0x2 \
+    -m 8096  \
+    -smp 24,maxcpus=24,cores=12,threads=1,dies=1,sockets=2  \
+    -cpu 'Skylake-Server',hv_stimer,hv_synic,hv_vpindex,hv_relaxed,hv_spinlocks=0xfff,hv_vapic,hv_time,hv_frequencies,hv_runtime,hv_tlbflush,hv_reenlightenment,hv_stimer_direct,hv_ipi,+kvm_pv_unhalt \
+    -device qemu-xhci,id=usb1,bus=pci.0,addr=0x3 \
+    -device usb-ehci,id=ehci,bus=pci.0,addr=0x4 \
+    -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
+    -object secret,id=image1_encrypt0,data=redhat \
+    -device virtio-scsi-pci,id=virtio_scsi_pci0,bus=pci.0,addr=0x5 \
+    -blockdev node-name=file_image1,driver=file,aio=native,filename=/home/kvm_autotest_root/images/win2019-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
+    -blockdev node-name=drive_image1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_image1 \
+    -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,write-cache=on \
+    -device virtio-net-pci,mac=9a:7b:97:4e:5a:92,id=idEF28Hb,netdev=idlRoM9I,bus=pci.0,addr=0x6  \
+    -netdev tap,id=idlRoM9I,vhost=on \
+    -blockdev node-name=file_cd1,driver=file,read-only=on,aio=native,filename=/home/kvm_autotest_root/iso/windows/winutils.iso,cache.direct=on,cache.no-flush=off \
+    -blockdev node-name=drive_cd1,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd1 \
+    -device ide-cd,id=cd1,drive=drive_cd1,write-cache=on,bus=ide.0,unit=0  \
+    -vnc :6 \
+        -rtc base=localtime,clock=host,driftfix=slew \
+        -enable-kvm \
+        -qmp tcp:0:5956,server,nowait \
+        -monitor stdio \
+
+
+}
+
+case3_step(){
+
+
+{'execute': 'qmp_capabilities'}
+{"execute": "blockdev-add", "arguments": {"node-name": "file_stg0", "driver": "file", "aio": "native", "filename": "/home/kvm_autotest_root/images/storage0.qcow2", "cache": {"direct": true, "no-flush": false}} }
+{"execute": "blockdev-add", "arguments": {"node-name": "drive_stg0", "driver": "qcow2", "cache": {"direct": true, "no-flush": false}, "file": "file_stg0"} }
+{"execute": "blockdev-add", "arguments": {"node-name": "file_stg1", "driver": "file", "aio": "native", "filename": "/home/kvm_autotest_root/images/storage1.qcow2", "cache": {"direct": true, "no-flush": false}} }
+{"execute": "blockdev-add", "arguments": {"node-name": "drive_stg1", "driver": "qcow2", "cache": {"direct": true, "no-flush": false}, "file": "file_stg1"} }
+
+{"execute": "device_add", "arguments": {"id": "virtio_scsi_pci5", "driver": "virtio-scsi-pci", "bus": "pci.0"}}
+
+{"execute": "device_add", "arguments": {"driver": "scsi-hd", "id": "stg0", "bus": "virtio_scsi_pci5.0", "drive": "drive_stg0", "write-cache": "on"}, "id": "L4QsYlkN0"}
+{"execute": "device_add", "arguments": {"driver": "scsi-hd", "id": "stg1", "bus": "virtio_scsi_pci5.0", "drive": "drive_stg1", "write-cache": "on"}, "id": "L4QsYlkN1"}
+
+{"execute": "device_del", "arguments": {"id": "stg0"}, "id": "h78JsAx0"}
+{"execute": "device_del", "arguments": {"id": "stg1"}, "id": "h78JsAx1"}
+
+#It have no event on device_del virtio_scsi_pci if no delay with above device_del disk.
+{"execute": "device_del", "arguments": {"id": "virtio_scsi_pci5"}, "id": "h78JsAx5"}
+
+}
+
+case3

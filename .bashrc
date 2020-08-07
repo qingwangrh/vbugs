@@ -21,7 +21,7 @@ alias wfind='find ./ -not \( -name .svn -a -prune \) -name'
 #alias wssh='ssh -o StrictHostKeyChecking=no '
 alias wmqing='mkdir -p /home/rworkdir/vbugs;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir/vbugs /home/rworkdir/vbugs; fi'
 alias wconsole='console -l qinwang -M conserver-01.eng.pek2.redhat.com '
-alias wversion='uname -r;rpm -qa|grep kvm-core-[0-9];rpm -qa|grep seabios-[0-9];readlink /home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso'
+alias wversion="uname -r;rpm -qa|grep -E kvm-common-\"(rhev|[0-9])\";rpm -qa|grep seabios-[0-9];readlink /home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso"
 if [[ -f /usr/bin/vim ]]; then
     alias vi=vim
 fi

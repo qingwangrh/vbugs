@@ -1,0 +1,485 @@
+<domain type='kvm' id='4'>
+  <name>myagent2</name>
+  <uuid>4a474e30-dcde-4541-8f2f-5607ae22f563</uuid>
+  <metadata xmlns:ns0="http://ovirt.org/vm/tune/1.0" xmlns:ovirt-vm="http://ovirt.org/vm/1.0">
+    <ns0:qos/>
+    <ovirt-vm:vm xmlns:ovirt-vm="http://ovirt.org/vm/1.0">
+    <ovirt-vm:clusterVersion>4.3</ovirt-vm:clusterVersion>
+    <ovirt-vm:destroy_on_reboot type="bool">False</ovirt-vm:destroy_on_reboot>
+    <ovirt-vm:launchPaused>false</ovirt-vm:launchPaused>
+    <ovirt-vm:memGuaranteedSize type="int">1024</ovirt-vm:memGuaranteedSize>
+    <ovirt-vm:minGuaranteedMemoryMb type="int">1024</ovirt-vm:minGuaranteedMemoryMb>
+    <ovirt-vm:resumeBehavior>auto_resume</ovirt-vm:resumeBehavior>
+    <ovirt-vm:startTime type="float">1596698597.77</ovirt-vm:startTime>
+    <ovirt-vm:device mac_address="56:6f:e3:07:00:00">
+        <ovirt-vm:network>ovirtmgmt</ovirt-vm:network>
+        <ovirt-vm:custom>
+            <ovirt-vm:queues>4</ovirt-vm:queues>
+        </ovirt-vm:custom>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdb">
+        <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+        <ovirt-vm:imageID>d78954bb-ab54-4ba5-ad4f-ae8adf28bad0</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>84b2de1b-5651-4d6f-95b2-582393acae94</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+                <ovirt-vm:imageID>d78954bb-ab54-4ba5-ad4f-ae8adf28bad0</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">115343360</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/106fd6c1-a215-457e-b8c5-a08bb6448f58/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/d78954bb-ab54-4ba5-ad4f-ae8adf28bad0/84b2de1b-5651-4d6f-95b2-582393acae94</ovirt-vm:path>
+                <ovirt-vm:volumeID>84b2de1b-5651-4d6f-95b2-582393acae94</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sda">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>31833a42-c8d3-4e94-804e-f2e88fa9c2fd</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>69da38e4-4089-488e-8864-9874b93d323f</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>31833a42-c8d3-4e94-804e-f2e88fa9c2fd</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">114294784</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/31833a42-c8d3-4e94-804e-f2e88fa9c2fd/69da38e4-4089-488e-8864-9874b93d323f</ovirt-vm:path>
+                <ovirt-vm:volumeID>69da38e4-4089-488e-8864-9874b93d323f</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdd">
+        <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+        <ovirt-vm:imageID>ace68709-1957-46d5-808c-492bdbb4c9c2</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>6036ad23-35d5-4b56-bb8c-4d8005b63a97</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+                <ovirt-vm:imageID>ace68709-1957-46d5-808c-492bdbb4c9c2</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">117440512</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/106fd6c1-a215-457e-b8c5-a08bb6448f58/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/ace68709-1957-46d5-808c-492bdbb4c9c2/6036ad23-35d5-4b56-bb8c-4d8005b63a97</ovirt-vm:path>
+                <ovirt-vm:volumeID>6036ad23-35d5-4b56-bb8c-4d8005b63a97</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdc">
+        <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+        <ovirt-vm:imageID>ba6cc1b5-a0a7-43dc-adb2-24925311734f</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>8ad1d43a-4e47-47d8-a419-53758569b9b4</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+                <ovirt-vm:imageID>ba6cc1b5-a0a7-43dc-adb2-24925311734f</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">116391936</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/106fd6c1-a215-457e-b8c5-a08bb6448f58/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/ba6cc1b5-a0a7-43dc-adb2-24925311734f/8ad1d43a-4e47-47d8-a419-53758569b9b4</ovirt-vm:path>
+                <ovirt-vm:volumeID>8ad1d43a-4e47-47d8-a419-53758569b9b4</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdf">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>2b9e3373-20ea-4718-a301-6f525a5049eb</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>cd6b788e-3d75-467c-8fe2-08ca34063124</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>2b9e3373-20ea-4718-a301-6f525a5049eb</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">113246208</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/2b9e3373-20ea-4718-a301-6f525a5049eb/cd6b788e-3d75-467c-8fe2-08ca34063124</ovirt-vm:path>
+                <ovirt-vm:volumeID>cd6b788e-3d75-467c-8fe2-08ca34063124</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sde">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>15d985be-d6b8-4c29-88e5-fe1d6a96a30c</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>0316dd6f-3cf2-4237-9259-c261393e51bd</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>15d985be-d6b8-4c29-88e5-fe1d6a96a30c</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">112197632</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/15d985be-d6b8-4c29-88e5-fe1d6a96a30c/0316dd6f-3cf2-4237-9259-c261393e51bd</ovirt-vm:path>
+                <ovirt-vm:volumeID>0316dd6f-3cf2-4237-9259-c261393e51bd</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdh">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>f1487fe9-0d7a-44d2-b352-e4ad06e9f72b</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>93663f58-68f1-40ab-b80b-083ea9df3c41</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>f1487fe9-0d7a-44d2-b352-e4ad06e9f72b</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">116391936</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/f1487fe9-0d7a-44d2-b352-e4ad06e9f72b/93663f58-68f1-40ab-b80b-083ea9df3c41</ovirt-vm:path>
+                <ovirt-vm:volumeID>93663f58-68f1-40ab-b80b-083ea9df3c41</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdg">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>bc24e201-553a-490e-ba27-57d1ce85db3f</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>fc6d2611-a20d-4e4d-9521-ee0d96f448ce</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>bc24e201-553a-490e-ba27-57d1ce85db3f</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">115343360</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/bc24e201-553a-490e-ba27-57d1ce85db3f/fc6d2611-a20d-4e4d-9521-ee0d96f448ce</ovirt-vm:path>
+                <ovirt-vm:volumeID>fc6d2611-a20d-4e4d-9521-ee0d96f448ce</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdj">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>7dfab2f6-c6f8-4256-a596-8b37ebafc610</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>812a7da4-903d-4631-a485-d228446e7303</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>7dfab2f6-c6f8-4256-a596-8b37ebafc610</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">118489088</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/7dfab2f6-c6f8-4256-a596-8b37ebafc610/812a7da4-903d-4631-a485-d228446e7303</ovirt-vm:path>
+                <ovirt-vm:volumeID>812a7da4-903d-4631-a485-d228446e7303</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdi">
+        <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+        <ovirt-vm:imageID>c2af6ebb-3c1b-4c12-af17-abebbfe49591</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>c9607c2c-3642-433f-8c4f-28ab37cd8bb6</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>f6566635-3eca-4465-8343-5914b6837245</ovirt-vm:domainID>
+                <ovirt-vm:imageID>c2af6ebb-3c1b-4c12-af17-abebbfe49591</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">117440512</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/f6566635-3eca-4465-8343-5914b6837245/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/c2af6ebb-3c1b-4c12-af17-abebbfe49591/c9607c2c-3642-433f-8c4f-28ab37cd8bb6</ovirt-vm:path>
+                <ovirt-vm:volumeID>c9607c2c-3642-433f-8c4f-28ab37cd8bb6</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="sdk">
+        <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+        <ovirt-vm:imageID>82076d73-cbca-40cf-b8d4-47eafc8bce47</ovirt-vm:imageID>
+        <ovirt-vm:poolID>ef16745e-690e-11ea-b10f-001a4a000510</ovirt-vm:poolID>
+        <ovirt-vm:volumeID>07de6892-1064-4d45-98c5-0293edbf50ad</ovirt-vm:volumeID>
+        <ovirt-vm:volumeChain>
+            <ovirt-vm:volumeChainNode>
+                <ovirt-vm:domainID>106fd6c1-a215-457e-b8c5-a08bb6448f58</ovirt-vm:domainID>
+                <ovirt-vm:imageID>82076d73-cbca-40cf-b8d4-47eafc8bce47</ovirt-vm:imageID>
+                <ovirt-vm:leaseOffset type="int">118489088</ovirt-vm:leaseOffset>
+                <ovirt-vm:leasePath>/dev/106fd6c1-a215-457e-b8c5-a08bb6448f58/leases</ovirt-vm:leasePath>
+                <ovirt-vm:path>/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/82076d73-cbca-40cf-b8d4-47eafc8bce47/07de6892-1064-4d45-98c5-0293edbf50ad</ovirt-vm:path>
+                <ovirt-vm:volumeID>07de6892-1064-4d45-98c5-0293edbf50ad</ovirt-vm:volumeID>
+            </ovirt-vm:volumeChainNode>
+        </ovirt-vm:volumeChain>
+    </ovirt-vm:device>
+    <ovirt-vm:device devtype="disk" name="hdc"/>
+    <ovirt-vm:custom>
+        <ovirt-vm:viodiskcache>writethrough</ovirt-vm:viodiskcache>
+    </ovirt-vm:custom>
+</ovirt-vm:vm>
+  </metadata>
+  
+  <maxMemory slots='16' unit='KiB'>4194304</maxMemory>
+  <memory unit='KiB'>2097152</memory>
+  <currentMemory unit='KiB'>2097152</currentMemory>
+  <vcpu placement='static' current='4'>16</vcpu>
+  <iothreads>1</iothreads>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <sysinfo type='smbios'>
+    <system>
+      <entry name='manufacturer'>Red Hat</entry>
+      <entry name='product'>RHEV Hypervisor</entry>
+      <entry name='version'>7.7-10.el7</entry>
+      <entry name='serial'>5b6975b0-b76f-401c-8923-24ff9f146c69</entry>
+      <entry name='uuid'>4a474e30-dcde-4541-8f2f-5607ae22f563</entry>
+    </system>
+  </sysinfo>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-rhel7.6.0'>hvm</type>
+    <smbios mode='sysinfo'/>
+  </os>
+  <features>
+    <acpi/>
+  </features>
+  <cpu mode='custom' match='exact' check='full'>
+    <model fallback='forbid'>Broadwell</model>
+    <topology sockets='16' cores='1' threads='1'/>
+    <feature policy='require' name='vme'/>
+    <feature policy='require' name='f16c'/>
+    <feature policy='require' name='rdrand'/>
+    <feature policy='require' name='hypervisor'/>
+    <feature policy='require' name='arat'/>
+    <feature policy='require' name='xsaveopt'/>
+    <feature policy='require' name='abm'/>
+    <numa>
+      <cell id='0' cpus='0-3' memory='2097152' unit='KiB'/>
+    </numa>
+  </cpu>
+  <clock offset='variable' adjustment='0' basis='utc'>
+    <timer name='rtc' tickpolicy='catchup'/>
+    <timer name='pit' tickpolicy='delay'/>
+    <timer name='hpet' present='no'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' error_policy='report'/>
+      <source startupPolicy='optional'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <alias name='ua-bda6a6e1-398d-467d-a0f4-a1c885119aaa'/>
+      <address type='drive' controller='0' bus='1' target='0' unit='0'/>
+    </disk>
+	
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='qcow2' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/31833a42-c8d3-4e94-804e-f2e88fa9c2fd/69da38e4-4089-488e-8864-9874b93d323f'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sda' bus='scsi'/>
+      <serial>31833a42-c8d3-4e94-804e-f2e88fa9c2fd</serial>
+      <boot order='1'/>
+      <alias name='ua-31833a42-c8d3-4e94-804e-f2e88fa9c2fd'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+	
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='qcow2' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/d78954bb-ab54-4ba5-ad4f-ae8adf28bad0/84b2de1b-5651-4d6f-95b2-582393acae94'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdb' bus='scsi'/>
+      <serial>d78954bb-ab54-4ba5-ad4f-ae8adf28bad0</serial>
+      <alias name='ua-d78954bb-ab54-4ba5-ad4f-ae8adf28bad0'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='3'/>
+    </disk>
+	
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='raw' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/ba6cc1b5-a0a7-43dc-adb2-24925311734f/8ad1d43a-4e47-47d8-a419-53758569b9b4'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdc' bus='scsi'/>
+      <serial>ba6cc1b5-a0a7-43dc-adb2-24925311734f</serial>
+      <alias name='ua-ba6cc1b5-a0a7-43dc-adb2-24925311734f'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='11'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='qcow2' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/ace68709-1957-46d5-808c-492bdbb4c9c2/6036ad23-35d5-4b56-bb8c-4d8005b63a97'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdd' bus='scsi'/>
+      <serial>ace68709-1957-46d5-808c-492bdbb4c9c2</serial>
+      <alias name='ua-ace68709-1957-46d5-808c-492bdbb4c9c2'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='10'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='qcow2' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/15d985be-d6b8-4c29-88e5-fe1d6a96a30c/0316dd6f-3cf2-4237-9259-c261393e51bd'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sde' bus='scsi'/>
+      <serial>15d985be-d6b8-4c29-88e5-fe1d6a96a30c</serial>
+      <alias name='ua-15d985be-d6b8-4c29-88e5-fe1d6a96a30c'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='9'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='raw' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/2b9e3373-20ea-4718-a301-6f525a5049eb/cd6b788e-3d75-467c-8fe2-08ca34063124'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdf' bus='scsi'/>
+      <serial>2b9e3373-20ea-4718-a301-6f525a5049eb</serial>
+      <alias name='ua-2b9e3373-20ea-4718-a301-6f525a5049eb'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='8'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='raw' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/bc24e201-553a-490e-ba27-57d1ce85db3f/fc6d2611-a20d-4e4d-9521-ee0d96f448ce'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdg' bus='scsi'/>
+      <serial>bc24e201-553a-490e-ba27-57d1ce85db3f</serial>
+      <alias name='ua-bc24e201-553a-490e-ba27-57d1ce85db3f'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='7'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='raw' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/f1487fe9-0d7a-44d2-b352-e4ad06e9f72b/93663f58-68f1-40ab-b80b-083ea9df3c41'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdh' bus='scsi'/>
+      <serial>f1487fe9-0d7a-44d2-b352-e4ad06e9f72b</serial>
+      <alias name='ua-f1487fe9-0d7a-44d2-b352-e4ad06e9f72b'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='6'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='raw' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/c2af6ebb-3c1b-4c12-af17-abebbfe49591/c9607c2c-3642-433f-8c4f-28ab37cd8bb6'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdi' bus='scsi'/>
+      <serial>c2af6ebb-3c1b-4c12-af17-abebbfe49591</serial>
+      <alias name='ua-c2af6ebb-3c1b-4c12-af17-abebbfe49591'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='5'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='raw' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/f6566635-3eca-4465-8343-5914b6837245/images/7dfab2f6-c6f8-4256-a596-8b37ebafc610/812a7da4-903d-4631-a485-d228446e7303'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdj' bus='scsi'/>
+      <serial>7dfab2f6-c6f8-4256-a596-8b37ebafc610</serial>
+      <alias name='ua-7dfab2f6-c6f8-4256-a596-8b37ebafc610'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+    </disk>
+    <disk type='block' device='disk' snapshot='no'>
+      <driver name='qemu' type='qcow2' cache='none' error_policy='stop' io='native'/>
+      <source dev='/rhev/data-center/mnt/blockSD/106fd6c1-a215-457e-b8c5-a08bb6448f58/images/82076d73-cbca-40cf-b8d4-47eafc8bce47/07de6892-1064-4d45-98c5-0293edbf50ad'>
+        <seclabel model='dac' relabel='no'/>
+      </source>
+      <backingStore/>
+      <target dev='sdk' bus='scsi'/>
+      <serial>82076d73-cbca-40cf-b8d4-47eafc8bce47</serial>
+      <alias name='ua-82076d73-cbca-40cf-b8d4-47eafc8bce47'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='12'/>
+    </disk>
+    <controller type='virtio-serial' index='0' ports='16'>
+      <alias name='ua-172cbd10-0493-4669-bbcc-f38f178bd3f9'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
+    </controller>
+    <controller type='usb' index='0' model='piix3-uhci'>
+      <alias name='usb'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
+    </controller>
+    <controller type='ide' index='0'>
+      <alias name='ide'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
+    </controller>
+    <controller type='scsi' index='0' model='virtio-scsi'>
+      <driver iothread='1'/>
+      <alias name='ua-c5a93381-12b1-4c71-adfe-1bcf82c256be'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </controller>
+    <controller type='pci' index='0' model='pci-root'>
+      <alias name='pci.0'/>
+    </controller>
+    <interface type='bridge'>
+      <mac address='56:6f:e3:07:00:00'/>
+      <source bridge='ovirtmgmt'/>
+      <target dev='vnet0'/>
+      <model type='virtio'/>
+      <driver name='vhost' queues='4'/>
+      <link state='up'/>
+      <mtu size='1500'/>
+      <alias name='ua-c99887ac-3891-485d-9dc0-1c0ab623d2d7'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+    <channel type='unix'>
+      <source mode='bind' path='/var/lib/libvirt/qemu/channels/4a474e30-dcde-4541-8f2f-5607ae22f563.ovirt-guest-agent.0'/>
+      <target type='virtio' name='ovirt-guest-agent.0' state='disconnected'/>
+      <alias name='channel0'/>
+      <address type='virtio-serial' controller='0' bus='0' port='1'/>
+    </channel>
+    <channel type='unix'>
+      <source mode='bind' path='/var/lib/libvirt/qemu/channels/4a474e30-dcde-4541-8f2f-5607ae22f563.org.qemu.guest_agent.0'/>
+      <target type='virtio' name='org.qemu.guest_agent.0' state='disconnected'/>
+      <alias name='channel1'/>
+      <address type='virtio-serial' controller='0' bus='0' port='2'/>
+    </channel>
+    <channel type='spicevmc'>
+      <target type='virtio' name='com.redhat.spice.0' state='disconnected'/>
+      <alias name='channel2'/>
+      <address type='virtio-serial' controller='0' bus='0' port='3'/>
+    </channel>
+    <input type='tablet' bus='usb'>
+      <alias name='input0'/>
+      <address type='usb' bus='0' port='1'/>
+    </input>
+    <input type='mouse' bus='ps2'>
+      <alias name='input1'/>
+    </input>
+    <input type='keyboard' bus='ps2'>
+      <alias name='input2'/>
+    </input>
+    <graphics type='vnc' port='5900' autoport='yes' listen='10.74.253.10' keymap='en-us' passwdValidTo='1970-01-01T00:00:01'>
+      <listen type='network' address='10.74.253.10' network='vdsm-ovirtmgmt'/>
+    </graphics>
+    <graphics type='spice' port='5901' tlsPort='5902' autoport='yes' listen='10.74.253.10' passwdValidTo='2020-08-06T07:25:42'>
+      <listen type='network' address='10.74.253.10' network='vdsm-ovirtmgmt'/>
+      <channel name='main' mode='secure'/>
+      <channel name='display' mode='secure'/>
+      <channel name='inputs' mode='secure'/>
+      <channel name='cursor' mode='secure'/>
+      <channel name='playback' mode='secure'/>
+      <channel name='record' mode='secure'/>
+      <channel name='smartcard' mode='secure'/>
+      <channel name='usbredir' mode='secure'/>
+    </graphics>
+    <video>
+      <model type='qxl' ram='65536' vram='8192' vgamem='16384' heads='1' primary='yes'/>
+      <alias name='ua-abc906a1-3f54-4635-9f72-070d52a72314'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'/>
+    </video>
+    <memballoon model='virtio'>
+      <stats period='5'/>
+      <alias name='ua-4fd3af80-8dc6-41a1-b150-65102fa90d71'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x07' function='0x0'/>
+    </memballoon>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+      <alias name='ua-932fced9-b5df-405c-ba88-ab3ace12d6f0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
+    </rng>
+  </devices>
+  <seclabel type='dynamic' model='selinux' relabel='yes'>
+    <label>system_u:system_r:svirt_t:s0:c583,c874</label>
+    <imagelabel>system_u:object_r:svirt_image_t:s0:c583,c874</imagelabel>
+  </seclabel>
+  <seclabel type='dynamic' model='dac' relabel='yes'>
+    <label>+107:+107</label>
+    <imagelabel>+107:+107</imagelabel>
+  </seclabel>
+</domain>
+

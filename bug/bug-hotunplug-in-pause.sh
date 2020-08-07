@@ -74,16 +74,11 @@ q35(){
 
 }
 
-#pc
-q35
-
-
 steps(){
 #have bug in q35 block_hotplug_in_pause.with_hotplug_no_resume_unplug.one_pci
 #stop->plug-unplug-continues
 
 qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg0.qcow2 1G
-
 
 
 #qmp
@@ -121,3 +116,32 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg0.qcow2 1G
 http://10.66.8.105:8000/%5B8.2.1%5D-2-PC%2BSeabios%2B8.3%2BQcow2%2BVirtio_blk%2BLocal%2Baio_native/test-results/131-Host_RHEL.m8.u2.product_av.qcow2.virtio_blk.up.virtio_net.Guest.RHEL.8.3.0.x86_64.io-github-autotest-qemu.block_hotplug_in_pause.with_plug.one_pci/
 
 }
+
+steps_pc_luks(){
+
+qemu-img create --object secret,id=stg0_encrypt0,data=redhat -f luks -o key-secret=stg0_encrypt0 /home/kvm_autotest_root/images/storage0.luks 1G
+
+{"execute":"qmp_capabilities"}
+
+
+
+{"execute": "object-add", "arguments": {"qom-type": "secret", "id": "stg0_encrypt0", "props": {"data": "redhat"}}, "id": "DxaSQoyf"}
+{"execute": "blockdev-add", "arguments": {"node-name": "file_stg0", "driver": "file", "aio": "threads", "filename": "/home/kvm_autotest_root/images/storage0.luks", "cache": {"direct": true, "no-flush": false}}, "id": "1u0zYJNZ"}
+{"execute": "blockdev-add", "arguments": {"node-name": "drive_stg0", "driver": "luks", "key-secret": "stg0_encrypt0", "cache": {"direct": true, "no-flush": false}, "file": "file_stg0"}, "id": "ooVN0XWj"}
+{"execute": "device_add", "arguments": {"driver": "virtio-blk-pci", "id": "stg0", "drive": "drive_stg0", "write-cache": "on", "bus": "pci.0", "addr": "0x6", "iothread": "iothread1"}, "id": "dGCBDEks"}
+
+
+  {"execute": "device_del", "arguments": {"id": "stg0"}, "id": "5myVHVo7"}
+  {"execute": "object-del", "arguments": {"id": "stg0_encrypt0"}, "id": "sj9FHGEv"}
+
+{'execute': 'blockdev-del', 'arguments': {'node-name': 'drive_stg0'}, 'id': 'eKGJKn9l'}
+{'execute': 'blockdev-del', 'arguments': {'node-name': 'file_stg0'}, 'id': 'eKGJKn92'}
+
+ {"execute": "stop", "id": "1oeqHhY5"}
+{"execute": "cont", "id": "w98SXnPQ"}
+
+
+}
+
+pc
+#q35

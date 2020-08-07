@@ -1,4 +1,4 @@
-
+#unplug scsi disks number great than 8
 
 
 /usr/libexec/qemu-kvm \
@@ -110,6 +110,12 @@ fdisk: cannot open /dev/sdi: Input/output error; the disk will disappear
 reboot guest and disks will disappear, it looks like the disks indeed delete,
 but not refresh on guest?
 please refer to 1516105
+
+Bug 1843324 - Guest failed to sync block info after hot unplugged multiple disks(greater than 8 disks)
+Reproduce via automation CML:
+
+python3 ConfigTest.py --guestname=RHEL.8.3.0 --driveformat=virtio_scsi --nicmodel=virtio_net --testcase=multi_disk_random_hotplug.parallel.single_type --clone=no  --nrepeat=50
+
 
 }
 
