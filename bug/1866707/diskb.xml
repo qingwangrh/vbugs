@@ -1,6 +1,6 @@
  <disk type='block' device='disk' snapshot='no'>
             <driver name='qemu' type='qcow2' cache='none' error_policy='stop' io='native'/>
-            <source dev='/home/kvm_autotest_root/images/stg1.qcow2'/>
+            <source dev='/home/kvm_autotest_root/images/stg1-1.qcow2'/>
             <backingStore/>
             <target dev='sdb' bus='scsi'/>
             <alias name='scsi0-0-0-1'/>

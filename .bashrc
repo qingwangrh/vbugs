@@ -199,59 +199,32 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
     [[ $? == 0 ]] && wenv ${host}
 }
 
-wkarsync() {
-    #wgitsync repo target files
-    if (($# < 2)); then
-        echo "miss parameter"
-        return 1
-    fi
-    wgitsync $@
-
-}
-
-wgitsync() {
-    echo -e "Usage: wgitsync repo target. \nExample: wgitsync tp-qemu kar-run"
+wgitsync(){
+    echo -e "Usage: wgitsync target [files]. \nExample: wgitsync /home/kar-code/tp-qemu a b c"
     echo "$#"
     if (($# < 1)); then
         echo "miss parameter"
+	git status -s ./ | cut -f 3 -d " "
         return 1
     fi
-    repo=$1
-    case $1 in
-        "a")
-            repo="avocado-vt"
-        ;;
-        "t")
-            repo="tp-qemu"
-        ;;
-        "k")
-            repo="kar"
-        ;;
-    esac
-    echo "${repo}"
-
-    target=kar-run
-    if [[ "X$2" != "X" ]]; then
-        target=$2
-    fi
-    shift
+    target=$1
     shift
     files="$@"
     if [[ "X$files" == "X" ]]; then
         echo "Checking"
-        cd ${repo}
-        git status -s
+        #git status -s
         files=$(git status -s ./ | cut -f 3 -d " ")
-        cd -
     fi
     if [[ "X$files" == "X" ]]; then
         echo "Nothing to do"
         return 1
     fi
-
+    echo -e "$files"
+    cmd="git status -s ./ | cut -f 3 -d \" \"|xargs -I {} scp  {} ${target}/{}"
+    echo "${cmd}"
     total=0
     for f in $files; do
-        cmd="cp ${repo}/${f} /workdir/${target}/${repo}/${f}"
+        cmd="scp ${f} ${target}/${f}"
         echo "$cmd"
         yes | $cmd
         let total=total+1
@@ -331,6 +304,7 @@ wyumsed() {
     if [[ "x${rp}" == "${rp}" ]]; then
         echo "donothing"
     fi
+    echo "/etc/yum.repos.d/${file} ${rp}"
     cmd="sed -i -e 's/${rp}-.*\../latest-${rp}/g' /etc/yum.repos.d/*.repo"
     echo "$cmd"
 }

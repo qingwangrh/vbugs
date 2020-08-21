@@ -38,7 +38,7 @@
 
         <disk type='file' device='cdrom'>
             <driver name='qemu' type='raw'/>
-            <source file=''/>
+            <source file='/home/kvm_autotest_root/iso/windows/winutils.iso'/>
             <backingStore/>
             <target dev='hdd' bus='sata'/>
             <readonly/>

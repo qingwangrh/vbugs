@@ -32,10 +32,6 @@ create_repo8(){
   yum install python3 brewkoji git vim net-tools mlocate -y
   updatedb
 }
-#  curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
-#  dnf install python3 brewkoji  git -y
-
-#  yum install http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/screen/4.6.2/4.el8/x86_64/screen-4.6.2-4.el8.x86_64.rpm -y
 
 create_repo(){
   if uname -r |grep el8;then
@@ -51,7 +47,7 @@ create_kar(){
   echo "create_kar"
   cd ${src_dir}
   git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
-  git clone https://gitlab.cee.redhat.com/yhong/vmt.git
+  #git clone https://gitlab.cee.redhat.com/yhong/vmt.git
   cd -
 }
 
@@ -70,28 +66,7 @@ usage_help(){
   fi
 }
 
-open_coredump(){
-mkdir -p /home/core/
-echo "/home/core/core.%e.%p.%h.%t" > /proc/sys/kernel/core_pattern
-sed -i -e '1,$s/#ProcessSizeMax=2G/ProcessSizeMax=32G/g' -e '1,$s/#ExternalSizeMax=2G/ExternalSizeMax=32G/g' /etc/systemd/coredump.conf
-ulimit -a
-sed -i '$a\*          soft     core   unlimited' /etc/security/limits.conf
-cat /etc/security/limits.conf
-}
 
-run_kar(){
-cd /workdir/kar
-#./Bootstrap.sh --venv --develop --verbose
-#./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=b57378a9ab078c75a021f8b176dccd60ba676e60
-
-if uname -r |grep el7;then
-    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0 --stable
-  else
-    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0
-fi
-ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;
-cd -
-}
 create_workdir
 create_cert
 create_component_manager

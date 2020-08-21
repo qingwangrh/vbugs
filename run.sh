@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #default
-os=rhel820
+os=rhel830
 fmt=qcow2
 drv=scsi
 mode=blockdev
@@ -78,11 +78,11 @@ else
 fi
 
 if [[ "$drv" == "blk" ]]; then
-    os_device="-device virtio-blk-pci,id=os_disk,drive=drive_image1,bus=pcie.0-root-port-2,addr=0x0,bootindex=0  "
-    data_device="-device virtio-blk-pci,id=data_disk,drive=data_image1,bus=pcie.0-root-port-3,addr=0x0,bootindex=1${params}  "
+    os_device="-device virtio-blk-pci,id=os_disk,drive=drive_image1,bus=pcie.0-root-port-2,addr=0x0,bootindex=0,serial=OS_DISK  "
+    data_device="-device virtio-blk-pci,id=data_disk,drive=data_image1,bus=pcie.0-root-port-3,addr=0x0,bootindex=1${params},serial=DATA_DISK  "
 else
-    os_device="-device scsi-hd,id=os_disk,drive=drive_image1,bootindex=0  "
-    data_device="-device scsi-hd,id=data_disk,drive=data_image1,bootindex=1${params}  "
+    os_device="-device scsi-hd,id=os_disk,drive=drive_image1,bootindex=0,serial=OS_DISK  "
+    data_device="-device scsi-hd,id=data_disk,drive=data_image1,bootindex=1${params},serial=DATA_DISK  "
 fi
 
 echo "${params}"

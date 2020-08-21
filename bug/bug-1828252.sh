@@ -11,6 +11,7 @@ pvcreate ${devname}
 vgcreate vg_scsi_debug ${devname}
 lvcreate --size 128M --name ro-test --permission r vg_scsi_debug
 
+
 /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1'  \
     -sandbox on  \
@@ -25,15 +26,15 @@ lvcreate --size 128M --name ro-test --permission r vg_scsi_debug
     -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
     -device pcie-root-port,id=pcie-root-port-2,port=0x2,addr=0x1.0x2,bus=pcie.0,chassis=3 \
     -device virtio-scsi-pci,id=virtio_scsi_pci0,bus=pcie-root-port-2,addr=0x0 \
-    -blockdev node-name=file_image1,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/rhel821-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
+    -blockdev node-name=file_image1,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
     -blockdev node-name=drive_image1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_image1 \
     -device scsi-hd,id=image1,drive=drive_image1,write-cache=on \
     \
-    -blockdev node-name=file_stg1,driver=host_device,aio=threads,filename=${lvname},cache.direct=on,cache.no-flush=off,auto-read-only=on,discard=unmap \
-    -blockdev node-name=drive_stg1,driver=raw,cache.direct=on,cache.no-flush=off,file=file_stg1,discard=unmap,auto-read-only=on \
-    -device scsi-hd,id=stg1,drive=drive_stg1,scsi-id=12 \
-    \
-    -device pcie-root-port,id=pcie-root-port-3,port=0x3,addr=0x1.0x3,bus=pcie.0,chassis=4 \
+   -blockdev node-name=file_stg1,driver=host_device,aio=threads,filename=${lvname},cache.direct=on,cache.no-flush=off,auto-read-only=on,read-only=on,discard=unmap \
+-blockdev node-name=drive_stg1,driver=raw,cache.direct=on,cache.no-flush=off,file=file_stg1,discard=unmap,auto-read-only=on,read-only=on \
+-device scsi-hd,id=stg1,drive=drive_stg1 \
+\
+     -device pcie-root-port,id=pcie-root-port-3,port=0x3,addr=0x1.0x3,bus=pcie.0,chassis=4 \
     -device virtio-net-pci,mac=9a:5b:4f:9b:c3:b0,id=idg2bFqS,netdev=ida2LQKm,bus=pcie-root-port-3,addr=0x0  \
     -netdev tap,id=ida2LQKm,vhost=on  \
     -vnc :6  \
@@ -47,10 +48,45 @@ lvcreate --size 128M --name ro-test --permission r vg_scsi_debug
     -device virtserialport,bus=virtio-serial0.0,nr=1,chardev=qga0,id=channel1,name=org.qemu.guest_agent.0 \
 
 
+
+
+
+steps(){
+#passthrough only on virtio-scsi
+#it works with on with read-only command, it must ?
+# only set auto-read-only for file ,it may write,  but the vm can boot.
+#only set auto-read-only for passthrough,
+#[ -f /home/kvm_autotest_root/images/stg0.qcow2 ] || qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg0.qcow2 1G
+#chmod 444 /home/kvm_autotest_root/images/stg0.qcow2
+#in guest read-only filesystem
+-blockdev node-name=file_stg1,driver=host_device,aio=threads,filename=${lvname},cache.direct=on,cache.no-flush=off,auto-read-only=on,read-only=on,discard=unmap \
+-blockdev node-name=drive_stg1,driver=raw,cache.direct=on,cache.no-flush=off,file=file_stg1,discard=unmap,auto-read-only=on,read-only=on \
+-device scsi-hd,id=stg1,drive=drive_stg1 \
+
+    #but failed on "The device is not writable: Permission denied"
+    -blockdev node-name=file_stg1,driver=host_device,aio=threads,filename=${lvname},cache.direct=on,cache.no-flush=off,auto-read-only=on,discard=unmap \
+    -blockdev node-name=drive_stg1,driver=raw,cache.direct=on,cache.no-flush=off,file=file_stg1,discard=unmap,auto-read-only=on \
+    -device scsi-hd,id=stg1,drive=drive_stg1 \
+
+#/usr/libexec/qemu-kvm -blockdev '{"driver":"host_device","filename":"/dev/vg_scsi_debug/ro-test","node-name":"libvirt-3-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"read-only":true,"discard":"unmap"}'
+
+#/usr/libexec/qemu-kvm -blockdev '{"driver":"host_device","filename":"/dev/vg_scsi_debug/ro-test","node-name":"libvirt-3-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}'
+#test on file, it not work
+ -blockdev node-name=file_stg2,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/stg0.qcow2,cache.direct=on,cache.no-flush=off,auto-read-only=on,discard=unmap \
+    -blockdev node-name=drive_stg2,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_stg2,discard=unmap,auto-read-only=on \
+    -device scsi-hd,id=stg2,drive=drive_stg2 \
+
+
+}
+
 steps(){
 
-#it works with on with read-only command
+ {"execute":"qmp_capabilities"}
 
-/usr/libexec/qemu-kvm -blockdev '{"driver":"host_device","filename":"/dev/vg_scsi_debug/ro-test","node-name":"libvirt-3-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"read-only":true,"discard":"unmap"}'
+ {"execute": "device_del", "arguments": {"id": "stg1"}}
+ {"execute": "blockdev-del", "arguments": {"node-name": "drive_stg1"}}
+ {"execute": "blockdev-del", "arguments": {"node-name": "file_stg1"}}
+
+ {"execute": "blockdev-add", "arguments": {"node-name": "file_stg1", "driver": "host_device", "aio": "threads", "filename": "/dev/vg_scsi_debug/ro-test", "cache": {"direct": true, "no-flush": false},"auto-read-only":true,"discard":"unmap"}}
 
 }
