@@ -1,19 +1,19 @@
 #This tools for new host to setup basic env
 #set -x
-src_dir=/home/workdir
+q_src_dir=/home/workdir
 create_workdir() {
   echo "create_workdir"
   [[ -d /workdir ]] || mkdir -p /workdir
-  [[ -d ${src_dir} ]] || mkdir -p ${src_dir}
+  [[ -d ${q_src_dir} ]] || mkdir -p ${q_src_dir}
   mkdir -p /home/rexports
   mkdir -p /home/rworkdir
 
   if mount | grep ' /workdir '; then
     echo "Already mount workdir"
   else
-    echo "mount ${src_dir}"
-    if ! mount -o bind ${src_dir} /workdir; then
-      echo "ERROR on mount ${src_dir}"
+    echo "mount ${q_src_dir}"
+    if ! mount -o bind ${q_src_dir} /workdir; then
+      echo "ERROR on mount ${q_src_dir}"
       exit 1
     fi
     if ! grep "/home/workdir" /etc/fstab; then
@@ -160,19 +160,24 @@ create_component_manager() {
 
 }
 
-run_kar() {
-  cd /workdir/kar
-
-  if uname -r | grep el7; then
-    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0 --stable
-  else
-    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0
-  fi
+create_kar(){
+  echo "create_kar"
+  DIR=$(pwd)
+  cd ${q_src_dir}
+  STAMP=$(date "+%m%d-%H%M")
+  [ -e kar ] && mv kar kar${STAMP}
+  git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
+  cd kar
+  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 --stable
   ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
   ln -s workspace/avocado-vt avocado-vt
   ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
-  cd -
+  touch ${STAMP}
+  #git clone https://gitlab.cee.redhat.com/yhong/vmt.git
+  cd ${DIR}
 }
+
+
 
 open_coredump() {
   yum install abrt abrt-addon-ccpp abrt-tui -y
@@ -191,20 +196,4 @@ open_coredump() {
 
 }
 
-run_kar() {
-  cd /workdir/kar
-
-  #if uname -r |grep el7;then
-  #    ./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0 --stable
-  #  else
-  #    # upstream conflict with stable
-  #    #./Bootstrap.sh --develop --upstream --verbose --venv --avocado-pt=80.0
-  #    ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 --stable
-  #fi
-  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 --stable
-  ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
-  ln -s workspace/avocado-vt avocado-vt
-  ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
-  cd -
-}
 

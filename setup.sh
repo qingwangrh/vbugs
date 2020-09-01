@@ -43,14 +43,6 @@ create_repo(){
   fi
 }
 
-create_kar(){
-  echo "create_kar"
-  cd ${src_dir}
-  git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
-  #git clone https://gitlab.cee.redhat.com/yhong/vmt.git
-  cd -
-}
-
 usage_help(){
   if uname -r |grep el8;then
     echo "python3 component_management.py --install-virtqemu ID --verbose"
@@ -73,6 +65,5 @@ create_component_manager
 create_repo
 open_coredump
 create_kar
-run_kar
 create_network
 usage_help

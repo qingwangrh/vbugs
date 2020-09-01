@@ -56,15 +56,19 @@ wscreen()
         idx=$1
     fi
     echo "wscreen $idx"
+    name="screen${idx}"
+    if screen -S $name -ls;then
+	echo "Quit exist $name"
+	screen -X -S $name quit
+    fi
     if [[ -d workspace/job-results ]]; then
         cd workspace/job-results
-        screen -dmS kar$idx python3 -m http.server 800$idx
-        screen -ls kar$idx
+        screen -dmS $name python3 -m http.server 800$idx
         cd -
     else
-        screen -dmS log$idx python3 -m http.server 800$idx
-        screen -ls log$idx
+        screen -dmS $name python3 -m http.server 800$idx
     fi
+    screen -S $name -ls
 
 }
 
@@ -197,6 +201,18 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
     fi
     wsshx ${host} "mkdir -p .ssh;echo '${id_rsa}' > .ssh/id_rsa;echo '${id_rsa_pub}' > .ssh/id_rsa.pub;yes|cp .ssh/id_rsa.pub .ssh/authorized_keys;chmod 600 .ssh/*"
     [[ $? == 0 ]] && wenv ${host}
+}
+
+wgitupdate(){
+ git st ./
+ git stash list
+ git stash
+ git stash list
+ git pull origin master
+ #keep change
+ #git stash apply
+ git stash pop 
+ git stash list
 }
 
 wgitsync(){
