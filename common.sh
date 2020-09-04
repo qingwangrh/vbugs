@@ -162,13 +162,18 @@ create_component_manager() {
 
 create_kar(){
   echo "create_kar"
+  local target
+  if [[ "x$1" != "x" ]];then
+    target="--stable"
+  fi
+
   DIR=$(pwd)
   cd ${q_src_dir}
   STAMP=$(date "+%m%d-%H%M")
   [ -e kar ] && mv kar kar${STAMP}
   git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
   cd kar
-  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 --stable
+  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 $target
   ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
   ln -s workspace/avocado-vt avocado-vt
   ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg

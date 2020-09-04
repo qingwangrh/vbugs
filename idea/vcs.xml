@@ -3,9 +3,10 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/avocado-vt" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/kar" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/tp-qemu" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/workspace/aexpect" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/workspace/avocado" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/avocado-vt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu" vcs="Git" />
   </component>
 </project>

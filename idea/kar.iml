@@ -4,16 +4,12 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/avocado-vt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tp-qemu" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/workspace/avocado" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/kar" />
+      <sourceFolder url="file://$MODULE_DIR$/tp-qemu/qemu/tests" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/workspace/avocado-vt" />
+      <excludeFolder url="file://$MODULE_DIR$/workspace/job-results" />
       <excludeFolder url="file://$MODULE_DIR$/workspace/var" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6 (kar)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-  </component>
-  <component name="PyDocumentationSettings">
-    <option name="format" value="PLAIN" />
-    <option name="myDocStringFormat" value="Plain" />
   </component>
 </module>
