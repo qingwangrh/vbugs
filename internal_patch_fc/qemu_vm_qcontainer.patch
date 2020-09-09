@@ -1,0 +1,31 @@
+diff --git a/virttest/qemu_devices/qcontainer.py b/virttest/qemu_devices/qcontainer.py
+index ab6f0687..c52308e1 100644
+--- a/virttest/qemu_devices/qcontainer.py
++++ b/virttest/qemu_devices/qcontainer.py
+@@ -2211,6 +2211,8 @@ class DevContainer(object):
+                         protocol_node.set_param(key, None)
+                     else:
+                         protocol_node.set_param(key, value)
++                    if key == 'pr-manager':
++                        value = None
+                     format_node.set_param(key, value)
+                 else:
+                     devices[-1].set_param(key, value)
+diff --git a/virttest/qemu_vm.py b/virttest/qemu_vm.py
+index 98362f6c..084d570c 100644
+--- a/virttest/qemu_vm.py
++++ b/virttest/qemu_vm.py
+@@ -2466,6 +2466,13 @@ class VM(virt_vm.BaseVM):
+             if ats:
+                 add_virtio_option("ats", ats, devices, device, dev_type)
+ 
++        #wq
++        pr_manager_helper = params.get("pr_manager_helper")
++        if pr_manager_helper:
++            cmd = "-object pr-manager-helper,id=%s,path=/var/run/qemu-pr-helper.sock"
++            devices.insert(StrDev("pr_manager_%s" % pr_manager_helper,
++                          cmdline=cmd % pr_manager_helper))
++
+         # Add extra root_port at the end of the command line only if there is
+         # free slot on pci.0, discarding them otherwise
+         func_0_addr = None

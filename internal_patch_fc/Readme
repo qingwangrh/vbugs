@@ -1,8 +1,0 @@
-#git diff > qemu_vm.patch
-git apply --whitespace=fix qemu_vm.patch
-#cp * /workdir/kar/tp-qemu/qemu/tests/ -rf
-#cp /home/rworkdir/vbugs/internal_patch_fc/* /workdir/kar/tp-qemu/qemu/tests/ -rf
-
-(workspace) root@dell-per440-08 /workdir/kar #
-python ConfigTest.py --testcase=multipath_offline_running --guestname=RHEL.8.2 --driveformat=virtio_scsi --imageformat=qcow2 --clone=no
-

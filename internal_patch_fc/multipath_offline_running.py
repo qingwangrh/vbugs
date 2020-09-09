@@ -529,8 +529,8 @@ def run(test, params, env):
             time.sleep(random.uniform(60, 180))
         else:
             vm.create(params=params)
-            fio_multipath = generate_instance(params, vm, 'fio')
             session = vm.wait_for_login(timeout=int(params.get("timeout", 240)))
+            fio_multipath = generate_instance(params, vm, 'fio')
             image_size_stg = params["image_size_stg"]
             image_num_stg = int(params["image_num_stg"])
             os_type = params["os_type"]

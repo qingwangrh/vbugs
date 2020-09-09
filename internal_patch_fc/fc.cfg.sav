@@ -1,0 +1,12 @@
+variants:
+    - @basic:
+        clone = no
+        Windows:
+          cd_format = ide
+        q35:
+          cd_format = ahci
+        only block_device_with_rotational passthrough_disk_limits_io_write multipath_offline_running dd_passthrough_disk_via_EmulexHBA multipath_persistent_reservation fc_storage_corrupt
+        case_type = prepare
+        rh_kernel_update:
+            qemu_force_use_drive_expression = yes
+

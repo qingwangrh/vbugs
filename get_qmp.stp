@@ -1,0 +1,66 @@
+global start
+
+
+# Print a string, with a timestamp relative to the start of the script
+
+function print_ts(msg)
+
+{
+
+  now = gettimeofday_ns() / (1000*1000)
+
+  delta = (now - start)
+
+  printf("%3d.%03d %s\n", (delta / 1000), (delta % 1000), msg);
+
+}
+
+
+
+# Just so we know the script is now running
+
+probe begin {
+
+  start = gettimeofday_ns() / (1000*1000)
+
+  print_ts("begin")
+
+}
+
+
+probe libvirt.qemu.monitor_send_msg {
+
+  if (fd != -1) {
+
+    print_ts(sprintf("> %s (fd=%d)", substr(msg, 0, strlen(msg)-2), fd));
+
+  } else {
+
+    print_ts(sprintf("> %s", substr(msg, 0, strlen(msg)-2)));
+
+  }
+
+}
+
+
+probe libvirt.qemu.monitor_recv_reply {
+
+  print_ts(sprintf("<  %s", reply));
+
+}
+
+
+probe libvirt.qemu.monitor_recv_event {
+
+  print_ts(sprintf("!  %s", event));
+
+}
+
+2. Install the systemtap package on the host
+# yum -y install systemtap
+
+3. Run the stap-prep cmd to install some necessary  package
+# stap-prep
+
+4. Run the script we created before.
+# stap get_qmp.stp

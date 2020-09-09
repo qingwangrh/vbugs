@@ -52,4 +52,8 @@
 
 -object throttle-group,x-iops-read-max=30,x-iops-read=20,x-iops-read-max-length=10,x-iops-write-max=30,x-iops-write=20,x-iops-write-max-length=10,id=group2 \
 
+{"execute":"qmp_capabilities"}
+{'execute': 'qom-get', 'arguments': {'path': 'group5', 'property': 'limits'}}
+
+
   }
