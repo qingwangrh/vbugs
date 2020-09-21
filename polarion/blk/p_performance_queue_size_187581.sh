@@ -25,7 +25,7 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/data4.qcow2 14G
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2,iothread=iothread0  \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-3,virtqueue_size=128,iothread=iothread0  \
   -device virtio-scsi-pci,id=scsi2,bus=pcie.0-root-port-4,virtqueue_size=1024,iothread=iothread0  \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0,bus=scsi0.0 \
   \
   -blockdev driver=qcow2,file.aio=threads,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/data1.qcow2,node-name=node1 \
@@ -52,9 +52,15 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/data4.qcow2 14G
   -device ide-cd,id=cd1,drive=drive_cd1,bus=ide.0,unit=0 \
 
 
-steps(){
+steps() {
 
-   #virtio_scsi
+  #virtio_scsi
   echo
+
+  time dd if=/dev/urandom of=/dev/sdb bs=1M count=4000 oflag=direct;
+  time dd if=/dev/urandom of=/dev/sdc bs=1M count=4000 oflag=direct
+
+  time dd if=/dev/urandom of=/dev/sda bs=1M count=4000 oflag=direct;
+  time dd if=/dev/urandom of=/dev/sdb bs=1M count=4000 oflag=direct
 
 }

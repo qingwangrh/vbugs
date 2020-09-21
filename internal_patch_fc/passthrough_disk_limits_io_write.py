@@ -72,7 +72,10 @@ def run(test, params, env):
         :param serial_name: e.g. 36d0946607a154f0023a0939504fa3b93
         :return: disk name. e.g. sdb
         """
-        cmd = "ls -l /dev/disk/by-id/scsi-%s" % serial_name
+        # cmd = "ls -l /dev/disk/by-id/scsi-%s" % serial_name
+        # return process.run(cmd, shell=True).stdout.decode().strip().split("/")[
+        #     -1]
+        cmd = "lsscsi  -b -g --scsi_id|grep %s|head -n 1|awk '{print $2}'" % serial_name
         return process.run(cmd, shell=True).stdout.decode().strip().split("/")[-1]
 
     def dd_test(session, dd_cmd):

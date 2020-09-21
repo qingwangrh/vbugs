@@ -19,7 +19,7 @@
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2-2,addr=0x0,iothread=iothread0 \
   \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel810-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel830-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
   \
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/data1.qcow2,node-name=data_image1 \

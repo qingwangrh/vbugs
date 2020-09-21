@@ -9,6 +9,7 @@
 #dell-per440-07.lab.eng.pek2.redhat.com
 #special_host = "dell-per440-08.lab.eng.pek2.redhat.com"
 #stg_serial_name = "360050763008084e6e0000000000001a4"
+
 wfc_patch() {
   cd /workdir/kar/avocado-vt/virttest
   git apply --whitespace=fix /home/rworkdir/vbugs/internal_patch_fc/qemu_vm_qcontainer.patch
@@ -17,7 +18,7 @@ wfc_patch() {
 }
 
 wfc_cp() {
-
+  echo "usage: $0 host serial mpatha"
   if [[ "x$1" != "x" ]]; then
     host=$1
     serial=$2
@@ -35,6 +36,7 @@ wfc_cp() {
     echo "$cmd"
     eval $cmd
   fi
+  echo "copy...."
   yes | cp /home/rworkdir/vbugs/internal_patch_fc/* /workdir/kar/tp-qemu/qemu/tests/ -rf
   yes | cp fc.cfg.sav /workdir/kar/internal_cfg/test_loops/fc.cfg
 
@@ -46,7 +48,7 @@ steps() {
   systemctl status qemu-pr-helper
   systemctl start qemu-pr-helper
 
-  python ConfigTest.py --category=fc --guestname=RHEL.8.2.1 --driveformat=virtio_scsi --machines=q35 --clone=no
+  python ConfigTest.py --category=fc --guestname=RHEL.8.3.0 --driveformat=virtio_scsi --machines=q35 --clone=no
   #https://docs.google.com/spreadsheets/d/11roIAL10e_pW9LJD8V31iXqe-yP61zAc/edit#gid=2022141352
   #114478
   python ConfigTest.py --testcase=block_device_with_rotational --guestname=RHEL.8.2 --driveformat=virtio_scsi --nicmodel=virtio_net --imageformat=qcow2 --machines=q35 --clone=no

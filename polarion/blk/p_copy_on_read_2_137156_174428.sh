@@ -19,7 +19,7 @@ qemu-img map /home/images/overlay2.qcow2
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,iothread=iothread0 \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-5,iothread=iothread0 \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel810-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/rhel830-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
   \
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/images/overlay1.qcow2,node-name=data_image1 \
@@ -50,12 +50,6 @@ steps(){
    qemu-io node0 "read 0 64M"
    qemu-img map /home/images/overlay1.qcow2
 
-   {"execute": "qmp_capabilities"}
-
-   {"execute":"blockdev-add","arguments":{"node-name":"node2","driver":"copy-on-read",
-"file":{"driver":"qcow2","file":{"driver":"file","filename":"/home/images/overlay2.qcow2"}}}}
-
-   {"execute":"device_add","arguments":{"driver":"scsi-hd","drive":"node2","id":"image_stg1","bus":"scsi1.0"}}
-
+   :q35
 
   }

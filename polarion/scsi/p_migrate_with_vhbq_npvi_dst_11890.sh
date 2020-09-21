@@ -24,7 +24,7 @@
   \
   \
   -device virtio-scsi-pci,id=virtio_scsi_pci0,bus=pcie.0-root-port-7,addr=0x0 \
-  -blockdev driver=host_device,cache.direct=off,cache.no-flush=on,filename=/dev/sdf,node-name=data_disk \
+  -blockdev driver=host_device,cache.direct=off,cache.no-flush=on,filename=/dev/mapper/mpathb,node-name=data_disk \
   -blockdev driver=raw,node-name=disk1,file=data_disk \
   -device scsi-block,drive=disk1,bus=virtio_scsi_pci0.0,id=data_disk \
   -vnc :6 \
@@ -34,39 +34,48 @@
   -smp 8 \
   -device virtio-net-pci,mac=9a:b5:b6:b1:b2:b5,id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie.0-root-port-5,addr=0x0 \
   -netdev tap,id=idxgXAlm \
-  -incoming tcp:0:5800 \
+  -incoming defer \
 
 
 steps() {
   #Host1
-  /dev/sdd
+  #Host1
+
+  root@dell-per440-07 ~ #  ls /sys/class/fc_host/
+host16  host7
+
+  #create
   echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_create
   echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_create
+  #delete
   echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_delete
   echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_delete
 
-    #Host2
-    /dev/sdf
-    echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host7/vport_create
-    echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host7/vport_create
+mpathb (360050763008084e6e00000000000019e) dm-5 IBM,2145
+size=30G features='1 queue_if_no_path' hwhandler='1 alua' wp=rw
+|-+- policy='service-time 0' prio=0 status=active
+| `- 19:0:0:0 sde 8:64 active undef running
+`-+- policy='service-time 0' prio=0 status=enabled
+  `- 19:0:1:0 sdf 8:80 active undef running
 
-    echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host7/vport_delete
-    echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host7/vport_delete
 
-    #Guest
 
-#    sg_persist --out --register --param-sark=123abc /dev/sdb
-#    sg_persist --out --reserve --param-rk=123abc --prout-type=1 /dev/sdb
-#    sg_persist -r /dev/sdb
-#
-#    sg_persist --out --release --param-rk=123abc --prout-type=1 /dev/sdb
-#    sg_persist -r /dev/sdb
+     fio --filename=/dev/sdb --direct=1 --rw=read/write --bs=64K --size=1000M --name=test --iodepth=1 --ioengine=libaio
 
-     fio --filename=/dev/sdb --direct=1 --rw=readwrite --bs=64K --size=1000M --name=test --iodepth=1 --ioengine=libaio
-    #randread/randwrite/randrw
-    fio --filename=/dev/sdb --direct=1 --rw=randrw --bs=64K --size=1000M --name=test --iodepth=1 --ioengine=libaio
 
-    {"execute": "qmp_capabilities"}
-    {"execute": "migrate","arguments":{"uri": "tcp:0:5800"}}
+#dst
+  {'execute': 'qmp_capabilities'}
+  {'execute': 'migrate-incoming', 'arguments': {'uri': 'tcp:[::]:5000'}}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+
+  #src
+
+
+  {'execute': 'qmp_capabilities'}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+  {"execute": "migrate","arguments":{"uri": "tcp:127.0.0.1:5000"}}
+  {"execute":"migrate-start-postcopy"}
+  {"execute":"query-migrate"}
+
 
 }

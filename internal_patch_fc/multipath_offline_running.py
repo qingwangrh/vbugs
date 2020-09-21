@@ -224,12 +224,13 @@ def run(test, params, env):
         """
         for disk in disks:
             set_disk_status_to_online_offline(disk, status)
+            time.sleep(2)
         if len(disks) == 1:
             wait.wait_for(lambda: compare_onepath_status(status, disks[0]),
-                          first=wait_time, step=1.5, timeout=60)
+                          first=wait_time, step=3, timeout=60)
         else:
             wait.wait_for(lambda: compare_multipath_status(status),
-                          first=wait_time, step=1.5, timeout=60)
+                          first=wait_time, step=3, timeout=60)
 
     def get_lvm_dm_name(blkdevs_used):
 
@@ -401,16 +402,29 @@ def run(test, params, env):
         for disk in disks:
             delete_partition_on_host(disk)
 
-    def _run_fio_background(filename):
+    def _run_fio_background(session,filename):
         """run fio testing by thread"""
 
         logging.info("Start fio in background.")
-        args = (params['fio_options'] % filename, 3600)
-        fio_thread = utils_misc.InterruptedThread(fio_multipath.run, args)
-        fio_thread.start()
-        if not utils_misc.wait_for(lambda: fio_thread.is_alive, 60):
-            test.fail("Failed to start fio thread.")
-        return fio_thread
+        cmd=fio_multipath.cfg.fio_path + params['fio_options'] % filename
+        logging.info(cmd)
+        session.cmdline(cmd)
+        # args = (params['fio_options'] % filename, 3600)
+        # fio_thread = utils_misc.InterruptedThread(fio_multipath.run, args)
+        # fio_thread.start()
+        # if not utils_misc.wait_for(lambda: fio_thread.is_alive, 60):
+        #     test.fail("Failed to start fio thread.")
+        # return fio_thread
+    # def _run_fio_background(filename):
+    #     """run fio testing by thread"""
+    #
+    #     logging.info("Start fio in background.")
+    #     args = (params['fio_options'] % filename, 3600)
+    #     fio_thread = utils_misc.InterruptedThread(fio_multipath.run, args)
+    #     fio_thread.start()
+    #     if not utils_misc.wait_for(lambda: fio_thread.is_alive, 60):
+    #         test.fail("Failed to start fio thread.")
+    #     return fio_thread
 
     def _get_windows_disks_index(session, image_size):
         """
@@ -460,7 +474,7 @@ def run(test, params, env):
             logging.error("Failed to resume vm: %s" % six.text_type(e))
         return vm_status
 
-    def resume_vm(vm, n_repeat=3):
+    def resume_vm(vm, n_repeat=2):
         """resume vm when it is paused.
 
         :param vm: VM object.
@@ -498,7 +512,7 @@ def run(test, params, env):
         test.cancel("The special disk is not '%s', cancel the test."
                     % stg_serial_name)
     wait_time = float(params.get("sub_test_wait_time", 0))
-    repeat_times = int(params.get("repeat_times", 3))
+    repeat_times = int(params.get("repeat_times", 2))
     multi_disks = get_multipath_disks(mpath_name)
     error_context.context("Get all disks for '%s': %s"
                           % (mpath_name, multi_disks), logging.info)
@@ -575,8 +589,8 @@ def run(test, params, env):
                 if not partitions:
                     test.fail("Fail to format disks.")
             fio_file_name = params["fio_file_name"] % partitions[0]
-            fio_thread = _run_fio_background(fio_file_name)
-
+            # fio_thread = _run_fio_background(fio_file_name)
+            _run_fio_background(session,fio_file_name)
         # disk = random.sample(multi_disks, 1)
         for disk in multi_disks:
             error_context.context("Disable disk %s during guest running"
@@ -616,19 +630,24 @@ def run(test, params, env):
             test.fail("Guest is not running after all disks online")
         if "bg" in locals().keys() and bg.is_alive and not vm.is_paused():
             bg.join()
-        if "fio_thread" in locals().keys() and fio_thread.is_alive \
-                and not vm.is_paused():
-            fio_thread.join()
+        # wq comment ,why need wait fio
+        # if "fio_thread" in locals().keys() and fio_thread.is_alive \
+        #         and not vm.is_paused():
+        #     fio_thread.join()
         error_context.context("Verify Host and guest kernel no error "
                               "and call trace", logging.info)
         vm.verify_kernel_crash()
+    # except Exception as e:
+    #     logging.error(e)
     finally:
         logging.info("Finally, clean environment.")
-        set_multipath_disks_status(multi_disks, "running")
-        if "session" in locals().keys() and session:
-            session.close()
-        if "fio_multipath" in locals().keys() and fio_multipath \
-                and not vm.is_paused():
-            fio_multipath.clean()
-        if vm.is_alive():
-            vm.destroy(gracefully=True)
+        # set_multipath_disks_status(multi_disks, "running")
+        # error_context.context("Test end")
+        # wq comment do not need clean action
+        # if "session" in locals().keys() and session:
+        #     session.close()
+        # if "fio_multipath" in locals().keys() and fio_multipath \
+        #         and not vm.is_paused():
+        #     fio_multipath.clean()
+        # if vm.is_alive():
+        #     vm.destroy(gracefully=True)

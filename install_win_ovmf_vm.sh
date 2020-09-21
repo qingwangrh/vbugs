@@ -1,6 +1,8 @@
 #cp /usr/share/edk2/ovmf/OVMF_VARS.fd /home/kvm_autotest_root/images/win2019-64-virtio.qcow2.fd
 # mkdir -p /home/images; qemu-img create -f qcow2 /home/images/win2019.qcow2 30G
 
+winos_iso=$(readlink /home/kvm_autotest_root/iso/ISO/Win2019/latest_x86_64/* -f)
+
 /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1' \
     -machine q35  \
@@ -19,7 +21,7 @@
     -m 13312  \
     -smp 24,maxcpus=24,cores=12,threads=1,sockets=2  \
     -cpu 'Skylake-Server',hv_stimer,hv_synic,hv_vpindex,hv_reset,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,hv-tlbflush,+kvm_pv_unhalt \
-    -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/ISO/Win2019/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso \
+    -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=${winos_iso} \
     -device ide-cd,id=cd1,drive=drive_cd1,bootindex=2,bus=ide.0,unit=0 \
     -drive id=drive_virtio,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso \
     -device ide-cd,id=virtio,drive=drive_virtio,bootindex=3,bus=ide.1,unit=0 \

@@ -60,7 +60,7 @@ steps() {
   {"execute": "blockdev-add","arguments": {"node-name": "VHBA-disk1","driver":"raw","file":"vHBA1"}}
   {"execute":"device_add","arguments":{"driver":"scsi-block","drive":"VHBA-disk1","id":"vdisk1","bus":"virtio_scsi_pci1.0"}}
 
-  {"execute": "blockdev-add","arguments": {"node-name": "vHBA2","driver": "host_device", "filename": "/dev/sdg"}}
+  {"execute": "blockdev-add","arguments": {"node-name": "vHBA2","driver": "host_device", "filename": "/dev/sde"}}
   {"execute": "blockdev-add","arguments": {"node-name": "VHBA-disk2","driver":"raw","file":"vHBA2"}}
   {"execute":"device_add","arguments":{"driver":"scsi-block","drive":"VHBA-disk2","id":"vdisk2","bus":"virtio_scsi_pci1.0"}}
 

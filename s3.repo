@@ -1,0 +1,6 @@
+[av-ci]
+name=av-ci
+baseurl=http://10.66.86.24/libvirt-CI-repos/RHEL/8.3/Latest-virt-8.3/x86_64/
+enabled=1
+gpgcheck=0
+skip_if_unavailable=1
