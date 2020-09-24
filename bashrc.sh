@@ -41,7 +41,7 @@ else
     grep -r -n -i "$*" ./ | grep -v '\.svn/' | grep --color=auto -i "$*"
   }
 
-  if grep --help > /dev/null | grep "exclude-dir"; then
+  if grep --help >/dev/null | grep "exclude-dir"; then
     GREP_OPTIONS="--exclude-dir=\.svn"
     export GREP_OPTIONS
   fi
@@ -72,6 +72,33 @@ wscreen() {
     screen -dmS $name python3 -m http.server 800$idx
   fi
   screen -S $name -ls
+
+}
+
+wiscsi() {
+  echo -e "
+yum install -y iscsi-initiator-utils device-mapper*
+  mpathconf --enable
+
+  cat /etc/iscsi/initiatorname.iscsi
+  InitiatorName=iqn.1994-05.com.redhat:share1
+
+  systemctl restart iscsid iscsi multipathd
+
+  #login
+  iscsiadm -m discovery -t st -p 10.66.8.105
+  iscsiadm -m node -T iqn.2016-06.qing.server60:a -p 10.66.8.105:3260 -l
+  iscsiadm -m node -T iqn.2016-06.qing.server60:b -p 10.66.8.105:3260 -l
+
+  #logout
+  iscsiadm -m node -T  iqn.2016-06.qing.server60:a  -p 10.66.8.105:3260 -u;
+  iscsiadm -m node -T  iqn.2016-06.qing.server60:b  -p 10.66.8.105:3260 -u
+
+  #delete
+  iscsiadm -m node -T  iqn.2016-06.qing.server60:a  -p 10.66.8.105:3260 -o delete;
+  iscsiadm -m node -T  iqn.2016-06.qing.server60:b  -p 10.66.8.105:3260  -o delete
+
+"
 
 }
 
@@ -143,7 +170,7 @@ wsshx() {
   cmd="$@"
   echo "cmd=$cmd"
   #"*IDENTIFICATION HAS CHANGED*" { send "rm -rf ~/.ssh/known_hosts\r";spawn ssh root@${host};exp_continue }
-  expect << EOF
+  expect <<EOF
     set timeout 3
     set rmflag 0
     spawn ssh -o "StrictHostKeyChecking=no" root@${host}
@@ -203,6 +230,29 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
   fi
   wsshx ${host} "mkdir -p .ssh;echo '${id_rsa}' > .ssh/id_rsa;echo '${id_rsa_pub}' > .ssh/id_rsa.pub;yes|cp .ssh/id_rsa.pub .ssh/authorized_keys;chmod 600 .ssh/*"
   [[ $? == 0 ]] && wenv ${host}
+}
+
+wgitupdate() {
+  {
+    echo -n "Are you sure start to git rebase[y/n]: "
+    read
+    echo You typed ${REPLY}
+  }
+  if [[ "${REPLY}" != "y" ]]; then
+    return 1
+  fi
+
+  if (($# < 1)); then
+    echo "miss parameter"
+    return 1
+  fi
+  branch=$1
+  #git stash
+  git checkout master
+  git pull
+  git checkout $branch
+  git rebase master
+  #git stash pop
 }
 
 wgitupdate() {
@@ -369,7 +419,7 @@ wbug() {
   #            target_dir=/home/exports/qbugs/
   #    fi
 
-  if ! mount | grep '/mnt/bug_nfs' > /dev/null; then
+  if ! mount | grep '/mnt/bug_nfs' >/dev/null; then
     [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
     echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
     if mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then
@@ -459,7 +509,7 @@ wlog() {
   #    fi
   #    target_dir="${target_dir} /home/rexports/qlogs/data/"
 
-  if ! mount | grep '/mnt/bug_nfs' > /dev/null; then
+  if ! mount | grep '/mnt/bug_nfs' >/dev/null; then
     [[ -d /mnt/bug_nfs/ ]] || mkdir -p /mnt/bug_nfs/
     echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
     if ! mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then
@@ -490,7 +540,7 @@ wlog() {
     stamp_link="${log_name}_${T}"
     echo "generate wversion.txt"
     wversion
-    yes|cp -rf /tmp/wversion.txt ${log_dir}/${log_id}/wversion_${T}.txt
+    yes | cp -rf /tmp/wversion.txt ${log_dir}/${log_id}/wversion_${T}.txt
 
     echo "create soft link:${log_dir}/${log_id} ${log_name}"
     touch ${log_dir}/${log_id}/${stamp_link}
@@ -500,13 +550,13 @@ wlog() {
     [[ -L ${log_name} ]] && echo "delete exist link ${log_name}" && rm -rf ${log_name}
     ln -s data/${log_id} ${log_name}
     ls -l ${log_name}
-    cd - > /dev/null
+    cd - >/dev/null
     echo "create history soft link:${log_dir}/${log_id} ${stamp_link}"
     cd ${log_dir}../history/
     [[ -L ${stamp_link} ]] && echo "delete exist link ${stamp_link}" && rm -rf ${stamp_link}
     ln -sf ../data/${log_id} ${stamp_link}
     ls -l ${stamp_link}
-    cd - > /dev/null
+    cd - >/dev/null
   done
 
   echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup/qlogs/${log_name}"

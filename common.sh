@@ -40,6 +40,12 @@ create_repo(){
   fi
 }
 
+create_s3(){
+  yes|cp s3.repo /etc/yum.repos.d/
+  yum module reset virt
+  yum module install virt:8.3
+}
+
 create_workdir() {
   echo "create_workdir"
   [[ -d /workdir ]] || mkdir -p /workdir

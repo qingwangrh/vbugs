@@ -1,5 +1,6 @@
+# This clone to 1881404,1881405,1881406
 # This only for pc?
-# dd if=/dev/zero of=fda.img bs=1024 count=1440
+# dd if=/dev/zero of=/home/kvm_autotest_root/images/fda.img bs=1024 count=1440
 #/usr/libexec/qemu-kvm  -nographic -enable-kvm -m 100 -net none -fda fda.img -cdrom hypertrash.iso
 
 /usr/libexec/qemu-kvm \
@@ -22,7 +23,7 @@
   -device virtio-blk-pci,id=os_disk,drive=drive_image1,bus=pcie-root-port-2,addr=0x0,bootindex=0,serial=OS_DISK   \
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/data1.qcow2,node-name=data_image1   \
   -device virtio-blk-pci,id=data_disk,drive=data_image1,bus=pcie-root-port-3,addr=0x0,bootindex=1,serial=DATA_DISK   \
-  -vnc :7 \
+  -vnc :5 \
   -monitor stdio \
   -m 8192 \
   -smp 8 \
@@ -31,9 +32,8 @@
   -netdev tap,id=idxgXAlm \
   -chardev file,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server,nowait \
   -mon chardev=qmp_id_qmpmonitor1,mode=control \
-  -qmp tcp:0:5957,server,nowait \
+  -qmp tcp:0:5955,server,nowait \
   -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0 \
   -device isa-serial,chardev=serial_id_serial0 \
   -D debug.log \
-  -blockdev node-name=file_cd1,driver=file,read-only=on,aio=threads,filename=/home/kvm_autotest_root/iso/ISO/Win2019/en_windows_server_2019_updated_may_2020_x64_dvd_5651846f.iso,cache.direct=on,cache.no-flush=off \
-  -blockdev node-name=drive_cd1,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd1 \
+  -fda /home/kvm_autotest_root/images/fda.img
