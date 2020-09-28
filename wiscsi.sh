@@ -1,4 +1,4 @@
-
+#iscsi relevant operations
 
 wiscsi(){
 

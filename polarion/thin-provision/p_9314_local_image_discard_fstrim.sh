@@ -17,13 +17,12 @@
     -blockdev driver=qcow2,node-name=disk_2,file=host_disk2 \
     -device scsi-hd,drive=disk_2,bus=scsi0.0,id=host_disk_2 \
     \
-    -blockdev driver=file,cache.direct=on,cache.no-flush=off,filename=/home/kvm_autotest_root/images/test.img,node-name=data_disk,discard=unmap \
-    -blockdev driver=raw,node-name=disk1,file=data_disk,cache.direct=on,cache.no-flush=off,discard=unmap \
-    -device scsi-hd,drive=disk1,bus=scsi2.0,id=data_disk,write-cache=on,logical_block_size=4096,physical_block_size=4096 \
+     -blockdev driver=file,cache.direct=on,cache.no-flush=off,filename=/home/kvm_autotest_root/images/data.qcow2,node-name=data_disk,discard=unmap \
+    -blockdev driver=qcow2,node-name=disk1,file=data_disk,cache.direct=on,cache.no-flush=off,discard=unmap \
+    -device scsi-hd,drive=disk1,bus=scsi2.0,id=data_disk,write-cache=on \
     \
-     -blockdev driver=host_device,cache.direct=on,cache.no-flush=off,filename=/dev/sdh,node-name=host_disk1,discard=unmap \
-    -blockdev driver=raw,node-name=disk_1,file=host_disk1,cache.direct=on,cache.no-flush=off,discard=unmap \
-    -device scsi-hd,drive=disk_1,id=data-disk1,bus=scsi2.0,write-cache=on,logical_block_size=4096,physical_block_size=4096 \
+    -drive file=/home/kvm_autotest_root/images/data2.qcow2,if=none,id=drive-disk2,media=disk,format=qcow2,cache=none,werror=stop,rerror=stop,discard=on \
+    -device scsi-hd,drive=drive-disk2,bus=scsi2.0,id=data_disk2 \
     \
     -device pcie-root-port,id=pcie.0-root-port-5,slot=5,chassis=5,addr=0x5,bus=pcie.0 \
     -device virtio-net-pci,mac=9a:55:56:57:58:59,id=id18Xcuo,netdev=idGRsMas,bus=pcie.0-root-port-5,addr=0x0  \
@@ -49,31 +48,20 @@
 
 
 steps() {
-
--drive file=/home/test.img,if=none,id=drive-data-disk,format=raw,cache=none,aio=native,werror=stop,rerror=stop,discard=on \
--device scsi-hd,drive=drive-data-disk,id=data-disk,logical_block_size=4096,bus=scsi1.0
-#(make sure install sg3_utils in guest)
 #host
-    #create image on host xfs
-    qemu-img create -f raw /home/kvm_autotest_root/images/test.img 1G
-    modprobe -r scsi_debug
-    modprobe scsi_debug lbprz=1 lbpu=1 dev_size_mb=1024
-    modprobe scsi_debug lbprz=0 lbpu=1 dev_size_mb=1024
-
-     cat /sys/bus/pseudo/drivers/scsi_debug/map
+    qemu-img create -f qcow2 /home/kvm_autotest_root/images/data.qcow2 1G
+     stat -c %b /home/kvm_autotest_root/images/data.qcow2
 
 #guest
-    yes | head -n2048 > buf
- sg_write_same --in buf --num=32 --lba=80 /dev/sdb
- sg_write_same --in /dev/zero --num=96 --lba=0 /dev/sdb
- sg_write_same -U --in /dev/zero --num=16 --lba=0 /dev/sdb
- time sg_write_same --in buf --num=65536 --lba=131074 /dev/sdb
- time sg_write_same --in /dev/zero --num=65534 --lba=196608 /dev/sdb
- sg_write_same --in /dev/zero --num=0 --lba=128 /dev/sdb
+dd if=/dev/zero of=/dev/sdb bs=1M
 
- sha1sum /dev/sdb
+mkdir -p /home/test
+mkfs.ext4 /dev/sdb
+mount /dev/sdb /home/test
+fstrim /home/test
+
 #host
- sha1sum test.img
-cat /sys/bus/pseudo/drivers/scsi_debug/map
+#do this after mkfs dd fstrim
+stat -c %b /home/kvm_autotest_root/images/data.qcow2
 
 }

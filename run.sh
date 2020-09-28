@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#default
+#Default
 os=rhel830
 fmt=qcow2
 drv=scsi
@@ -8,11 +8,17 @@ mode=blockdev
 mac=9a:b5:b6:b1:b2:b7
 params=
 machine=q35
-while getopts ":o:m:b:p:d:f:rh" opt; do
+install=0
+while getopts ":o:m:b:p:d:f:rhi" opt; do
   case $opt in
   h)
-    echo "usage: -o <rhel820/win2019> -b <scsi/blk> -f <qcow2/raw> -d <drive/blockdev> -m <q35/pc> -p <params>"
+    echo -e "Usage: -o <rhel820/win2019> -b <scsi/blk> -f <qcow2/raw>
+    -d <drive/blockdev> -m <q35/pc> -p <params> -i [enable installation]"
     exit 0
+    ;;
+  i)
+    echo -e "Enable install"
+    install=1
     ;;
   p)
     echo " $OPTARG"
@@ -85,10 +91,19 @@ else
   bus="pcie.0"
 fi
 
+if [[ "$install" == "1" ]]; then
+  os="${os}-new"
+fi
+
 if [[ "$drv" == "blk" ]]; then
   os_img_name="${os}-64-virtio.${fmt}"
 else
   os_img_name="${os}-64-virtio-scsi.${fmt}"
+fi
+
+if [[ ! -e ${img_dir}/${os_img_name} ]]; then
+  echo "Create install disk"
+  qemu-img create -f ${fmt} ${img_dir}/${os_img_name} 25G
 fi
 
 if [[ "$mode" == "drive" ]]; then
@@ -170,7 +185,7 @@ cmd="
   -device isa-serial,chardev=serial_id_serial0 @
   -D debug.log @
   ${cds}
-  -fda /home/kvm_autotest_root/images/fda.img
+
 "
 
 cmd="${cmd//@/\\}"
