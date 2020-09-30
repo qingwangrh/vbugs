@@ -9,20 +9,20 @@
     -device qemu-xhci,id=usb1,bus=pcie.0-root-port-2,addr=0x0 \
     -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
     -object iothread,id=iothread0 \
-    -object throttle-group,id=foo,x-bps-total=1024000,x-iops-total=100 \
+    -object throttle-group,id=group1,x-iops-total=50,x-iops-total-max=100,x-iops-total-max-length=20 \
     -device pcie-root-port,id=pcie.0-root-port-3,slot=3,chassis=3,addr=0x3,bus=pcie.0 \
     -device pcie-root-port,id=pcie.0-root-port-4,slot=4,chassis=4,addr=0x4,bus=pcie.0 \
     -device pcie-root-port,id=pcie.0-root-port-6,slot=6,chassis=6,addr=0x6,bus=pcie.0 \
     -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-3,addr=0x0 \
     -device virtio-scsi-pci,id=scsi2,bus=pcie.0-root-port-4,addr=0x0,iothread=iothread0 \
     \
-    -blockdev driver=file,cache.direct=off,cache.no-flush=on,filename=/mnt/gluster/wq/rhel820-64-virtio.qcow2,node-name=os_img \
+    -blockdev driver=file,cache.direct=off,cache.no-flush=on,filename=/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2,node-name=os_img \
     -blockdev driver=qcow2,node-name=os_drive,file=os_img \
     -device scsi-hd,drive=os_drive,bus=scsi0.0,id=os_disk \
     \
-    -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg1,filename=//mnt/gluster/wq/stg1.raw \
+    -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg1,filename=/home/kvm_autotest_root/images/stg1.raw \
     -blockdev driver=raw,node-name=drive_stg1,file=file_stg1 \
-    -blockdev driver=throttle,throttle-group=foo,node-name=foo1,file=drive_stg1 \
+    -blockdev driver=throttle,throttle-group=group1,node-name=foo1,file=drive_stg1 \
     -device virtio-blk-pci,drive=foo1,id=data,bus=pcie.0-root-port-6,addr=0x0,iothread=iothread0 \
     \
     -device pcie-root-port,id=pcie.0-root-port-5,slot=5,chassis=5,addr=0x5,bus=pcie.0 \
@@ -36,7 +36,7 @@
     -device pcie-root-port,id=pcie_extra_root_port_0,slot=8,chassis=8,addr=0x8,bus=pcie.0 \
     -monitor stdio \
     -qmp tcp:0:5956,server,nowait \
-    -incoming tcp:0:5200 \
+    -incoming defer \
 
 
 
@@ -44,6 +44,8 @@
 steps() {
 #ABI different host
 mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0  /mnt/gluster
+
+qemu-img create -f raw /home/kvm_autotest_root/images/stg1.raw 1G
 
 fio --filename=/dev/vda --direct=1 --rw=randrw --bs=4k --size=100M --name=test --iodepth=1 --runtime=30
 

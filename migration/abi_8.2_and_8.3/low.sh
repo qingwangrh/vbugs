@@ -22,7 +22,7 @@ fi
   -device pcie-root-port,id=pcie.0-root-port-5,slot=5,bus=pcie.0 \
   -device pcie-root-port,id=pcie.0-root-port-6,slot=6,bus=pcie.0 \
   -device qemu-xhci,id=usb1,bus=pcie.0-root-port-6,addr=0x0 \
-  -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1  \
+  -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,iothread=iothread0 \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-5,iothread=iothread0 \
@@ -44,10 +44,7 @@ fi
   -qmp tcp:0:5955,server,nowait \
   -chardev file,path=/var/tmp/monitor-serial5.log,id=serial_id_serial0 \
   -device isa-serial,chardev=serial_id_serial0 \
-  $target \
-
-
-
+  $target
 
 steps() {
 
@@ -66,8 +63,10 @@ steps() {
 
   #dst
   {'execute': 'qmp_capabilities'}
-   {'execute': 'migrate-incoming', 'arguments': {'uri': 'tcp:[::]:5000'}}
-   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+  {'execute': 'migrate-incoming', 'arguments': {'uri': 'tcp:[::]:5000'}}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"late-block-activate","state":true}]}}
+
 
   #src
   10.73.196.177
@@ -75,7 +74,11 @@ steps() {
 
   {'execute': 'qmp_capabilities'}
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
-  {"execute": "migrate","arguments":{"uri": "tcp:10.73.224.209:5000"}}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"pause-before-switchover","state":true}]}}
+  {"execute": "migrate","arguments":{"uri": "tcp:10.73.196.177:5000"}}
+  {"execute":"query-migrate"}
+  {"execute":"migrate-continue","arguments":{"state":"pre-switchover"}}
+
   {"execute":"migrate-start-postcopy"}
   {"execute":"query-migrate"}
 

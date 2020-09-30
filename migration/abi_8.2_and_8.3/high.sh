@@ -65,6 +65,8 @@ steps() {
   {'execute': 'qmp_capabilities'}
   {'execute': 'migrate-incoming', 'arguments': {'uri': 'tcp:[::]:5000'}}
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"late-block-activate","state":true}]}}
+
 
   #src
   10.73.196.177
@@ -72,7 +74,11 @@ steps() {
 
   {'execute': 'qmp_capabilities'}
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+  {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"pause-before-switchover","state":true}]}}
   {"execute": "migrate","arguments":{"uri": "tcp:10.73.196.177:5000"}}
+  {"execute":"query-migrate"}
+  {"execute":"migrate-continue","arguments":{"state":"pre-switchover"}}
+
   {"execute":"migrate-start-postcopy"}
   {"execute":"query-migrate"}
 
