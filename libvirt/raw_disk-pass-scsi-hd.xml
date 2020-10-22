@@ -1,0 +1,6 @@
+ <disk type='block' device='disk'>
+            <driver name='qemu' type='raw' cache='none'/>
+            <source dev='/dev/sdd'/>
+            <target dev='sdi' bus='scsi'/>
+            <address type='drive' controller='0' bus='0' target='0' unit='4'/>
+        </disk>

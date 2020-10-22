@@ -1,0 +1,8 @@
+<hostdev mode='subsystem' type='scsi' >
+            <source>
+                <adapter name='scsi_host17'/>
+                <address bus='0' target='0' unit='0'/>
+            </source>
+            <target dev='sdi' bus='scsi'/>
+            <address type='drive' controller='0' bus='0' target='0' unit='4'/>
+        </hostdev>

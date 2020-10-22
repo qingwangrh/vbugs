@@ -1,0 +1,6 @@
+<disk type='file' device='disk'>
+    <driver name='qemu' type='raw' cache='none' iothread='1'/>
+    <source file='/home/kvm_autotest_root/images/stg2.raw'/>
+    <target dev='sdj' bus='virtio'/>
+    <address type='pci' domain='0x0000' bus='0x05' slot='0x01' function='0x0'/>
+</disk>

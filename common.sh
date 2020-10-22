@@ -2,7 +2,7 @@
 #set -x
 q_src_dir=/home/workdir
 
-create_cert(){
+create_cert() {
   echo "create_cert"
 
   curl -kL 'https://password.corp.redhat.com/RH-IT-Root-CA.crt' -o /etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt
@@ -12,36 +12,37 @@ create_cert(){
   update-ca-trust extract
 }
 
-create_repo7(){
+create_repo7() {
   echo "create_repo7"
   curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-7-server.repo' -o /etc/yum.repos.d/rcm-tools-rhel-7.repo
   rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   yum install python2-pip python3 brewkoji git vim net-tools screen mlocate -y
   updatedb
-  pip install --upgrade pip;pip install Jinja2
+  pip install --upgrade pip
+  pip install Jinja2
 }
 
-create_repo8(){
+create_repo8() {
   echo "create_repo8"
   curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
-#  dnf install python3 brewkoji  git -y
+  #  dnf install python3 brewkoji  git -y
   yum install http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/screen/4.6.2/4.el8/x86_64/screen-4.6.2-4.el8.x86_64.rpm -y
   yum install python3 brewkoji git vim net-tools mlocate -y
   updatedb
 }
 
-create_repo(){
-  if uname -r |grep el8;then
+create_repo() {
+  if uname -r | grep el8; then
     create_repo8
-  elif uname -r |grep el7;then
+  elif uname -r | grep el7; then
     create_repo7
   else
     echo "Warning nothing to do"
   fi
 }
 
-create_s3(){
-  yes|cp s3.repo /etc/yum.repos.d/
+create_s3() {
+  yes | cp s3.repo /etc/yum.repos.d/
   yum module reset virt
   yum module install virt:8.3
 }
@@ -205,10 +206,10 @@ create_component_manager() {
 
 }
 
-create_kar(){
+create_kar() {
   echo "create_kar"
   local target
-  if [[ "x$1" != "x" ]];then
+  if [[ "x$1" != "x" ]]; then
     target="--stable"
   fi
 
@@ -227,8 +228,6 @@ create_kar(){
   cd ${DIR}
 }
 
-
-
 open_coredump() {
   yum install abrt abrt-addon-ccpp abrt-tui -y
   mkdir -p /home/core/
@@ -246,12 +245,27 @@ open_coredump() {
 
 }
 
-
-disable_firewalld(){
+disable_firewalld() {
   systemctl stop firewalld
   systemctl disable firewalld
   setenforce 0
   sed -i -e '$a\SELINUX=disabled' -e '/SELINUX=enforcing/d' /etc/sysconfig/selinux
 
+}
+
+enable_libvirt_repo() {
+  vers=`cat /etc/redhat-release |awk '{print $6}'`
+  cp -rf libvirt-$vers.repo /etc/yum.repos.d/
+  yum -y module reset virt
+  yum -y module enable virt:$vers
+#  yum -y remove qemu-kvm*
+#  yum -y install qemu-kvm
+#  yum -y install libvirt*
+
+  echo "log_level = 3" >> /etc/libvirt/libvirtd.config
+  echo "log_filters=\"1:qemu 1:libvirt\"">>/etc/libvirt/libvirtd.config
+  echo "log_outputs=\"1:file:/tmp/libvirtd.log\"" >> /etc/libvirt/libvirtd.config
+
+  echo "max_core = \"unlimited\"" >>  /etc/libvirt/qemu.conf
 
 }

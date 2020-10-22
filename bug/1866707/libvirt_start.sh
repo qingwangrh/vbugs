@@ -13,12 +13,12 @@ virsh destroy myagent
 [ -f /home/kvm_autotest_root/images/stg10.qcow2 ] || qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg10.qcow2 2G
 [ -f /home/kvm_autotest_root/images/stg11.qcow2 ] || qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg11.qcow2 2.1G
 
-#qemu-img create -f qcow2 -b /home/kvm_autotest_root/images/stg1.qcow2 /home/kvm_autotest_root/images/stg1-1.qcow2 1G
+qemu-img create -f qcow2 -b /home/kvm_autotest_root/images/stg1.qcow2 /home/kvm_autotest_root/images/stg1-1.qcow2 1G
 
 
 virsh destroy myagent
 virsh undefine myagent
-virsh define agent-pc.xml
+virsh define agent-pc3.xml
 virsh start myagent
 
 sleep 30
