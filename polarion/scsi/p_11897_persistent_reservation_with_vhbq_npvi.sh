@@ -41,10 +41,11 @@
 steps() {
   #Host1
   /dev/sdd
-  echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_create
-  echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_create
-  echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_delete
-  echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host1/vport_delete
+  echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host16/vport_create
+  echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host16/vport_create
+
+  echo '2101001b32a90002:2100001b32a9da4e' > /sys/class/fc_host/host16/vport_delete
+  echo '2101001b32a90001:2100001b32a9da4e' > /sys/class/fc_host/host16/vport_delete
 
     #Host2
     /dev/sdf
@@ -56,11 +57,12 @@ steps() {
 
     #Guest
 
-    sg_persist --out --register --param-sark=123abc /dev/sdb
-    sg_persist --out --reserve --param-rk=123abc --prout-type=1 /dev/sdb
-    sg_persist -r /dev/sdb
+    target=/dev/mapper/mpathb
+    sg_persist --out --register --param-sark=123abc ${target}
+    sg_persist --out --reserve --param-rk=123abc --prout-type=1 ${target}
+    sg_persist -r ${target}
 
-    sg_persist --out --release --param-rk=123abc --prout-type=1 /dev/sdb
-    sg_persist -r /dev/sdb
+    sg_persist --out --release --param-rk=123abc --prout-type=1 ${target}
+    sg_persist -r ${target}
 
 }

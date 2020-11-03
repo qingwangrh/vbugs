@@ -51,8 +51,9 @@ steps() {
   #host
   #yum install glusterfs-fuse -y
   mkdir -p /home/qing/images
-  #mount qing:/home/kvm_autotest_root/images /home/qing/images
-  mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0/wq /home/qing/images
+  mount qing:/home/kvm_autotest_root/images /home/qing/images
+  #mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0/wq /home/qing/images
+
   [[ ! -e /home/qing/images/data1.qcow2 ]] && qemu-img create -f qcow2 /home/qing/images/data1.qcow2 1G
   [[ ! -e /home/qing/images/data2.qcow2 ]] && qemu-img create -f qcow2 /home/qing/images/data2.qcow2 2G
 

@@ -51,8 +51,9 @@ steps() {
   #host
   #yum install glusterfs-fuse -y
   mkdir -p /home/qing/images
-  #mount qing:/home/kvm_autotest_root/images /home/qing/images
-  mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0/wq /home/qing/images
+  umount /home/qing/images
+  mount 10.66.8.105:/home/kvm_autotest_root/images /home/qing/images
+#  mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0/wq /home/qing/images
   [[ ! -e /home/qing/images/data1.qcow2 ]] && qemu-img create -f qcow2 /home/qing/images/data1.qcow2 1G
   [[ ! -e /home/qing/images/data2.qcow2 ]] && qemu-img create -f qcow2 /home/qing/images/data2.qcow2 2G
 
@@ -65,6 +66,7 @@ steps() {
   {'execute': 'qmp_capabilities'}
   {'execute': 'migrate-incoming', 'arguments': {'uri': 'tcp:[::]:5000'}}
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"late-block-activate","state":true}]}}
 
 
@@ -74,8 +76,9 @@ steps() {
 
   {'execute': 'qmp_capabilities'}
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"postcopy-ram","state":true}]}}
+
   {"execute":"migrate-set-capabilities","arguments":{"capabilities":[{"capability":"pause-before-switchover","state":true}]}}
-  {"execute": "migrate","arguments":{"uri": "tcp:10.73.196.177:5000"}}
+  {"execute": "migrate","arguments":{"uri": "tcp:10.73.224.209:5000"}}
   {"execute":"query-migrate"}
   {"execute":"migrate-continue","arguments":{"state":"pre-switchover"}}
 

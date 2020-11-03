@@ -1,21 +1,25 @@
-#there are on one server
+#for multipath backend,the two vms use same mapper path
+#run 2 vm in same host
 #WQTEST\Administrator Kvm_autotest
 
 winos_iso=$(readlink /home/kvm_autotest_root/iso/ISO/Win2019/latest_x86_64/* -f)
 
-if [ $# == 0 ];then
+if [ $# == 0 ]; then
   echo "xx"
   exit
 fi
 
-  idx=$1
+idx=$1
 
-if [ $idx == 1 ];then
+if [ $idx == 1 ]; then
   idx=1
-  scsi=sdf
+  scsi=sdb
+  mapper=/dev/mapper/mpathc
 else
   idx=2
-  scsi=sde
+  scsi=sdc
+  mapper=/dev/mapper/mpathd
+
 fi
 
 #scsi=`modprobe -r scsi_debug; modprobe scsi_debug lbpu=1 dev_size_mb=1024;lsblk -S|grep scsi_debug|cut -d " " -f 1`
@@ -41,12 +45,12 @@ vm() {
     -blockdev driver=file,node-name=file_disk,cache.direct=off,cache.no-flush=on,filename=/home/windbg/pub-dnode${idx}.qcow2 \
     -blockdev driver=qcow2,node-name=protocol_disk,file=file_disk \
     -device scsi-hd,drive=protocol_disk,bus=scsi0.0,id=os_disk,bootindex=1 \
-    \
-    -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
-    -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=/dev/${scsi},node-name=drive2,file.pr-manager=helper0 \
-    -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive2,id=scsi0-0-0-0,bootindex=2 \
-    \
-    -device virtio-net-pci,mac=${mac},id=idKSMZST,netdev=idWCSiU5,bus=pcie-root-port-6,addr=0x0 \
+    -object \
+    pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock \
+    -blockdev driver=raw,file.driver=host_device,cache.direct=off,cache.no-flush=on,file.filename=${mapper},node-name=drive2,file.pr-manager=helper0 \
+    -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive2,id=scsi0-0-0-0,share-rw=on,bootindex=2 \
+    -device \
+    virtio-net-pci,mac=${mac},id=idKSMZST,netdev=idWCSiU5,bus=pcie-root-port-6,addr=0x0 \
     -netdev tap,id=idWCSiU5,script=/etc/qemu-ifup,vhost=on \
     -m 8G \
     -smp 24,maxcpus=24,cores=12,threads=1,sockets=2 \
@@ -70,13 +74,26 @@ vm() {
 
 steps() {
 
+  #  root@dell-per440-07 ~ # lsblk
+  #...
+  #sdb                              8:16   0  200G  0 disk
+  #sdc                              8:32   0  200G  0 disk
+
   systemctl start qemu-pr-helper
   systemctl status qemu-pr-helper
-  #run this on 2 hosts
 
+  #after first boot, it need resign dns
+  # due to domain server ip changed perhaps,
+  #then restart windows(reboot)
 
-  # run ms failover from vm1, it successd
-  echo
+    target=/dev/mapper/mpathd
+    sg_persist --out --register --param-sark=123abc ${target}
+    sg_persist --out --reserve --param-rk=123abc --prout-type=1 ${target}
+    sg_persist -r ${target}
+
+    sg_persist --out --release --param-rk=123abc --prout-type=1 ${target}
+    sg_persist -r ${target}
+
 
 }
 
