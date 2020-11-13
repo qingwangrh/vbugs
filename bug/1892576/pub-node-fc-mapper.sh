@@ -1,3 +1,4 @@
+#Not using this script,it need 2 vm run 2host
 #for multipath backend,the two vms use same mapper path
 #run 2 vm in same host
 #WQTEST\Administrator Kvm_autotest

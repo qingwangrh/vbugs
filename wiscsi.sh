@@ -66,4 +66,8 @@ wiscsi_discover() {
 
 }
 
+#libiscsi windows guest inititorname
+#uuid=ea78071a-f6e4-4347-8077-9cb9f7959e66
+#uuid=ea78071a-f6e4-4347-8077-9cb9f7959e88
+#iqn.2008-11.org.linux-kvm:${uuid}
 #wiscsi $@

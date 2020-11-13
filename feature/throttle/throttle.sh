@@ -3,6 +3,11 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg2.qcow2 12G
 qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg3.qcow2 13G
 qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg4.qcow2 14G
 
+attr1=$1
+if  [[ "x$attr1" == "x" ]];then
+  attr1="x-iops-total=50,x-iops-total-max=100,x-iops-total-max-length=20 "
+fi
+
 /usr/libexec/qemu-kvm \
   -name 'avocado-vt-vm1' \
   -sandbox on \
@@ -13,7 +18,7 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg4.qcow2 14G
   -smp 4,maxcpus=4,cores=2,threads=1,dies=1,sockets=2 \
   -device qemu-xhci,id=usb1,bus=pci.0,addr=0x3 \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
-  -object throttle-group,id=group1,x-iops-total=50,x-iops-total-max=100,x-iops-total-max-length=20 \
+  -object throttle-group,id=group1,$attr1 \
   -object throttle-group,id=group2,x-iops-total=50 \
   -device virtio-scsi-pci,id=virtio_scsi_pci0,bus=pci.0,addr=0x4 \
   -blockdev node-name=file_image1,driver=file,aio=threads,filename=/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \

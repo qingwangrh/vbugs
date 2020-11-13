@@ -398,7 +398,7 @@ wmount() {
   echo "mount qing:/home/exports /home/rexports"
   echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
   echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup"
-  echo " ln -s workspace/var/lib/avocado/data/avocado-vt/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;"
+  echo " ln -s workspace/var/lib/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;"
 }
 
 wbug() {

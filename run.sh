@@ -171,7 +171,7 @@ cmd="
   ${os_device} @
   ${data_img} @
   ${data_device} @
-  -vnc :7 @
+  -vnc :5 @
   -monitor stdio @
   -m 8192 @
   -smp 8 @
@@ -180,7 +180,7 @@ cmd="
   -netdev tap,id=idxgXAlm @
   -chardev file,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server,nowait @
   -mon chardev=qmp_id_qmpmonitor1,mode=control @
-  -qmp tcp:0:5957,server,nowait @
+  -qmp tcp:0:5955,server,nowait @
   -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0 @
   -device isa-serial,chardev=serial_id_serial0 @
   -D debug.log @

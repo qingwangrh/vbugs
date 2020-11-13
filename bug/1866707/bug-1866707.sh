@@ -87,7 +87,7 @@ steps(){
   #not reproduce on libvirt
   #this related repeated hotplug/unplug
 
-  wloop 0 41 qemu-img create -f qcow2 stg@@.qcow2
+  wloop 0 41 qemu-img create -f qcow2 stg@@.qcow2 1G
 
 # NUM_LUNS = 12 also may reproduce this issue
   NUM_LUNS=40
