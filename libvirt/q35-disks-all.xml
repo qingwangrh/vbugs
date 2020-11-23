@@ -56,6 +56,26 @@
             <target dev='sdg' bus='scsi'/>
             <address type='drive' controller='0' bus='0' target='0' unit='2'/>
         </disk>
+        <!--        pass through multipath with scsi-block-->
+        <!--        <disk type='block' device='lun'>-->
+        <!--            <driver name='qemu' type='raw' cache='none' io='native'/>-->
+        <!--            <source dev='/dev/mapper/mpathc'/>-->
+        <!--            <backingStore/>-->
+        <!--            <target dev='sdl' bus='scsi'/>-->
+        <!--            <alias name='scsi0-0-0-0'/>-->
+        <!--            <address type='drive' controller='0' bus='0' target='0' unit='6'/>-->
+        <!--        </disk>-->
+
+        <!--        pass through multipath with blk-->
+        <disk type='block' device='disk'>
+            <driver name='qemu' type='raw' cache='none' io='native'/>
+            <source dev='/dev/mapper/mpathc'/>
+            <backingStore/>
+            <target dev='vdl' bus='virtio'/>
+            <alias name='virtio-disk0'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x0a' function='0x0'/>
+        </disk>
+
         <!--        <disk type='file' device='disk'>-->
         <!--            <driver name='qemu' type='raw' cache='none'/>-->
         <!--            <source file='/home/kvm_autotest_root/images/stg5.raw'/>-->
@@ -74,12 +94,12 @@
         <!--            <address type='drive' controller='0' bus='0' target='0' unit='4'/>-->
         <!--        </disk>-->
 
-<!--        pass-through to scsi-generic-->
-<!--        -blockdev '{"driver":"host_device","filename":"/dev/sg4","node-name":"libvirt-7-backend","read-only":false}' \-->
-<!-- -device -->
-<!--        scsi-generic,bus=scsi0.0,channel=0,scsi-id=0,lun=4,drive=libvirt-7-backend,id=hostdev0 \-->
+        <!--        pass-through to scsi-generic-->
+        <!--        -blockdev '{"driver":"host_device","filename":"/dev/sg4","node-name":"libvirt-7-backend","read-only":false}' \-->
+        <!-- -device -->
+        <!--        scsi-generic,bus=scsi0.0,channel=0,scsi-id=0,lun=4,drive=libvirt-7-backend,id=hostdev0 \-->
 
-        <hostdev mode='subsystem' type='scsi' >
+        <hostdev mode='subsystem' type='scsi'>
             <source>
                 <adapter name='scsi_host17'/>
                 <address bus='0' target='0' unit='0'/>

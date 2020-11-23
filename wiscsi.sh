@@ -5,6 +5,7 @@ wiscsi_deploy() {
   mkdir -p /etc/target/pr
   mkdir -p /home/iscsi/
   yum install targetcli -y
+  systemctl enable target;systemctl start target
   systemctl enable targetcli
   systemctl start targetcli
   dd if=/dev/zero of=/home/iscsi/share4g.img bs=1M count=4096

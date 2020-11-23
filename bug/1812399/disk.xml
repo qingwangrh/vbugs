@@ -1,0 +1,7 @@
+<disk type="file" device="disk">
+      <driver name="qemu" type="raw" cache="none" discard="ignore" io="native"/>
+      <source file="/home/kvm_autotest_root/images/stg0.raw">
+      </source>
+      <backingStore/>
+      <target dev="sdb" bus="scsi"/>
+    </disk>

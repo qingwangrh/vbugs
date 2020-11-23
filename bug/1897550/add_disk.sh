@@ -1,3 +1,5 @@
+#Please use multidisk-hotplug.sh get flexible
+
 NUM_LUNS=199
 
 add_devices() {

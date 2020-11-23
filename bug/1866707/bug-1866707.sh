@@ -18,7 +18,7 @@
     -object iothread,id=iothread1 \
     -device virtio-scsi,id=scsi0 \
     -device virtio-scsi,id=scsi1,iothread=iothread1 \
-    -drive id=drive_image1,if=none,snapshot=off,aio=threads,cache=none,format=qcow2,file=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi.qcow2 \
+    -drive id=drive_image1,if=none,snapshot=off,aio=threads,cache=none,format=qcow2,file=/home/kvm_autotest_root/images/rhel831-64-virtio-scsi.qcow2 \
     -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,bus=scsi0.0 \
     \
     -blockdev node-name=test_disk0,driver=file,filename=/home/kvm_autotest_root/images/stg0.qcow2 \
@@ -87,47 +87,19 @@ steps(){
   #not reproduce on libvirt
   #this related repeated hotplug/unplug
 
-  wloop 0 41 qemu-img create -f qcow2 stg@@.qcow2 1G
+#host
+  wloop 0 41 qemu-img create -f qcow2 /home/kvm_autotest_root/images/stg@@.qcow2 1G
+  1866707-host-run.sh
+#guest
+  1866707-guest-run.sh
+cat run.sh
+trap 'kill $(jobs -p)' EXIT SIGINT
 
-# NUM_LUNS = 12 also may reproduce this issue
-  NUM_LUNS=40
-add_devices() {
-  exec 3<>/dev/tcp/localhost/5955
-  echo "$@"
-  echo -e "{'execute':'qmp_capabilities'}" >&3
-  read response <&3
-  echo $response
-  for i in $(seq 1 $NUM_LUNS) ; do
-  cmd="{'execute':'device_add', 'arguments': {'driver':'scsi-hd','drive':'test_disk$i','id':'scsi_disk$i','bus':'scsi1.0','lun':$i}}"
-  echo "$cmd"
-  echo -e "$cmd" >&3
-  read response <&3
-  echo "$response"
-  done
-}
-
-remove_devices() {
-  exec 3<>/dev/tcp/localhost/5955
-  echo "$@"
-  echo -e "{'execute':'qmp_capabilities'}" >&3
-  read response <&3
-  echo $response
-  for i in $(seq 1 $NUM_LUNS) ; do
-  cmd="{'execute':'device_del', 'arguments': {'id':'scsi_disk$i'}}"
-  echo "$cmd"
-  echo -e "$cmd" >&3
-  read response <&3
-  echo "$response"
-  done
-}
-
-
-while true ; do
-    echo "adding devices"
-    add_devices
-    sleep 3
-    echo "removing devices"
-    remove_devices
-    sleep 3
+for i in `seq 0 32` ; do
+	while true ; do
+		sg_luns /dev/sdb > /dev/null 2>&1
+	done &
 done
+echo "wait"
+
 }

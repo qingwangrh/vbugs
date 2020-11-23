@@ -6,6 +6,12 @@ python ConfigTest.py --testcase=block_hotplug..fmt_raw..with_plug..with_repetiti
 python ConfigTest.py --testcase=block_hotplug..block_scsi..fmt_raw..with_plug..with_repetition --guestname=RHEL.8.2 --clone=no
 
 
+virsh define pc.xml
+virsh start pc
+
+#org usage
+while true;do virsh attach-device pc disk.xml; virsh detach-device pc disk.xml;done
+
 
 a=1;while true;do let a=a+1;echo "a=$a";virsh attach-device pc disk.xml; ssh 192.168.122.65 lsblk /dev/sda|grep 1G && echo "ok" ||break;virsh detach-device pc disk.xml;ssh 192.168.122.65 "lsblk /dev/sda|grep 1G||echo 'detached'";done
 

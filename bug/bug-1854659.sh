@@ -23,9 +23,10 @@
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
   \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
-  -blockdev node-name=host_device_stg0,driver=host_device,filename=/dev/mapper/mpatha \
+  -blockdev node-name=host_device_stg0,driver=host_device,filename=/dev/mapper/mpathb \
   -blockdev node-name=drive_stg0,driver=raw,file=host_device_stg0 \
-  -device scsi-block,id=stg0,drive=drive_stg0,bus=scsi1.0 \
+  -device virtio-blk-pci,scsi=off,bus=pcie.0-root-port-4,addr=0,drive=drive_stg0,id=stg0,write-cache=on,rerror=stop,werror=stop,bootindex=2 \
+  \
   -vnc :5 \
   -qmp tcp:0:5955,server,nowait \
   -monitor stdio \
@@ -41,18 +42,24 @@ steps() {
   #host
      mpathconf --enable
  /bin/systemctl restart multipathd.service
+
+multipath -f /dev/mapper/mpathb;modprobe -r scsi_debug
+modprobe scsi_debug dev_size_mb=5000 num_tgts=1 vpd_use_hostno=0 add_host=2 delay=1 max_luns=2 no_lun_0=1
+
+multipath-switch.sh 5
 #guest
- dd if=/dev/zero of=/dev/sdb bs=1M count=30000
+# dd if=/dev/zero of=/dev/sdb bs=1M count=30000
+dd if=/dev/zero of=/dev/sdb
 
+#hit io-errot
 -device scsi-block,id=stg0,rerror=stop,werror=stop,drive=drive_stg0,bus=scsi1.0 \
--device scsi-block,id=stg0,drive=drive_stg0,bus=scsi1.0 \
-
-{"execute":"qmp_capabilities"}
-{"execute":"device_del","arguments":{"id":"stg1"}}
-
-system_reset
-{"execute":"device_add","arguments":{"driver":"scsi-block","drive":"drive_stg1","bus":"scsi1.0"}}
-
+#not hit io-erro
+-device virtio-blk-pci,scsi=off,bus=pcie.0-root-port-4,addr=0,drive=drive_stg0,id=stg0,write-cache=on,rerror=stop,werror=stop,bootindex=2 \
+#{"execute":"qmp_capabilities"}
+#{"execute":"device_del","arguments":{"id":"stg1"}}
+#
+#system_reset
+#{"execute":"device_add","arguments":{"driver":"scsi-block","drive":"drive_stg1","bus":"scsi1.0"}}
 
 
 }

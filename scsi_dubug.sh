@@ -39,8 +39,7 @@ dev=`lsscsi |grep scsi|awk '{ print $6 }'`
 steps(){
 #
 echo
-
-
 nc -U /tmp/qga.sock
 {"execute":"guest-fstrim"}
+
 }

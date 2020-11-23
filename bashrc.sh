@@ -232,28 +232,28 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
   [[ $? == 0 ]] && wenv ${host}
 }
 
-wgitupdate() {
-  {
-    echo -n "Are you sure start to git rebase[y/n]: "
-    read
-    echo You typed ${REPLY}
-  }
-  if [[ "${REPLY}" != "y" ]]; then
-    return 1
-  fi
-
-  if (($# < 1)); then
-    echo "miss parameter"
-    return 1
-  fi
-  branch=$1
-  #git stash
-  git checkout master
-  git pull
-  git checkout $branch
-  git rebase master
-  #git stash pop
-}
+#wgitupdate() {
+#  {
+#    echo -n "Are you sure start to git rebase[y/n]: "
+#    read
+#    echo You typed ${REPLY}
+#  }
+#  if [[ "${REPLY}" != "y" ]]; then
+#    return 1
+#  fi
+#
+#  if (($# < 1)); then
+#    echo "miss parameter"
+#    return 1
+#  fi
+#  branch=$1
+#  #git stash
+#  git checkout master
+#  git pull
+#  git checkout $branch
+#  git rebase master
+#  #git stash pop
+#}
 
 wgitupdate() {
   {
@@ -569,6 +569,58 @@ wlog() {
 wrdesktop() {
   echo "create windows remote desktop"
   rdesktop -g 1600x900 10.73.74.245 -u administrator -p Assentor01
+}
+
+wqmp_loop() {
+  echo "wloop_qmp start end action"
+  exec 3<>/dev/tcp/localhost/5955
+  echo -e "{'execute':'qmp_capabilities'}" >&3
+  read response <&3
+  echo $response
+
+  unset n
+  start=$1
+  let end=$1+$2
+  shift
+  shift
+  cmd="$@"
+  # you need put ; for you multiline command
+  cmd=$(echo $cmd | tr -s "\n" ";")
+  echo $cmd
+
+  for ((n = $start; n < $end; n++)); do
+    echo ""
+    #    echo "$(date)- - - - - - - - - - -$n"
+    #replace @@ with index
+    new_cmd="${cmd//@@/$n}"
+
+    OLD_IFS="$IFS"
+    IFS=";"
+
+    myarray=($new_cmd)
+
+    for mvar in ${myarray[@]}; do
+      var=$(echo "$mvar" | grep -o "[^ ]\+\( \+[^ ]\+\)*")
+      if [[ "x$var" != "x" ]]; then
+        if echo "$var" | grep ":" >/dev/null; then
+          echo "$var"
+          echo -e "$var" >&3
+          read response <&3
+          echo "$response"
+        else
+          eval "$var"
+        fi
+      fi
+    done
+    IFS="$OLD_IFS"
+
+    sleep 1
+
+  done
+}
+
+wqmp_exec() {
+  wqmp_loop 1 1 "$@"
 }
 
 export PATH=$PATH:/usr/local/bin

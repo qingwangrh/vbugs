@@ -115,11 +115,11 @@ else
 fi
 
 if [[ "$drv" == "blk" ]]; then
-  os_device="-device virtio-blk-pci,id=os_disk,drive=drive_image1,bus=pcie-root-port-2,addr=0x0,bootindex=0,serial=OS_DISK  "
-  data_device="-device virtio-blk-pci,id=data_disk,drive=data_image1,bus=pcie-root-port-3,addr=0x0,bootindex=1${params},serial=DATA_DISK  "
+  os_device="-device virtio-blk-pci,id=os,drive=drive_image1,bus=pcie-root-port-2,addr=0x0,bootindex=0,serial=OS_DISK  "
+  data_device="-device virtio-blk-pci,id=data1,drive=data_image1,bus=pcie-root-port-3,addr=0x0,bootindex=1${params},serial=DATA_DISK  "
 else
-  os_device="-device scsi-hd,id=os_disk,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK  "
-  data_device="-device scsi-hd,id=data_disk,drive=data_image1,bus=scsi0.0,bootindex=1${params},serial=DATA_DISK  "
+  os_device="-device scsi-hd,id=os,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK  "
+  data_device="-device scsi-hd,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1${params},serial=DATA_DISK,scsi-id=64  "
 fi
 
 echo "${params}"

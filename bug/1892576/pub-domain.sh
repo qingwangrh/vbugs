@@ -47,7 +47,7 @@ winos_iso=$(readlink /home/kvm_autotest_root/iso/ISO/Win2019/latest_x86_64/* -f)
 steps() {
 #this server should using static ip. 10.73.198.60
 #first run with dhcp in guest,then set the ip as static
-ip 10.73.199.187
+ip 10.73.198.60
 mask 255.255.252.0
 gatway 10.73.199.254
 dns:127.0.0.1,10.73.2.107

@@ -1,1 +1,2 @@
-run.sh+bug_1866707 is the reproduce
+same reason with bug 1812399
+bug_1866707 + 1866707-host-run.sh + 1866707-guest-run.sh is the reproducer

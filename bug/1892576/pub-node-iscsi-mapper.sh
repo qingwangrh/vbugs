@@ -13,18 +13,18 @@ idx=$1
 
 if [ $idx == 1 ]; then
   idx=1
-  scsi=sdb
-  mapper=/dev/mapper/mpathc
+#  scsi=sdb
+  mapper=/dev/mapper/mpathb
 else
   idx=2
-  scsi=sdc
-  mapper=/dev/mapper/mpathd
+#  scsi=sdc
+  mapper=/dev/mapper/mpatha
 
 fi
 
 #scsi=`modprobe -r scsi_debug; modprobe scsi_debug lbpu=1 dev_size_mb=1024;lsblk -S|grep scsi_debug|cut -d " " -f 1`
 
-echo "ready fc run vm $idx"
+echo "ready iscsi run vm $idx"
 mac="9a:95:96:97:98:9${idx}"
 
 vm() {
@@ -79,8 +79,7 @@ steps() {
   #sdb                              8:16   0  200G  0 disk
   #sdc                              8:32   0  200G  0 disk
 
-  systemctl start qemu-pr-helper
-  systemctl status qemu-pr-helper
+  systemctl enable qemu-pr-helper;systemctl start qemu-pr-helper;  systemctl status qemu-pr-helper
 
   #after first boot, it need resign dns
   # due to domain server ip changed perhaps,
