@@ -18,7 +18,7 @@ if [ $idx == 1 ]; then
 else
   idx=2
 #  scsi=sdc
-  mapper=/dev/mapper/mpatha
+  mapper=/dev/mapper/mpathc
 
 fi
 

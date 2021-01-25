@@ -220,7 +220,7 @@ create_kar() {
   git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
   cd kar
   ./Bootstrap.sh --develop --upstream --verbose --venv $target
-#  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 $target
+  #  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 $target
   ln -s workspace/var/lib/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
   ln -s workspace/avocado-vt avocado-vt
   ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
@@ -237,6 +237,11 @@ open_coredump() {
   sed -i -e '$a\ExternalSizeMax=32G' -e '$a\ProcessSizeMax=32G' /etc/systemd/coredump.conf
   ulimit -a
   sed -i '$a\*          soft     core   unlimited' /etc/security/limits.conf
+  echo "*   soft noproc   65535" >> /etc/security/limits.conf
+  echo "*   hard noproc   65535" >> /etc/security/limits.conf
+  echo "*   soft nofile   265535" >> /etc/security/limits.conf
+  echo "*   hard nofile   65535" >> /etc/security/limits.conf
+
   cat /etc/security/limits.conf
   cat /etc/systemd/coredump.conf
   systemctl daemon-reload
@@ -255,18 +260,18 @@ disable_firewalld() {
 }
 
 enable_libvirt_repo() {
-  vers=`cat /etc/redhat-release |awk '{print $6}'`
+  vers=$(cat /etc/redhat-release | awk '{print $6}')
   cp -rf libvirt-$vers.repo /etc/yum.repos.d/
   yum -y module reset virt
   yum -y module enable virt:$vers
-#  yum -y remove qemu-kvm*
-#  yum -y install qemu-kvm
-#  yum -y install libvirt*
+  #  yum -y remove qemu-kvm*
+  #  yum -y install qemu-kvm
+  #  yum -y install libvirt*
 
-  echo "log_level = 3" >> /etc/libvirt/libvirtd.config
-  echo "log_filters=\"1:qemu 1:libvirt\"">>/etc/libvirt/libvirtd.config
-  echo "log_outputs=\"1:file:/tmp/libvirtd.log\"" >> /etc/libvirt/libvirtd.config
+  echo "log_level = 3" >>/etc/libvirt/libvirtd.config
+  echo "log_filters=\"1:qemu 1:libvirt\"" >>/etc/libvirt/libvirtd.config
+  echo "log_outputs=\"1:file:/tmp/libvirtd.log\"" >>/etc/libvirt/libvirtd.config
 
-  echo "max_core = \"unlimited\"" >>  /etc/libvirt/qemu.conf
+  echo "max_core = \"unlimited\"" >>/etc/libvirt/qemu.conf
 
 }

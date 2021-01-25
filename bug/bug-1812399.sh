@@ -9,6 +9,7 @@ python ConfigTest.py --testcase=block_hotplug..block_scsi..fmt_raw..with_plug..w
 virsh define pc.xml
 virsh start pc
 
+qemu-img create -f raw /home/kvm_autotest_root/images/stg0.raw 1G
 #org usage
 while true;do virsh attach-device pc disk.xml; virsh detach-device pc disk.xml;done
 

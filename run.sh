@@ -173,7 +173,7 @@ cmd="
   ${data_device} @
   -vnc :5 @
   -monitor stdio @
-  -m 8192 @
+  -m 8G @
   -smp 8 @
   -device pcie-root-port,id=pcie-root-port-8,slot=8,chassis=8,addr=0x8,bus=${bus} @
   -device virtio-net-pci,mac=${mac},id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie-root-port-8,addr=0x0 @
