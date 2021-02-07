@@ -19,7 +19,7 @@ alias lsf="ls -p|grep [^/]$|xargs ls -lh --color"
 #alias lsd="ls -d */|sed 's/\///g'"
 alias wfind='find ./ -not \( -name .svn -a -prune \) -name'
 #alias wssh='ssh -o StrictHostKeyChecking=no '
-alias wmqing='mkdir -p /home/rworkdir/vbugs;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir/vbugs /home/rworkdir/vbugs; fi'
+alias wmqing='if ! rpm -qa|grep nfs-uitls;then yum install nfs-utils -y;fi;mkdir -p /home/rworkdir/vbugs;if ! mount |grep /home/rworkdir;then mount 10.66.8.105:/home/workdir/vbugs /home/rworkdir/vbugs; fi'
 alias wconsole='console -l qinwang -M conserver-01.eng.pek2.redhat.com '
 alias wversion="{ cat /etc/redhat-release;uname -r;rpm -qa|grep -E kvm-common-\"(rhev|[0-9])\";rpm -qa|grep seabios-[0-9];rpm -qa|grep edk2;readlink /home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso; } > /tmp/wversion.txt;cat /tmp/wversion.txt"
 
@@ -390,10 +390,12 @@ wmount() {
   [[ -d /mnt/bug_nfs ]] || mkdir -p /mnt/bug_nfs
   [[ -d /mnt/gluster ]] || mkdir -p /mnt/gluster
   [[ -d /mnt/logs ]] || mkdir -p /mnt/logs
+  [[ -d /mnt/exlogs ]] || mkdir -p /mnt/exlogs
   echo "mount.glusterfs gluster-virt-qe-01.lab.eng.pek2.redhat.com:/gv0  /mnt/gluster"
   echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /mnt/iso"
   echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /home/kvm_autotest_root/iso"
   echo "mount 10.73.194.27:/vol/S4/virtlablogs /mnt/logs"
+  echo "mount 10.73.32.21:/kvmqelogs /mnt/exlogs"
   echo "mount -o bind /home/workdir /workdir"
   echo "mount qing:/home/exports /home/rexports"
   echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"

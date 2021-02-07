@@ -1,3 +1,10 @@
+#
+# yum install systemtap* -y
+# stap get_qmp.stp
+#
+#
+
+
 global start
 
 # Print a string, with a timestamp relative to the start of the script

@@ -31,8 +31,22 @@ create_repo8() {
   updatedb
 }
 
+create_repo9() {
+  echo "create_repo9"
+#  curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
+  #  dnf install python3 brewkoji  git -y
+  yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/screen/4.6.2/4.el8/x86_64/screen-4.6.2-4.el8.x86_64.rpm
+#  yum install python3 brewkoji git vim net-tools mlocate -y
+  yum install -y nfs-utils git vim net-tools mlocate
+  yum install -y qemu*
+  yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/python3-brewkoji-1.26-1.el9.noarch.rpm  http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-qe-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-stage-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/koji/1.23.1/1.el9/noarch/python3-koji-1.23.1-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/koji/1.23.1/1.el9/noarch/koji-1.23.1-1.el9.noarch.rpm
+  updatedb
+}
+
 create_repo() {
-  if uname -r | grep el8; then
+  if uname -r | grep el9; then
+    create_repo9
+  elif uname -r | grep el8; then
     create_repo8
   elif uname -r | grep el7; then
     create_repo7
@@ -130,7 +144,12 @@ _setup_bridge() {
   #Get connection name
   CONID=$(nmcli device show $NDEV | awk -F: '/GENERAL.CONNECTION/ {print $2}' | awk '{$1=$1}1')
 
-  nmcli con add type bridge ifname "$BRIDGE_IFNAME" con-name "$BRIDGE_IFNAME" stp no
+  MAC=$(nmcli device show $NDEV|grep GENERAL.HWADDR|awk '{print $2}')
+  if uname -r | grep el9; then
+    nmcli con add type bridge ifname "$BRIDGE_IFNAME" con-name "$BRIDGE_IFNAME" stp no 802-3-ethernet.cloned-mac-address $MAC
+  else
+    nmcli con add type bridge ifname "$BRIDGE_IFNAME" con-name "$BRIDGE_IFNAME" stp no
+  fi
   nmcli con modify "$CONID" master "$BRIDGE_IFNAME"
   nmcli con up "$CONID"
   [ $? -ne 0 ] && echo "NetworkManager Command failed" && return 1
@@ -225,6 +244,11 @@ create_kar() {
   ln -s workspace/avocado-vt avocado-vt
   ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
   touch ${STAMP}
+  if uname -r | grep el9; then
+    #temp
+    wget http://fileshare.englab.nay.redhat.com/pub/section2/kvm/xuwei/rhel9_installation/RHEL-9-series.ks
+    cp -rf RHEL-9-series.ks internal_ks/RHEL-9-series.ks
+  fi
   #git clone https://gitlab.cee.redhat.com/yhong/vmt.git
   cd ${DIR}
 }

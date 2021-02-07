@@ -102,6 +102,8 @@ else
 fi
 
 if [[ ! -e ${img_dir}/${os_img_name} ]]; then
+  echo "Can not find os image ${img_dir}/${os_img_name}"
+  exit 1
   echo "Create install disk"
   qemu-img create -f ${fmt} ${img_dir}/${os_img_name} 25G
 fi
@@ -149,12 +151,16 @@ else
   -device scsi-cd,id=cd3,drive=drive_cd3,write-cache=on,bus=scsi1.0 @"
 fi
 
+  #-cpu 'Skylake-Server',+kvm_pv_unhalt @
+  #-cpu host @
+  #-cpu 'EPYC-Rome',+kvm_pv_unhalt @
+  #-nodefaults @
+  #-device VGA @
 cmd="
 /usr/libexec/qemu-kvm @
   -name testvm @
   -machine ${machine} @
-  -nodefaults @
-  -vga qxl @
+  -cpu host,+kvm_pv_unhalt @
   -device pcie-root-port,id=pcie-root-port-0,multifunction=on,bus=${bus},addr=0x3,chassis=1 @
   -device pcie-root-port,id=pcie-root-port-1,port=0x1,addr=0x3.0x1,bus=${bus},chassis=2 @
   -device pcie-root-port,id=pcie-root-port-2,port=0x2,addr=0x3.0x2,bus=${bus},chassis=3 @
@@ -184,6 +190,7 @@ cmd="
   -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0 @
   -device isa-serial,chardev=serial_id_serial0 @
   -D debug.log @
+  -boot menu=on,reboot-timeout=1000 @
   ${cds}
 
 "

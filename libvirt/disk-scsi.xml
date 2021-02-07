@@ -1,6 +1,6 @@
  <disk type='file' device='disk'>
-            <driver name='qemu' type='qcow2' cache='none' />
-            <source file='/home/kvm_autotest_root/images/stg2.qcow2'/>
-             <target dev='sde' bus='scsi'/>
-            <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+            <driver name='qemu' type='qcow2' />
+            <source file='/home/kvm_autotest_root/images/stg3.qcow2'/>
+            <target dev='sdg' bus='scsi'/>
+            <address type='drive' controller='0' bus='0' target='0' unit='2'/>
         </disk>
