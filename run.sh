@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #Default
-os=rhel830
+os=rhel840
 fmt=qcow2
 drv=scsi
 mode=blockdev
@@ -132,7 +132,7 @@ echo "${mac}"
 echo ""
 
 if echo "${os}" | grep rhel; then
-  os_iso=$(readlink /home/kvm_autotest_root/iso/linux/RHEL8.3.1-BaseOS-x86_64.iso -f)
+  os_iso=$(readlink /home/kvm_autotest_root/iso/linux/RHEL8.4.0-BaseOS-x86_64.iso -f)
   cds=" @
   -blockdev node-name=file_cd1,driver=file,read-only=on,aio=threads,filename=${os_iso},cache.direct=on,cache.no-flush=off @
   -blockdev node-name=drive_cd1,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd1 @
@@ -184,7 +184,7 @@ cmd="
   -device pcie-root-port,id=pcie-root-port-8,slot=8,chassis=8,addr=0x8,bus=${bus} @
   -device virtio-net-pci,mac=${mac},id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie-root-port-8,addr=0x0 @
   -netdev tap,id=idxgXAlm @
-  -chardev file,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server,nowait @
+  -chardev socket,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server,nowait @
   -mon chardev=qmp_id_qmpmonitor1,mode=control @
   -qmp tcp:0:5955,server,nowait @
   -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0 @

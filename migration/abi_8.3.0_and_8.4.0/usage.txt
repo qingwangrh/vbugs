@@ -1,0 +1,6 @@
+low.sh  for lower
+high.sh for higher
+
+./high.sh run as src node
+./high.sh xxx run as dst node 
+

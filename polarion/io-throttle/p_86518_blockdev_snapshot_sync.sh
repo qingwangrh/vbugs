@@ -1,4 +1,4 @@
-
+qemu-img create -f raw /home/kvm_autotest_root/images/data.raw 1G
 /usr/libexec/qemu-kvm \
     -name 'throttle-vm1' \
     -machine q35  \
@@ -21,16 +21,11 @@
     -blockdev driver=qcow2,node-name=os_drive,file=os_img \
     -device scsi-hd,drive=os_drive,bus=scsi0.0,id=os_disk \
     \
-    -object throttle-group,id=foo,x-bps-total=512000,x-bps-total-max=5120000,x-iops-total=100,x-bps-total-max-length=4 \
-    -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg1,filename=/home/kvm_autotest_root/images/stg1.raw \
+    -object throttle-group,id=foo,x-iops-total=50 \
+    -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg1,filename=/home/kvm_autotest_root/images/data.raw \
     -blockdev driver=raw,node-name=drive_stg1,file=file_stg1 \
     -blockdev driver=throttle,throttle-group=foo,node-name=foo1,file=drive_stg1 \
-    -device virtio-blk-pci,drive=foo1,id=data,bus=pcie.0-root-port-6,addr=0x0,iothread=iothread0 \
-    \
-    -blockdev driver=file,cache.direct=off,cache.no-flush=on,node-name=file_stg2,filename=/home/kvm_autotest_root/images/stg2.raw \
-    -blockdev driver=raw,node-name=drive_stg2,file=file_stg2 \
-    -blockdev driver=throttle,throttle-group=foo,node-name=foo2,file=drive_stg2 \
-    -device virtio-blk-pci,drive=foo2,id=data2,bus=pcie.0-root-port-7,addr=0x0,iothread=iothread0 \
+    -device virtio-blk-pci,drive=foo1,id=data1,bus=pcie.0-root-port-6,addr=0x0 \
     \
     -object throttle-group,id=foo2,x-iops-total=100,x-iops-size=8192 \
     \
@@ -48,6 +43,8 @@
 
 
 steps() {
+-object throttle-group,id=foo,x-bps-total=512000,x-bps-total-max=5120000,x-iops-total=100,x-bps-total-max-length=4 \
+
 
     -drive id=drive_cd1,if=none,snapshot=off,aio=threads,cache=none,media=cdrom,file=/home/kvm_autotest_root/iso/ISO/Win2019/en_windows_server_2019_updated_march_2019_x64_dvd_2ae967ab.iso  \
  -device ide-cd,id=cd1,drive=drive_cd1,bootindex=2,bus=ide.0,unit=0  \
@@ -65,13 +62,26 @@ steps() {
  #ok
     -device virtio-blk-pci,drive=foo1,id=data,bus=pcie.0-root-port-6,addr=0x0,iothread=iothread0
 
-    {"execute": "qmp_capabilities"}
-    {'execute':'blockdev-create','arguments':{'options': {'driver':'file','filename':'/home/kvmtest/1.raw','size':21474836480},'job-id':'job1'}}
-    {'execute':'blockdev-add','arguments':{'driver':'file','node-name':'data_disk1','filename':'/home/kvmtest/1.raw'}}
-    {'execute':'job-dismiss','arguments':{'id':'job1'}}
+   {"execute": "qmp_capabilities"}
 
-    {"execute": "transaction", "arguments": { "actions":[{ 'type': 'blockdev-snapshot', 'data' : { "node": "foo1","overlay":"data_disk1"}}]}}
-    {"execute":"qom-get","arguments":{"path":"foo","property":"limits" }}
+{"execute": "blockdev-create", "arguments": {"options": {"driver": "file", "filename": "/home/kvm_autotest_root/images/sn1.qcow2", "size": 104857600}, "job-id": "file_sn1"}, "id": "lI1v3pjM"}
+
+{"execute": "query-jobs", "id": "eknDwEbD"}
+
+{"execute": "job-dismiss", "arguments": {"id": "file_sn1"}, "id": "1pF2hDBK"}
+
+{"execute": "blockdev-add", "arguments": {"node-name": "file_sn1", "driver": "file", "filename": "/home/kvm_autotest_root/images/sn1.qcow2", "aio": "threads", "auto-read-only": true, "discard": "unmap"}, "id": "c0PkSEKH"}
+
+
+{"execute": "blockdev-create", "arguments": {"options": {"driver": "qcow2", "file": "file_sn1", "size": 104857600, "cluster-size": 512}, "job-id": "drive_sn1"}, "id": "mHZQGs67"}
+{"execute": "query-jobs", "id": "eknDwEbD"}
+
+{"execute": "job-dismiss", "arguments": {"id": "drive_sn1"}, "id": "8pDXDcDM"}
+
+{"execute": "blockdev-add", "arguments": {"node-name": "drive_sn1", "driver": "qcow2", "file": "file_sn1", "read-only": false}, "id": "Kib3C8EH"}
+
+
+{"execute": "blockdev-snapshot", "arguments": {"node": "drive_data", "overlay": "drive_sn1"}, "id": "Z8BFNiEr"}
 
     fio --filename=/dev/vda --direct=1 --rw=randrw --bs=4k --size=100M --name=test --iodepth=1 --runtime=30
 

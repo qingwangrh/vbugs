@@ -1,4 +1,4 @@
-#iommu
+#iommu 1903957
 
 /usr/libexec/qemu-kvm \
   -name 'avocado-vt-vm1' \
@@ -49,8 +49,15 @@ steps() {
   qemu-img create -f qcow2 /home/kvm_autotest_root/images/storage1.qcow2 11G
   qemu-img create -f qcow2 /home/kvm_autotest_root/images/storage2.qcow2 12G
 
-  {"execute":"qmp_capabilities"}
+ {"execute":"qmp_capabilities"}
+
+#hotunplug iommu enabled device
   {'execute': 'device_del', 'arguments': {'id': 'stg0'}, 'id': 'SDclV94I'}
+  #or
+  {'execute': 'device_del', 'arguments': {'id': 'pcie_root_port_1'}, 'id': 'SDclV94I'}
+
+
+#end
 
   {"execute":"qmp_capabilities"}
   {"execute": "blockdev-add", "arguments": {"node-name": "file_stg2", "driver": "file", "auto-read-only": true, "discard": "unmap", "aio": "threads", "filename": "/home/kvm_autotest_root/images/storage2.qcow2", "cache": {"direct": true, "no-flush": false}}, "id": "Jaw90cpP"}

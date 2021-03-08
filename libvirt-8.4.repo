@@ -1,0 +1,7 @@
+[libvirt-8.4]
+name=libvirt-8.4
+baseurl=http://s3-qe-cn-storage.usersys.redhat.com/libvirt-CI-repos/RHEL/8.4/Latest-virt-av/x86_64/
+enabled=1
+priority=1
+gpgcheck=0
+skip_if_unavailable=1
