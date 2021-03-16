@@ -113,7 +113,7 @@ if [[ "$mode" == "drive" ]]; then
   data_img="-drive id=data_image1,if=none,snapshot=off,aio=threads,cache=none,format=qcow2,file=${img_dir}/${data_img_name}  "
 else
   os_img="-blockdev driver=${fmt},file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=${img_dir}/${os_img_name},node-name=drive_image1  "
-  data_img="-blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=${img_dir}/${data_img_name},node-name=data_image1  "
+  data_img="-blockdev driver=qcow2,file.driver=file,file.filename=${img_dir}/${data_img_name},node-name=data_image1  "
 fi
 
 if [[ "$drv" == "blk" ]]; then

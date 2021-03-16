@@ -83,8 +83,12 @@ steps() {
   {"execute":"query-migrate"}
 
   #or hmp
+  #dst
+  migrate_incoming tcp:[::]:5000
   migrate_set_capability postcopy-ram on
-  migrate -d tcp:10.73.196.27:5000
+  #src
+  migrate_set_capability postcopy-ram on
+  migrate -d tcp:10.73.224.209:5000
   migrate_start_postcopy
 
 }
