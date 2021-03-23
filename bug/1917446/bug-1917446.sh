@@ -4,7 +4,7 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/ahci-cdrom.img 256M
 
 /usr/libexec/qemu-kvm -nographic -enable-kvm -m 2048 \
     	-device ich9-ahci,id=ahci \
-    	-drive file=/home/kvm_autotest_root/images/ahci-cdrom.img,media=cdrom,if=none,id=mycdrom \
+    	-drive file=/home/kvm_autotest_root/images/ahci-cdrom.iso,media=cdrom,if=none,id=mycdrom \
     	-device ide-cd,drive=mycdrom,bus=ahci.0 \
     	/home/kvm_autotest_root/images/rhel840-64-virtio-scsi.qcow2 \
 
@@ -13,6 +13,8 @@ qemu-img create -f qcow2 /home/kvm_autotest_root/images/ahci-cdrom.img 256M
 
 steps() {
 
+dd if=/dev/urandom of=/tmp/orig.dat bs=1M count=100
+mkisofs -o /home/kvm_autotest_root/images/ahci-cdrom.iso /tmp/orig.dat
 #  guest$
 #  guest$ sudo cat /proc/iomem
 #  Please confirm there is an "ahci" section in 0xfebf1000.
@@ -28,5 +30,8 @@ steps() {
    [1] Set SECTOR_TEST1 in ahci.py to a bigger value like 0xFF.
    [2] Check if PRDTL_VALUE is correct. This value depends on your image,
   normally 0x1300 should work. Here the code validates the value of PRDTL:
+
+  #guest
+  cat /proc/iomem |grep ahci
 
 }

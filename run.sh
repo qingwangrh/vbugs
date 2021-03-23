@@ -87,8 +87,29 @@ fi
 
 if [[ "$machine" == "pc" ]]; then
   bus="pci.0"
+  diskbus1="pci.0"
+  diskbus2="pci.0"
+  scsibus1="pci.0"
+  scsibus2="pci.0"
+  netbus="pci.0"
 else
+  #q35 using multifunction default
   bus="pcie.0"
+
+  multi="@
+  -device pcie-root-port,id=pcie-root-port-0,multifunction=on,bus=${bus},addr=0x3,chassis=1 @
+  -device pcie-root-port,id=pcie-root-port-1,port=0x1,addr=0x3.0x1,bus=${bus},chassis=2 @
+  -device pcie-root-port,id=pcie-root-port-2,port=0x2,addr=0x3.0x2,bus=${bus},chassis=3 @
+  -device pcie-root-port,id=pcie-root-port-3,port=0x3,addr=0x3.0x3,bus=${bus},chassis=4 @
+  -device pcie-root-port,id=pcie-root-port-4,port=0x4,addr=0x3.0x4,bus=${bus},chassis=5 @
+  -device pcie-root-port,id=pcie-root-port-5,port=0x5,addr=0x3.0x5,bus=${bus},chassis=6 @
+  -device pcie-root-port,id=pcie-root-port-6,port=0x6,addr=0x3.0x6,bus=${bus},chassis=7 @
+  -device pcie-root-port,id=pcie-root-port-7,port=0x7,addr=0x3.0x7,bus=${bus},chassis=8 "
+  diskbus1="pcie-root-port-3"
+  diskbus2="pcie-root-port-4"
+  scsibus1="pcie-root-port-5"
+  scsibus2="pcie-root-port-6"
+  netbus="pcie-root-port-7"
 fi
 
 if [[ "$install" == "1" ]]; then
@@ -116,13 +137,14 @@ else
   data_img="-blockdev driver=qcow2,file.driver=file,file.filename=${img_dir}/${data_img_name},node-name=data_image1  "
 fi
 
-if [[ "$drv" == "blk" ]]; then
-  os_device="-device virtio-blk-pci,id=os,drive=drive_image1,bus=pcie-root-port-2,addr=0x0,bootindex=0,serial=OS_DISK  "
-  data_device="-device virtio-blk-pci,id=data1,drive=data_image1,bus=pcie-root-port-3,addr=0x0,bootindex=1${params},serial=DATA_DISK  "
-else
-  os_device="-device scsi-hd,id=os,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK  "
-  data_device="-device scsi-hd,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1${params},serial=DATA_DISK,scsi-id=64  "
+if [[ "$drv" == "scsi" ]]; then
+  diskbus1="scsi0.0"
+  diskbus2="scsi0.0"
+#  device_extra=",scsi-id=64"
 fi
+
+os_device="-device scsi-hd,id=os,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK  "
+data_device="-device scsi-hd,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1${params},serial=DATA_DISK${device_extra}  "
 
 echo "${params}"
 echo "${os_img}"
@@ -151,42 +173,35 @@ else
   -device scsi-cd,id=cd3,drive=drive_cd3,write-cache=on,bus=scsi1.0 @"
 fi
 
-  #-cpu 'Skylake-Server',+kvm_pv_unhalt @
-  #-cpu host @
-  #-cpu 'EPYC-Rome',+kvm_pv_unhalt @
-  #-nodefaults @
-  #-device VGA @
+#-cpu 'Skylake-Server',+kvm_pv_unhalt @
+#-cpu host @
+#-cpu 'EPYC-Rome',+kvm_pv_unhalt @
+#-nodefaults @
+#-device VGA @
 cmd="
 /usr/libexec/qemu-kvm @
   -name testvm @
   -machine ${machine} @
+  -m 8G @
+  -smp 8 @
   -cpu host,+kvm_pv_unhalt @
-  -device pcie-root-port,id=pcie-root-port-0,multifunction=on,bus=${bus},addr=0x3,chassis=1 @
-  -device pcie-root-port,id=pcie-root-port-1,port=0x1,addr=0x3.0x1,bus=${bus},chassis=2 @
-  -device pcie-root-port,id=pcie-root-port-2,port=0x2,addr=0x3.0x2,bus=${bus},chassis=3 @
-  -device pcie-root-port,id=pcie-root-port-3,port=0x3,addr=0x3.0x3,bus=${bus},chassis=4 @
-  -device pcie-root-port,id=pcie-root-port-4,port=0x4,addr=0x3.0x4,bus=${bus},chassis=5 @
-  -device pcie-root-port,id=pcie-root-port-5,port=0x5,addr=0x3.0x5,bus=${bus},chassis=6 @
-  -device pcie-root-port,id=pcie-root-port-6,port=0x6,addr=0x3.0x6,bus=${bus},chassis=7 @
-  -device pcie-root-port,id=pcie-root-port-7,port=0x7,addr=0x3.0x7,bus=${bus},chassis=8 @
-  -device qemu-xhci,id=usb1,bus=pcie-root-port-1,addr=0x0 @
+  -device qemu-xhci,id=usb1 @
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 @
-  -device virtio-scsi-pci,id=scsi0,bus=pcie-root-port-5 @
-  -device virtio-scsi-pci,id=scsi1,bus=pcie-root-port-6 @
+  ${multi} @
+  -device virtio-scsi-pci,id=scsi0,bus=${scsibus1} @
+  -device virtio-scsi-pci,id=scsi1,bus=${scsibus2} @
   ${os_img} @
   ${os_device} @
+  @
   ${data_img} @
   ${data_device} @
   -vnc :5 @
   -monitor stdio @
-  -m 8G @
-  -smp 8 @
-  -device pcie-root-port,id=pcie-root-port-8,slot=8,chassis=8,addr=0x8,bus=${bus} @
-  -device virtio-net-pci,mac=${mac},id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie-root-port-8,addr=0x0 @
+  -qmp tcp:0:5955,server,nowait @
+  -device virtio-net-pci,mac=${mac},id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=${netbus} @
   -netdev tap,id=idxgXAlm @
   -chardev socket,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server,nowait @
   -mon chardev=qmp_id_qmpmonitor1,mode=control @
-  -qmp tcp:0:5955,server,nowait @
   -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0 @
   -device isa-serial,chardev=serial_id_serial0 @
   -D debug.log @

@@ -90,7 +90,13 @@ steps() {
   {"execute": "blockdev-add", "arguments": {"node-name": "drive_sn1", "driver": "qcow2", "file": "file_sn1", "read-only": false}, "id": "Kib3C8EH"}
 
 
-  {"execute": "blockdev-snapshot", "arguments": {"node": "drive_stg1", "overlay": "drive_sn1"}, "id": "7UAdhqLR"}
+  {"execute": "blockdev-snapshot", "arguments": {"node": "fmt_stg1", "overlay": "drive_sn1"}, "id": "7UAdhqLR"}
+
+  # it is not necessary, looks like auto refresh the point to snap node
+  {"execute": "x-blockdev-reopen", "arguments": {"driver": "throttle", "node-name": "drive_stg1", "file": "drive_sn1",
+"throttle-group": "group1"}, "id": "Z8BFNiEr"}
+
+{"execute":"x-debug-query-block-graph"}
 
   fio --filename=/dev/vdb --direct=1 --rw=randrw --bs=4k --size=500M --name=test --iodepth=1 --runtime=30
 

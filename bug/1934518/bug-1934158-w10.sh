@@ -1,7 +1,7 @@
 #Bug 1934158 - Windows guest looses network connectivity when NIC was configured with static IP
 
 
-/usr/libexec/qemu-kvm -name Win2016 \
+/usr/libexec/qemu-kvm -name Win10 \
 -M pc-q35-rhel8.2.0,kernel-irqchip=split -m 8G \
 -nodefaults \
 -cpu Haswell-noTSX \
@@ -15,9 +15,9 @@
 -device pcie-root-port,id=root.7,chassis=7,addr=0x2.6 \
 -device pcie-root-port,id=root.8,chassis=8,addr=0x2.7 \
 -device virtio-scsi-pci,id=scsi0,bus=root.3 \
--blockdev driver=file,filename=/home/kvm_autotest_root/images/win2016-64-virtio.qcow2,node-name=my_file \
+-blockdev driver=file,filename=/home/kvm_autotest_root/images/win10-64-virtio-scsi.qcow2,node-name=my_file \
 -blockdev driver=qcow2,node-name=my,file=my_file \
--device virtio-blk-pci,drive=my,id=virtio-blk0,bus=root.1,bootindex=0 \
+-device scsi-hd,drive=my,id=virtio-blk0,bus=scsi0.0,bootindex=0 \
 -blockdev driver=file,filename=/home/kvm_autotest_root/images/data1.qcow2,node-name=my_file1 \
 -blockdev driver=qcow2,node-name=mydata1,file=my_file1 \
 -device virtio-blk-pci,drive=mydata1,id=data1,bus=root.2,bootindex=2 \

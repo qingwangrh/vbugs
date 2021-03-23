@@ -1,3 +1,5 @@
+qemu-img create -f qcow2 /home/kvm_autotest_root/images/data1.qcow2 5G
+
 /usr/libexec/qemu-kvm \
   -name L1-vm \
   -machine q35 \
@@ -14,7 +16,7 @@
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie-root-port-5 \
   -device virtio-scsi-pci,id=scsi1,bus=pcie-root-port-6 \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel840-64-virtio-scsi-L1.qcow2,node-name=drive_image1   \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel820-64-virtio-scsi-L1.qcow2,node-name=drive_image1   \
   -device scsi-hd,id=os,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK   \
   \
   -blockdev driver=qcow2,file.driver=file,file.filename=/home/kvm_autotest_root/images/data1.qcow2,node-name=data_image1   \
@@ -39,9 +41,9 @@ qemu-img create -f raw /home/kvm_autotest_root/images/data1.raw 5G
 -device scsi-hd,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1,rerror=stop,werror=stop \
 
 
-  -device scsi-block,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1,rerror=stop,werror=stop   \
+-device scsi-block,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1,rerror=stop,werror=stop   \
 
-
+#scsi_debug do not support resize,so using file instead.
 
 dd of=/dev/sdb if=/dev/urandom bs=1k count=500000 oflag=direct
 

@@ -13,7 +13,7 @@
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie-root-port-5 \
   -device virtio-scsi-pci,id=scsi1,bus=pcie-root-port-6 \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/nfs/rhel840-64-virtio-scsi-L2.qcow2,node-name=drive_image1   \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/nfs/rhel820-64-virtio-scsi-L2.qcow2,node-name=drive_image1   \
   -device scsi-hd,id=os,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK   \
   -blockdev driver=raw,file.driver=host_device,file.filename=/dev/sdb,node-name=data_image1   \
   -device scsi-block,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1,rerror=stop,werror=stop   \
