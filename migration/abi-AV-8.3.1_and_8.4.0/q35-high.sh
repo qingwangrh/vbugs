@@ -24,16 +24,19 @@ fi
   -device qemu-xhci,id=usb1,bus=pcie.0-root-port-6,addr=0x0 \
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 \
   -object iothread,id=iothread0 \
+  -object iothread,id=iothread1 \
   -device virtio-scsi-pci,id=scsi0,iothread=iothread0 \
-  -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-5,iothread=iothread0 \
+  -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-5,iothread=iothread1 \
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/qing/images/rhel840-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
   \
   -blockdev driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/qing/images/data1.qcow2,node-name=data_image1,discard=ignore,read-only=off,lazy-refcounts=on,overlap-check=none,auto-read-only=on,force-share=off,file.aio=threads \
   -device virtio-blk-pci,id=blk_data1,drive=data_image1,bus=pcie.0-root-port-3,addr=0x0,bootindex=1 \
   \
-  -blockdev driver=qcow2,file.driver=file,cache.direct=on,cache.no-flush=on,file.filename=/home/qing/images/data2.qcow2,node-name=data_image2,discard=unmap,read-only=on,lazy-refcounts=off,overlap-check=none,auto-read-only=off,force-share=on,file.aio=native \
-  -device scsi-hd,id=scsi_data2,drive=data_image2,bootindex=2 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=on,cache.no-flush=on,file.filename=/home/qing/images/data2.qcow2,node-name=data_image2,discard=unmap,read-only=off,lazy-refcounts=off,overlap-check=none,auto-read-only=off,force-share=off,file.aio=native \
+  -device scsi-hd,id=scsi_data2,bus=scsi0.0,drive=data_image2,bootindex=2 \
+  -blockdev driver=qcow2,file.driver=file,cache.direct=on,cache.no-flush=on,file.filename=/home/qing/images/data3.qcow2,node-name=data_image3,discard=unmap,read-only=on,lazy-refcounts=off,overlap-check=none,auto-read-only=off,force-share=on,file.aio=native \
+  -device scsi-hd,id=scsi_data3,bus=scsi1.0,drive=data_image3,bootindex=3 \
   -vnc :5 \
   -monitor stdio \
   -m 8192 \

@@ -1,16 +1,32 @@
-target=$1
 
-if [[ "x$target" == "x" ]]; then
+usage(){
+  echo "$0 -t [source/dest] -n [name]"
+  exit 0
+}
+
+target="s"
+while getopts 't:n:h' OPT; do
+    case $OPT in
+        t) target="$OPTARG";;
+        n) name="$OPTARG";;
+        h) usage;;
+        ?) usage;;
+    esac
+done
+
+if [[ "x$target" == "xs" ]]; then
   #src default
-  target=
+  incoming=
   echo "run as src"
+  name="$name_src_vm"
 else
   echo "run as dst"
-  target=" -incoming defer "
+  incoming=" -incoming defer "
+  name="$name_dst_vm"
 fi
 
 /usr/libexec/qemu-kvm \
-  -name low_q35_vm \
+  -name ${name} \
   -machine pc-q35-rhel8.3.0 \
   -nodefaults \
   -vga qxl \
@@ -49,7 +65,7 @@ fi
   -qmp tcp:0:5955,server,nowait \
   -chardev file,path=/var/tmp/monitor-serial5.log,id=serial_id_serial0 \
   -device isa-serial,chardev=serial_id_serial0 \
-  $target
+  ${incoming}
 
 steps() {
 
@@ -63,9 +79,6 @@ steps() {
   mount 10.66.8.105:/home/kvm_autotest_root/images /home/qing/images
   [[ ! -e /home/qing/images/data1.qcow2 ]] && qemu-img create -f qcow2 /home/qing/images/data1.qcow2 11G
   [[ ! -e /home/qing/images/data2.qcow2 ]] && qemu-img create -f qcow2 /home/qing/images/data2.qcow2 12G
-
-  #guest
-  dd if=/dev/urandom of=/dev/vda bs=4k count=100000 oflag=direct
 
   #dst
   {'execute': 'qmp_capabilities'}
@@ -93,5 +106,5 @@ steps() {
   migrate -d tcp:10.73.224.209:5000
   migrate_start_postcopy
 
-
+  10.73.196.177
 }
