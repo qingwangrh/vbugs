@@ -1,6 +1,7 @@
 #This tools for new host to setup basic env
 #set -x
-q_src_dir=/home/workdir
+#q_src_dir=/home/workdir
+q_src_dir=/home/
 
 create_cert() {
   echo "create_cert"
@@ -33,13 +34,13 @@ create_repo8() {
 
 create_repo9() {
   echo "create_repo9"
-#  curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
+  #  curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
   #  dnf install python3 brewkoji  git -y
   yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/screen/4.6.2/4.el8/x86_64/screen-4.6.2-4.el8.x86_64.rpm
-#  yum install python3 brewkoji git vim net-tools mlocate -y
+  #  yum install python3 brewkoji git vim net-tools mlocate -y
   yum install -y nfs-utils git vim net-tools mlocate
   yum install -y qemu*
-  yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/python3-brewkoji-1.26-1.el9.noarch.rpm  http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-qe-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-stage-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/koji/1.23.1/1.el9/noarch/python3-koji-1.23.1-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/koji/1.23.1/1.el9/noarch/koji-1.23.1-1.el9.noarch.rpm
+  yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/python3-brewkoji-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-qe-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/brewkoji/1.26/1.el9/noarch/brewkoji-stage-1.26-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/koji/1.23.1/1.el9/noarch/python3-koji-1.23.1-1.el9.noarch.rpm http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/koji/1.23.1/1.el9/noarch/koji-1.23.1-1.el9.noarch.rpm
   updatedb
 }
 
@@ -53,12 +54,6 @@ create_repo() {
   else
     echo "Warning nothing to do"
   fi
-}
-
-create_s3() {
-  yes | cp s3.repo /etc/yum.repos.d/
-  yum module reset virt
-  yum module install virt:8.3
 }
 
 create_workdir() {
@@ -76,8 +71,8 @@ create_workdir() {
       echo "ERROR on mount ${q_src_dir}"
       exit 1
     fi
-    if ! grep "/home/workdir" /etc/fstab; then
-      sed -i '$a\/home/workdir           /workdir                none    rw,bind         0 0' /etc/fstab
+    if ! grep " /workdir" /etc/fstab; then
+      sed -i '$a\/home  /workdir  none    rw,bind    0 0' /etc/fstab
     fi
   fi
 
@@ -144,7 +139,7 @@ _setup_bridge() {
   #Get connection name
   CONID=$(nmcli device show $NDEV | awk -F: '/GENERAL.CONNECTION/ {print $2}' | awk '{$1=$1}1')
 
-  MAC=$(nmcli device show $NDEV|grep GENERAL.HWADDR|awk '{print $2}')
+  MAC=$(nmcli device show $NDEV | grep GENERAL.HWADDR | awk '{print $2}')
   if uname -r | grep el9; then
     nmcli con add type bridge ifname "$BRIDGE_IFNAME" con-name "$BRIDGE_IFNAME" stp no 802-3-ethernet.cloned-mac-address $MAC
   else
@@ -235,7 +230,10 @@ create_kar() {
   DIR=$(pwd)
   cd ${q_src_dir}
   STAMP=$(date "+%m%d-%H%M")
-  [ -e kar ] && mv kar kar${STAMP}
+  [ -e kar ] && {
+    mkdir -p oldkar
+    mv kar oldkar/kar${STAMP}
+  }
   git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
   cd kar
   ./Bootstrap.sh --develop --upstream --verbose --venv $target
@@ -261,10 +259,10 @@ open_coredump() {
   sed -i -e '$a\ExternalSizeMax=32G' -e '$a\ProcessSizeMax=32G' /etc/systemd/coredump.conf
   ulimit -a
   sed -i '$a\*          soft     core   unlimited' /etc/security/limits.conf
-  echo "*   soft noproc   65535" >> /etc/security/limits.conf
-  echo "*   hard noproc   65535" >> /etc/security/limits.conf
-  echo "*   soft nofile   265535" >> /etc/security/limits.conf
-  echo "*   hard nofile   65535" >> /etc/security/limits.conf
+  echo "*   soft noproc   65535" >>/etc/security/limits.conf
+  echo "*   hard noproc   65535" >>/etc/security/limits.conf
+  echo "*   soft nofile   265535" >>/etc/security/limits.conf
+  echo "*   hard nofile   65535" >>/etc/security/limits.conf
 
   cat /etc/security/limits.conf
   cat /etc/systemd/coredump.conf
@@ -283,8 +281,8 @@ disable_firewalld() {
 
 }
 
-enable_libvirt_repo() {
-  vers=$(cat /etc/redhat-release | awk '{print $6}')
+create_libvirt_repo() {
+  local vers=$(cat /etc/redhat-release | awk '{print $6}')
   cp -rf libvirt-$vers.repo /etc/yum.repos.d/
   yum -y module reset virt
   yum -y module enable virt:$vers

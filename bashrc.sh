@@ -72,33 +72,9 @@ wscreen() {
     screen -dmS $name python3 -m http.server 800$idx
   fi
   screen -S $name -ls
-
-}
-
-wiscsi() {
-  echo -e "
-yum install -y iscsi-initiator-utils device-mapper*
-  mpathconf --enable
-
-  cat /etc/iscsi/initiatorname.iscsi
-  InitiatorName=iqn.1994-05.com.redhat:share1
-
-  systemctl restart iscsid iscsi multipathd
-
-  #login
-  iscsiadm -m discovery -t st -p 10.66.8.105
-  iscsiadm -m node -T iqn.2016-06.qing.server60:a -p 10.66.8.105:3260 -l
-  iscsiadm -m node -T iqn.2016-06.qing.server60:b -p 10.66.8.105:3260 -l
-
-  #logout
-  iscsiadm -m node -T  iqn.2016-06.qing.server60:a  -p 10.66.8.105:3260 -u;
-  iscsiadm -m node -T  iqn.2016-06.qing.server60:b  -p 10.66.8.105:3260 -u
-
-  #delete
-  iscsiadm -m node -T  iqn.2016-06.qing.server60:a  -p 10.66.8.105:3260 -o delete;
-  iscsiadm -m node -T  iqn.2016-06.qing.server60:b  -p 10.66.8.105:3260  -o delete
-
-"
+  #ip addr|grep inet|grep "10\."|awk '{print $2}'|cut -f 1 -d "/"
+  local ip=`hostname -I|awk '{print $1}'`
+  echo "http:\\\\$ip:800$idx"
 
 }
 
@@ -112,24 +88,21 @@ wdu() {
   du --max-depth=$d -h
 }
 
-PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;33m\]\w\[\033[00m\] \$ '
-PROMPT_COMMAND='echo -ne "\033]0;${HOSTNAME%%.*}  \007"'
-
-wvncserver() {
-  if [ "x$1" == "x" ]; then
-    VNC_ID=86
-  else
-    VNC_ID=$1
-  fi
-  if [ "x$2" == "x" ]; then
-    VNC_RES=1600x1000
-  else
-    VNC_RES=$2
-  fi
-  cmd="vncserver -kill :${VNC_ID};  vncserver :${VNC_ID} -SecurityTypes None -geometry ${VNC_RES}"
-  echo "$cmd"
-  eval $cmd
-}
+#wvncserver() {
+#  if [ "x$1" == "x" ]; then
+#    VNC_ID=86
+#  else
+#    VNC_ID=$1
+#  fi
+#  if [ "x$2" == "x" ]; then
+#    VNC_RES=1600x1000
+#  else
+#    VNC_RES=$2
+#  fi
+#  cmd="vncserver -kill :${VNC_ID};  vncserver :${VNC_ID} -SecurityTypes None -geometry ${VNC_RES}"
+#  echo "$cmd"
+#  eval $cmd
+#}
 
 wview() {
   echo "Usage: wview host port protocol"
@@ -186,6 +159,13 @@ wsshx() {
     send "exit\r"
     expect eof
 EOF
+}
+
+
+wclear(){
+
+  host=$1
+  wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
 }
 
 winit() {
@@ -256,10 +236,11 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
 #}
 
 wgitupdate() {
+  local REPLY
   {
     echo -n "Are you sure start to git update[y/n]: "
     read
-    echo You typed ${REPLY}
+    echo "You typed ${REPLY}"
   }
   if [[ "${REPLY}" != "y" ]]; then
     return 1
@@ -628,6 +609,12 @@ wqmp_exec() {
 
 export PATH=$PATH:/usr/local/bin
 export VTE="./var/lib/avocado/data/avocado-vt/backends/qemu/cfg/tests-example.cfg"
+
+#PS1='[${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;33m\]\w\[\033[00m\]]\$ '
+PS1="\[\033[01;32m\]\u@\h \[\033[01;33m\]\w\\[\033[00m\] \$ "
+
+PROMPT_COMMAND='echo -ne "\033]0;${HOSTNAME%%.*}  \007"'
+#PROMPT_COMMAND='printf "\033]0;%s:%s\007" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"'
 
 cd
 #ulimit -c unlimited

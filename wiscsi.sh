@@ -8,62 +8,94 @@ wiscsi_deploy() {
   mkdir -p /etc/target/pr
   mkdir -p /home/iscsi/
   yum install targetcli -y
-  systemctl enable target;systemctl start target
+  systemctl enable target
+  systemctl start target
   systemctl enable targetcli
   systemctl start targetcli
   dd if=/dev/zero of=/home/iscsi/share4g.img bs=1M count=4096
+  dd if=/dev/zero of=/home/iscsi/share10g.img bs=1M count=10240
   targetcli clearconfig confirm=True
 }
 
-wiscsi_create(){
-  echo "dev/file target clients"
-  dev=$1
-  target=$2
-  shift
-  shift
-  clients="$@"
+wiscsi_clear() {
+  targetcli clearconfig confirm=True
+  systemctl restart target iscsi iscsid
+}
+
+wiscsi_create() {
+  local usage="usage: -l lun_name -n [dev/file] name -t targets -b backend [block/fileio] -c clients
+example: -l disk0 -n /home/iscsi/share4g.img -t iqn.2016-06.one.server:4g -b fileio -c iqn.1994-05.com.redhat:clienta"
+  local backend="fileio"
+  local targets name lun clients OPT OPTARG OPTIND
+  while getopts 't:l:b:c:n:h' OPT; do
+    case $OPT in
+    t) targets="$OPTARG" ;;
+    n) name="$OPTARG" ;;
+    l) lun="$OPTARG" ;;
+    c) clients="$OPTARG" ;;
+    b) backend="$OPTARG" ;;
+    h) echo -e ${usage} ;;
+    ?) echo -e ${usage} ;;
+    esac
+  done
+
+  [[ "${targets}" == "" ]] && echo -e "targets:${usage}" && return 0
+  [[ "${lun}" == "" ]] && echo -e "lun:${usage}" && return 0
+  [[ "${name}" == "" ]] && echo -e "name:${usage}" && return 0
+  [[ "${backend}" == "" ]] && echo -e "backend:${usage}" && return 0
+  [[ "${clients}" == "" ]] && echo -e "clients:${usage}" && return 0
+
+  if ! targetcli / ls /backstores/${backend}/${lun}; then
+    targetcli /backstores/${backend} create ${lun} ${name}
+  fi
+  for target in ${targets}; do
+    targetcli /iscsi delete ${target}
+    targetcli /iscsi create ${target}
+    targetcli /iscsi/${target}/tpg1/luns create /backstores/${backend}/${lun}
+    for c in ${clients}; do
+      targetcli /iscsi/${target}/tpg1/acls create ${c}
+    done
+  done
+  targetcli / ls
+  targetcli saveconfig
+  targetcli exit
 
 }
 
 wiscsi_create_block_scsi() {
   #targetcli script and targetcli can not run meanwhile
   #create one block device backend
-  local targeta="iqn.2016-06.share.server:scsi-debug"
-  modprobe -r scsi_debug; modprobe scsi_debug dev_size_mb=3000
-  dev=`lsscsi |grep scsi|awk '{ print $6 }'`
-  pvcreate ${dev}
-  vgcreate vg ${dev}
-#  lvcreate iscsi_disk01 -l 100%FREE -n iscsi_lv01
-  lvcreate -L 2G -n lv vg
-  dev=/dev/vg/lv
-  targetcli /backstores/block create disk0 $dev
-  targetcli /iscsi create ${targeta}
-  targetcli /iscsi/${targeta}/tpg1/luns create /backstores/block/disk0
-  targetcli /iscsi/${targeta}/tpg1/acls create ${clienta}
-  targetcli /iscsi/${targeta}/tpg1/acls create ${clienta}
-
-  targetcli / ls
-  targetcli saveconfig
-  targetcli exit
-
-  systemctl restart target iscsi iscsid
+  #  local targeta="iqn.2016-06.share.server:scsi-debug"
+  #  modprobe -r scsi_debug
+  #  modprobe scsi_debug dev_size_mb=3000
+  #  dev=$(lsscsi | grep scsi | awk '{ print $6 }')
+  #  pvcreate ${dev}
+  #  vgcreate vg ${dev}
+  #  #  lvcreate iscsi_disk01 -l 100%FREE -n iscsi_lv01
+  #  lvcreate -L 2G -n lv vg
+  #  dev=/dev/vg/lv
+  wiscsi_create -t "iqn.2016-06.block.server:4g" -b block -c "$clienta $clientb" -l block1 -n /dev/vg/lv
 
 }
 
-wiscsi_create_share() {
+wiscsi_create_share10() {
+  wiscsi_create -t "iqn.2016-06.share.server:10g-a iqn.2016-06.share.server:10g-b" -b fileio -c "$clienta $clientb" -l disk1 -n /home/iscsi/share10g.img
+}
+
+wiscsi_create_share_old() {
   #targetcli script and targetcli can not run meanwhile
   #create two shared target and can be accessed by two client
   local targeta=iqn.2016-06.share.server:4g-a
-  local nameb=iqn.2016-06.share.server:4g-b
+  local targetb=iqn.2016-06.share.server:4g-b
   targetcli /backstores/fileio create disk0 /home/iscsi/share4g.img
   targetcli /iscsi create ${targeta}
-  targetcli /iscsi create ${nameb}
+  targetcli /iscsi create ${targetb}
   targetcli /iscsi/${targeta}/tpg1/luns create /backstores/fileio/disk0
-  targetcli /iscsi/${nameb}/tpg1/luns create /backstores/fileio/disk0
-  targetcli /iscsi/${targeta}/tpg1/acls create iqn.1994-05.com.redhat:clienta
-  targetcli /iscsi/${targeta}/tpg1/acls create iqn.1994-05.com.redhat:clientb
-  targetcli /iscsi/${nameb}/tpg1/acls create iqn.1994-05.com.redhat:clienta
-  targetcli /iscsi/${nameb}/tpg1/acls create iqn.1994-05.com.redhat:clientb
+  targetcli /iscsi/${targetb}/tpg1/luns create /backstores/fileio/disk0
+  targetcli /iscsi/${targeta}/tpg1/acls create ${clienta}
+  targetcli /iscsi/${targeta}/tpg1/acls create ${clientb}
+  targetcli /iscsi/${targetb}/tpg1/acls create ${clienta}
+  targetcli /iscsi/${targetb}/tpg1/acls create ${clientb}
   targetcli / ls
   targetcli saveconfig
   targetcli exit
@@ -73,35 +105,37 @@ wiscsi_create_share() {
 }
 
 wiscsi_discover() {
-  local OPTIND opt
+
+  local usage="usage: -t <targets> -n name -f filter"
+  local targets name filter OPT OPTARG OPTIND
+
   port=3260
-  host=10.66.8.105
-  target=iqn.2016-06.local.server:sas
-  echo "$0 -l -t <target> -h host"
-  while getopts ":t:h:" opt; do
-    case $opt in
-#    l)
-#      cmd="iscsiadm -m discovery -t st -p $host"
-#      ;;
-    t)
-      echo "target: $OPTARG"
-      target="$OPTARG"
-      ;;
-    h)
-      echo "host: $OPTARG"
-      host="$OPTARG"
-      ;;
-    ?)
-      echo "unknown parameter"
-      return 1
-      ;;
+  name=10.66.8.105
+  targets=$(targetcli /iscsi ls depth=1 | grep iqn | awk '{print $2}')
+  while getopts 'f:t:n:h' OPT; do
+    case $OPT in
+    t) targets="$OPTARG" ;;
+    n) name="$OPTARG" ;;
+    f) filter="$OPTARG" ;;
+    h) echo -e ${usage} ;;
+    ?) echo -e ${usage} ;;
     esac
   done
 
-  echo "iscsiadm -m discovery -t st -p $host"
-  echo "iscsiadm -m node -T ${target}  -p $host:$port -l"
-  echo "iscsiadm -m node -T ${target}  -p $host:$port -u"
-  echo "iscsiadm -m node -T ${target}  -p $host:$port -o delete"
+  if [[ "$filter" != "" ]]; then
+    targets=$(echo -e "$targets" | grep "$filter"ef)
+  fi
+
+  echo "iscsiadm -m discovery -t st -p $name"
+  local opa=("-l" "-u" "-o delete")
+  for o in "${opa[@]}"; do
+    for target in ${targets}; do
+      echo "iscsiadm -m node -T ${target}  -p $name:$port $o"
+      #    echo "iscsiadm -m node -T ${target}  -p $name:$port -l"
+      #    echo "iscsiadm -m node -T ${target}  -p $name:$port -u"
+      #    echo "iscsiadm -m node -T ${target}  -p $name:$port -o delete"
+    done
+  done
 
 }
 

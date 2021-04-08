@@ -1,6 +1,6 @@
 modprobe -r scsi_debug; modprobe scsi_debug  lbpu=1 lbpws=1 lbprz=0
 dev=`lsscsi |grep scsi|awk '{ print $6 }'`
-
+#modprobe scsi_debug dev_size_mb=5000 num_tgts=1 vpd_use_hostno=0 add_host=2 delay=1 max_luns=2 no_lun_0=1
 /usr/libexec/qemu-kvm \
     -name 'avocado-vt-vm1'  \
     -sandbox on  \
