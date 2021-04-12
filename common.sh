@@ -1,7 +1,19 @@
 #This tools for new host to setup basic env
 #set -x
-#q_src_dir=/home/workdir
+
 q_src_dir=/home/
+
+create_workdir() {
+  echo "create_workdir"
+  [[ -d /home/kvm_autotest_root/iso ]] || mkdir -p /home/kvm_autotest_root/iso
+  [[ -d /home/kvm_autotest_root/images ]] || mkdir -p /home/kvm_autotest_root/images
+  [[ -d ${q_src_dir} ]] || mkdir -p ${q_src_dir}
+
+  #  if ! grep " /workdir" /etc/fstab; then
+  #    sed -i '$a\/home  /workdir  none    rw,bind    0 0' /etc/fstab
+  #  fi
+
+}
 
 create_cert() {
   echo "create_cert"
@@ -11,6 +23,17 @@ create_cert() {
   curl -kL 'https://engineering.redhat.com/Eng-CA.crt' -o /etc/pki/ca-trust/source/anchors/Eng-CA.crt
   update-ca-trust enable
   update-ca-trust extract
+}
+
+create_component_manager() {
+  echo "create_component_manager"
+  curl -Lk http://git.host.prod.eng.bos.redhat.com/git/kvmqe-ci.git/tree/utils/beaker-workflow/ks/el8.ks -o /tmp/el8.ks
+  sed -n '/base64 -d.*component_management/,/chmod .*component_management/p' /tmp/el8.ks >/tmp/create_component_manager_x.sh
+  #  sed -e 's/\/root/\/home\/workdir/' -e 's/&lt;/</g' -e 's/&gt;/>/' /tmp/create_component_manager_x.sh >/tmp/create_component_manager_y.sh
+  sed -e 's/&lt;/</g' -e 's/&gt;/>/' /tmp/create_component_manager_x.sh >/tmp/create_component_manager_y.sh
+  /bin/sh /tmp/create_component_manager_y.sh
+  cp ~/component_management.py /home -rf
+
 }
 
 create_repo7() {
@@ -56,81 +79,14 @@ create_repo() {
   fi
 }
 
-create_workdir() {
-  echo "create_workdir"
-  [[ -d /workdir ]] || mkdir -p /workdir
-  [[ -d ${q_src_dir} ]] || mkdir -p ${q_src_dir}
-  mkdir -p /home/rexports
-  mkdir -p /home/rworkdir
-
-  if mount | grep ' /workdir '; then
-    echo "Already mount workdir"
-  else
-    echo "mount ${q_src_dir}"
-    if ! mount -o bind ${q_src_dir} /workdir; then
-      echo "ERROR on mount ${q_src_dir}"
-      exit 1
-    fi
-    if ! grep " /workdir" /etc/fstab; then
-      sed -i '$a\/home  /workdir  none    rw,bind    0 0' /etc/fstab
-    fi
-  fi
-
-}
-
 mount_resource() {
 
   [[ -d /home/kvm_autotest_root/iso ]] || mkdir -p /home/kvm_autotest_root/iso
-  [[ -d /home/workdir/exports ]] || mkdir -p /home/workdir/exports
   if ! mount | grep '/home/kvm_autotest_root/iso'; then
     echo "mount 10.73.194.27:/vol/s2kvmauto/iso /home/kvm_autotest_root/iso"
     mount 10.73.194.27:/vol/s2kvmauto/iso /home/kvm_autotest_root/iso
   fi
-  #if ! mount | grep '/workdir/exports';then
-  #	echo "mount 10.66.8.105:/home/exports /workdir/exports"
-  #	mount 10.66.8.105:/home/exports /workdir/exports
-  #fi
 
-}
-
-common_env() {
-  echo "common_env $@"
-  if [[ "x$1" == "x" ]]; then
-    idx=0
-  else
-    idx=$1
-  fi
-  os_img="rhel820-${idx}.qcow2"
-
-  if [[ "x$2" == "x" ]]; then
-    os_img="rhel820-${idx}.qcow2"
-  else
-    os_img=$2
-  fi
-
-  MAC="9a:b5:b6:b1:b2:b${idx}"
-  port="595${idx}"
-  vnc="1${idx}"
-  data1_img="data${idx}-1.qcow2"
-  data2_img="data${idx}-2.qcow2"
-  data3_img="data${idx}-3.qcow2"
-  img_dir=/home/kvm_autotest_roo
-  img_dir=/home/kvm_autotest_root/images
-  iso_dir=/home/kvm_autotest_root/iso
-  [ -d ${iso_dir} ] || mkdir -p ${iso_dir}
-
-  if ! mount | grep ${iso_dir}; then
-    mount 10.73.194.27:/vol/s2kvmauto/iso ${iso_dir}
-  fi
-  [ -f ${img_dir}/${data1_img} ] || qemu-img create -f qcow2 ${img_dir}/${data1_img} 1G
-  [ -f ${img_dir}/${data2_img} ] || qemu-img create -f qcow2 ${img_dir}/${data2_img} 2G
-  [ -f ${img_dir}/${data3_img} ] || qemu-img create -f qcow2 ${img_dir}/${data3_img} 3G
-}
-
-env_print() {
-  echo "${idx}"
-  echo "${os_img}"
-  echo "${img_dir}"
 }
 
 _setup_bridge() {
@@ -209,24 +165,25 @@ create_network() {
 
 }
 
-create_component_manager() {
-  echo "create_component_manager"
-
-  #curl -Lk https://gitlab.cee.redhat.com/pingl/script_repo/raw/master/component_management.py -o /home/workdir/component_management.py
-  curl -Lk http://git.host.prod.eng.bos.redhat.com/git/kvmqe-ci.git/tree/utils/beaker-workflow/ks/el8.ks -o /home/workdir/el8.ks
-  sed -n '/base64 -d.*component_management/,/chmod .*component_management/p' /home/workdir/el8.ks >/tmp/create_component_manager_x.sh
-  sed -e 's/\/root/\/home\/workdir/' -e 's/&lt;/</g' -e 's/&gt;/>/' /tmp/create_component_manager_x.sh >/tmp/create_component_manager_y.sh
-  /bin/sh /tmp/create_component_manager_y.sh
-
-}
-
 create_kar() {
-  echo "create_kar"
-  local target
-  if [[ "x$1" != "x" ]]; then
-    target="--stable"
-  fi
-
+  export https_proxy=http://squid.corp.redhat.com:3128
+  local usage="create_kar [-v disable venv] [-s stable] [-o options]"
+  local OPT OPTARG OPTIND others
+  local vflag="1"
+  local options=" --develop --upstream --verbose "
+  while getopts 'o:vsh' OPT; do
+    case $OPT in
+    o) others="$OPTARG" ;;
+    v) vflag="0" ;;
+    s) sflag="1" ;;
+    h) echo -e ${usage} ;;
+    ?) echo -e ${usage} ;;
+    esac
+  done
+  [[ "$vflag" == "1" ]] && options="$options --venv "
+  [[ "$sflag" == "1" ]] && options="$options --stable "
+  options="$options $others "
+  echo "options:$options"
   DIR=$(pwd)
   cd ${q_src_dir}
   STAMP=$(date "+%m%d-%H%M")
@@ -236,12 +193,21 @@ create_kar() {
   }
   git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
   cd kar
-  ./Bootstrap.sh --develop --upstream --verbose --venv $target
+
+  ./Bootstrap.sh $options
   #  ./Bootstrap.sh --develop --verbose --venv --avocado-pt=80.0 $target
-  ln -s workspace/var/lib/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
+
+  if [[ "$vflag" == "1" ]]; then
+    pathfix="workspace"
+    venv="venv"
+  else
+    ln -s ~/avocado/job-results workspace/job-results
+  fi
+  ln -s $pathfix/var/lib/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
   ln -s workspace/avocado-vt avocado-vt
-  ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
-  touch ${STAMP}
+  ln -s $pathfix/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
+
+  touch $venv${STAMP}
   if uname -r | grep el9; then
     #temp
     wget http://fileshare.englab.nay.redhat.com/pub/section2/kvm/xuwei/rhel9_installation/RHEL-9-series.ks
@@ -285,7 +251,9 @@ create_libvirt_repo() {
   local vers=$(cat /etc/redhat-release | awk '{print $6}')
   cp -rf libvirt-$vers.repo /etc/yum.repos.d/
   yum -y module reset virt
-  yum -y module enable virt:$vers
+  #yum module list
+  yum -y module enable virt:av
+  yum -y module install virt:av
   #  yum -y remove qemu-kvm*
   #  yum -y install qemu-kvm
   #  yum -y install libvirt*

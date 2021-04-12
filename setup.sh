@@ -2,10 +2,6 @@
 #This tools for install qemu
 source ./common.sh
 
-
-
-
-
 usage_help(){
   if uname -r |grep el8;then
     echo "python3 component_management.py --install-virtqemu ID --verbose"
@@ -28,6 +24,7 @@ create_component_manager
 create_repo
 open_coredump
 disable_firewalld
-create_kar
 create_network
+
+create_kar
 usage_help

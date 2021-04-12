@@ -1,7 +1,13 @@
 #cache writeback
 /usr/libexec/qemu-kvm \
   -name src_vm1 \
-  -machine q35 \
+  -machine pc-q35-rhel8.3.0,accel=kvm,usb=off,dump-guest-core=off \
+-m size=1024000k,slots=16,maxmem=1024000k \
+-overcommit mem-lock=off \
+-smp 14,maxcpus=16,sockets=16,dies=1,cores=1,threads=1 \
+-object iothread,id=iothread1 \
+-object memory-backend-ram,id=ram-node0,size=1024000k \
+-numa node,nodeid=0,cpus=0-15,memdev=ram-node0 \
   -nodefaults \
   -vga qxl \
   -device pcie-root-port,id=pcie.0-root-port-2,slot=2,bus=pcie.0,multifunction=on \
@@ -30,8 +36,7 @@
   :5 \
   -qmp tcp:0:5955,server,nowait \
   -monitor stdio \
-  -m 8192 \
-  -smp 8 \
+  \
   -device virtio-net-pci,mac=9a:b5:b6:b1:b2:b5,id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=pcie.0-root-port-5,addr=0x0 \
   -netdev tap,id=idxgXAlm
 

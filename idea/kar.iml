@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/avocado-vt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tp-qemu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tp-qemu/qemu/tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/workspace/avocado" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/workspace/avocado-vt" />
       <excludeFolder url="file://$MODULE_DIR$/workspace/job-results" />
       <excludeFolder url="file://$MODULE_DIR$/workspace/var" />

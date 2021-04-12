@@ -124,7 +124,7 @@ wview() {
 
 wenv() {
   echo "cp host gitconfig bashrc to target host"
-  for target in $@; do
+  for target in "$@"; do
     echo "==>$target"
     scp -o StrictHostKeyChecking=no ~/.bashrc $target:~/
     scp -o StrictHostKeyChecking=no ~/.gitconfig $target:~/
@@ -169,8 +169,9 @@ wclear() {
   fi
   echo "clean bashrc,auto login on $1"
   host=$1
-  wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
-  wsshx ${host} "sed -i -e '/PS1=/d' -e '/PROMPT_COMMAND=/d' ~/.bashrc;"
+#   wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
+  wsshx ${host} "sed -i -e '/PS1=/d' -e '/PROMPT_COMMAND=/d' ~/.bashrc;yes|rm ~/.ssh/authorized_keys -rf"
+  wsshx ${host} "tail -n 8 ~/.bashrc;ls ~/.ssh/"
 }
 
 winit() {
@@ -554,7 +555,7 @@ wqmp_loop() {
 
     myarray=($new_cmd)
 
-    for mvar in ${myarray[@]}; do
+    for mvar in "${myarray[@]}"; do
       var=$(echo "$mvar" | grep -o "[^ ]\+\( \+[^ ]\+\)*")
       if [[ "x$var" != "x" ]]; then
         if echo "$var" | grep ":" >/dev/null; then
@@ -582,10 +583,10 @@ export PATH=$PATH:/usr/local/bin
 export VTE="./var/lib/avocado/data/avocado-vt/backends/qemu/cfg/tests-example.cfg"
 
 #PS1='[${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\] \[\033[01;33m\]\w\[\033[00m\]]\$ '
-PS1="\[\033[01;32m\]\u@\h \[\033[01;33m\]\w\\[\033[00m\] \$ "
-
-PROMPT_COMMAND='echo -ne "\033]0;${HOSTNAME%%.*}  \007"'
 #PROMPT_COMMAND='printf "\033]0;%s:%s\007" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"'
+
+PS1="\[\033[01;32m\]\u@\h \[\033[01;33m\]\w\\[\033[00m\] \$ "
+PROMPT_COMMAND='echo -ne "\033]0;${HOSTNAME%%.*}  \007"'
 
 cd /home
 #ulimit -c unlimited

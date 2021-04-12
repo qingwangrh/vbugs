@@ -72,7 +72,7 @@ wscreen() {
     screen -dmS $name python3 -m http.server 800$idx
   fi
   screen -S $name -ls
-  local ip=$(ip addr | grep inet | grep "10\." | awk '{print $2}' | cut -f 1 -d "/")
+  local ip=`ip addr|grep inet|grep "10\."|awk '{print $2}'|cut -f 1 -d "/"`
   #local ip=`hostname -I|awk '{print $1}'`
   echo "http://$ip:800$idx"
 
@@ -162,7 +162,8 @@ wsshx() {
 EOF
 }
 
-wclear() {
+
+wclear(){
   if (($# < 1)); then
     echo "Usage wclear host"
     return
@@ -170,7 +171,6 @@ wclear() {
   echo "clean bashrc,auto login on $1"
   host=$1
   wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
-  wsshx ${host} "sed -i -e '/PS1=/d' -e '/PROMPT_COMMAND=/d' ~/.bashrc;"
 }
 
 winit() {
@@ -213,7 +213,7 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
   if [[ ${ret} == 168 ]]; then
     rm -rf /root/.ssh/known_hosts
   fi
-  wsshx ${host} "mkdir -p ~/.ssh;echo '${id_rsa}' > ~/.ssh/id_rsa;echo '${id_rsa_pub}' > ~/.ssh/id_rsa.pub;yes|cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys;chmod 600 ~/.ssh/*"
+  wsshx ${host} "mkdir -p .ssh;echo '${id_rsa}' > .ssh/id_rsa;echo '${id_rsa_pub}' > .ssh/id_rsa.pub;yes|cp .ssh/id_rsa.pub .ssh/authorized_keys;chmod 600 .ssh/*"
   [[ $? == 0 ]] && wenv ${host}
 }
 
@@ -239,47 +239,28 @@ wgitupdate() {
 }
 
 wgitcp() {
-  local usage="Usage: wgitcp [-All/-Track]  -d dst -f [files]"
-  local OPT OPTARG OPTIND
-  local mode="tracked"
-  local target files
-  while getopts 'd:f:ath' OPT; do
-    case $OPT in
-    f) files="$OPTARG" ;;
-    d) target="$OPTARG" ;;
-    a) mode="all" ;;
-    t) mode="tracked" ;;
-    h)
-      echo -e ${usage}
-      return 0
-      ;;
-    ?)
-      echo -e ${usage}
-      return 0
-      ;;
-    esac
-  done
-
-  if [ "X$target" == "X" ]; then
-    echo -e ${usage}
+  echo -e "Usage: wgitsync target [files]. \nExample: wgitsync /home/kar-code/tp-qemu a b c"
+  echo "$#"
+  if (($# < 1)); then
+    echo "miss parameter"
+    git status -s ./ | cut -f 3 -d " "
     return 1
   fi
-
+  target=$1
+  shift
+  files="$@"
   if [[ "X$files" == "X" ]]; then
-    echo "Checking $mode"
-    if [[ "$mode" == "all" ]]; then
-      files=$(git status -s | awk '{print $2}')
-    else
-      files=$(git status -s --untracked-files=no | awk '{print $2}')
-    fi
+    echo "Checking"
+    #git status -s
+    files=$(git status -s ./ | cut -f 3 -d " ")
   fi
   if [[ "X$files" == "X" ]]; then
     echo "Nothing to do"
     return 1
   fi
   echo -e "$files"
-  #  cmd="echo -e $files |xargs -I {} scp  {} ${target}/{}"
-  #  echo "${cmd}"
+  cmd="git status -s ./ | cut -f 3 -d \" \"|xargs -I {} scp  {} ${target}/{}"
+  echo "${cmd}"
   total=0
   for f in $files; do
     cmd="scp ${f} ${target}/${f}"
@@ -292,9 +273,9 @@ wgitcp() {
 }
 
 wloop() {
-  usage="wloop start end cmd"
-  local cmd n end start=$1
-
+  echo "wloop start end action"
+  unset n
+  start=$1
   let end=$1+$2
   shift
   shift
@@ -311,13 +292,14 @@ wloop() {
 }
 
 wloopl() {
-  local usage="wloopl file cmd"
-  local n f=$1
+
+  unset n
+  f=$1
   shift
-  local cmd="$@"
+
+  cmd="$@"
   if [[ "x$cmd" == "x" ]]; then
-    echo -e ${usage}
-    return 1
+    return
   fi
 
   data=$(cat ${f})
@@ -348,7 +330,6 @@ wsetup() {
 }
 
 wyumsed() {
-  loca rp
   if [[ "x$1" == "x" ]]; then
     [[ -f /etc/yum.repos.d/beaker-Server.repo ]] && file=beaker-Server.repo || file=beaker-BaseOS.repo
     if cat /etc/yum.repos.d/${file} | egrep "RHEL-[0-9.]{3,}"; then
@@ -377,7 +358,7 @@ wmount() {
   echo "mount 10.73.194.27:/vol/s2kvmauto/iso  /home/kvm_autotest_root/iso"
   echo "mount 10.73.194.27:/vol/S4/virtlablogs /mnt/logs"
   echo "mount 10.73.32.21:/kvmqelogs /mnt/exlogs"
-  echo "mount qing:/home/exports /home/rexports"
+    echo "mount qing:/home/exports /home/rexports"
   echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
   echo "http://fileshare.englab.nay.redhat.com/pub/section2/images_backup"
   echo " ln -s workspace/var/lib/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu; ln -s workspace/avocado-vt avocado-vt; ln -s workspace/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg;"
@@ -464,7 +445,7 @@ wlog() {
     return 1
   fi
 
-  if ! mount | grep '/mnt/bug_nfs' >/dev/null; then
+   if ! mount | grep '/mnt/bug_nfs' >/dev/null; then
     [[ -d /mnt/bug_nfs ]] || mkdir -p /mnt/bug_nfs
     echo "mount 10.73.194.27:/vol/s2images294422  /mnt/bug_nfs/"
     if ! mount 10.73.194.27:/vol/s2images294422 /mnt/bug_nfs/; then

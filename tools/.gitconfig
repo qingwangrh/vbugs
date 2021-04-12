@@ -1,0 +1,37 @@
+[color]
+    ui = auto
+    diff = auto
+    branch = auto
+    interactive = auto
+[user]
+    name = qingwangrh
+    email = qinwang@redhat.com
+[alias]
+    st = status
+    ci = commit
+    br = branch
+    co = checkout
+    df = diff
+    lg = log -p
+[stgit]
+    pager = colordiff | less -FRX
+    smtpserver = smtp.corp.redhat.com
+    sender = Qing Wang <qinwang@redhat.com>
+    smtpuser = qinwang@redhat.com
+[sendemail]
+    smtpserver = smtp.corp.redhat.com
+    from = qinwang@redhat.com
+#    chainreplyto = false
+[format]
+    #to = kvm-autotest@redhat.com
+    subjectprefix = KVM-AUTOTEST][PATCH
+    #headers =
+    #suffix =
+    #numbered =
+    #cc =
+    #
+    signoff = true
+[push]
+    default = simple
+[credential]
+	helper = store

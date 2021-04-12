@@ -1,0 +1,51 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+#host
+10.66.11.29 wq
+10.66.8.105 qing
+
+#server
+10.73.224.36 dell-per740xd-01.lab.eng.pek2.redhat.com dell1
+#10.73.224.84 dell-per7425-02.lab.eng.pek2.redhat.com dell2
+10.73.2.38 dell-per740xd-06.lab.eng.pek2.redhat.com dell6
+10.73.2.36 dell-per740-10.lab.eng.pek2.redhat.com dell7-10
+10.73.196.27 dell-per440-07.lab.eng.pek2.redhat.com dell7
+10.73.196.25 dell-per440-08.lab.eng.pek2.redhat.com dell8
+10.73.114.14 dell-per440-09.lab.eng.pek2.redhat.com dell9
+10.73.114.30 dell-per440-10.lab.eng.pek2.redhat.com dell10
+10.73.114.32 dell-per440-11.lab.eng.pek2.redhat.com dell11
+10.73.32.15 dell-per730-56.lab.eng.pek2.redhat.com dell56
+10.73.73.112 dell-per730-38.lab.eng.pek2.redhat.com dell38
+10.73.131.73 dell-per730-39.lab.eng.pek2.redhat.com dell39
+10.73.114.93 dell-per6515-03.lab.eng.pek2.redhat.com dell3
+10.73.114.91 dell-per6515-02.lab.eng.pek2.redhat.com dell2
+
+10.73.224.125 ibm-x3850x5-07.lab.eng.pek2.redhat.com ibm7
+#10.73.196.57 ibm-x3650m4-06.lab.eng.pek2.redhat.com ibm6
+10.73.224.197 ibm-x3250m6-02.lab.eng.pek2.redhat.com ibm2
+10.73.73.83 ibm-x3250m6-05.lab.eng.pek2.redhat.com ibm5m6
+10.73.224.123 ibm-x3850x5-06.lab.eng.pek2.redhat.com ibm6x5
+#10.73.196.59 ibm-x3650m4-05.lab.eng.pek2.redhat.com ibm5
+10.73.73.85 ibm-x3250m6-06.lab.eng.pek2.redhat.com ibm6
+10.73.224.129 ibm-x3850x5-09.lab.eng.pek2.redhat.com ibm9
+
+10.73.224.151 hp-dl385g8-01.lab.eng.pek2.redhat.com hp1
+10.73.130.201 hp-dl385pg8-03.lab.eng.pek2.redhat.com hpo3
+10.73.3.13 hp-dl585g7-03.lab.eng.pek2.redhat.com hp3
+10.73.130.203 hp-dl385pg8-04.lab.eng.pek2.redhat.com hp4
+10.16.210.156 hp-xl420gen9-01.khw2.lab.eng.bos.redhat.com bos-hp1
+10.16.216.14 hpe-bl460cgen9-01.hpe2.lab.eng.bos.redhat.com bos-hpe2
+10.16.216.94 hpe-dl380gen9-01.hpe2.lab.eng.bos.redhat.com bos-hpe1
+10.66.148.24 hp-z620-04.qe.lab.eng.nay.redhat.com nay-hp4
+hp-dl380g9-03.lab.eng.pek2.redhat.com
+hp-dl380pg8-09.lab.eng.pek2.redhat.com  
+
+10.66.144.33 intel-e52650-16-3.englab.nay.redhat.com intel3
+10.66.144.34 intel-e52650-16-4.englab.nay.redhat.com intel4
+10.66.144.46 intel-e5620-12-5.englab.nay.redhat.com intel5
+10.66.144.67 intel-q9550-4-2.englab.nay.redhat.com intel2 
+10.66.144.27 intel-e31225-16-1.englab.nay.redhat.com intel1
+10.66.144.20 intel-i72600-03.qe.lab.eng.nay.redhat.com intel3x
+#guest
+10.73.226.181 guest5
