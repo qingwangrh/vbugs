@@ -19,7 +19,40 @@ wiscsi_deploy() {
 
 wiscsi_clear() {
   targetcli clearconfig confirm=True
-  systemctl restart target iscsi iscsid
+  targetcli saveconfig
+  systemctl restart target
+  #iscsi iscsid
+}
+
+wiscsi_quit() {
+  local file=/tmp/iscsi
+  local usage="wiscsi_quit [-t targets]"
+  if ! iscsiadm -m session > $file;then
+    echo "No session found"
+    return 1
+  fi
+  while getopts 't:h' OPT; do
+    case $OPT in
+    t) targets="$OPTARG" ;;
+    h) echo -e ${usage} ;;
+    ?) echo -e ${usage} ;;
+    esac
+  done
+  if [[ "$targets" == "" ]];then
+    targets=`cat $file`
+  fi
+  cat $file  | while read LINE;do
+    echo $LINE;
+    portal=`echo $LINE |awk '{print $3}'|cut -f 1 -d ","`
+    target=`echo $LINE |awk '{print $4}'`
+    echo "$portal"
+    echo "$target"
+    if echo "$targets"|grep $target;then
+    iscsiadm -m node -T $target  -p $portal -u
+    iscsiadm -m node -T $target  -p $portal -o delete
+    fi
+  done
+  iscsiadm -m session
 }
 
 wiscsi_create() {
@@ -27,13 +60,14 @@ wiscsi_create() {
 example: -l disk0 -n /home/iscsi/share4g.img -t iqn.2016-06.one.server:4g -b fileio -c iqn.1994-05.com.redhat:clienta"
   local backend="fileio"
   local targets name lun clients OPT OPTARG OPTIND
-  while getopts 't:l:b:c:n:h' OPT; do
+  while getopts 't:l:b:c:s:n:h' OPT; do
     case $OPT in
     t) targets="$OPTARG" ;;
     n) name="$OPTARG" ;;
     l) lun="$OPTARG" ;;
     c) clients="$OPTARG" ;;
     b) backend="$OPTARG" ;;
+    s) size="$OPTARG" ;;
     h) echo -e ${usage} ;;
     ?) echo -e ${usage} ;;
     esac
@@ -46,7 +80,8 @@ example: -l disk0 -n /home/iscsi/share4g.img -t iqn.2016-06.one.server:4g -b fil
   [[ "${clients}" == "" ]] && echo -e "clients:${usage}" && return 0
 
   if ! targetcli / ls /backstores/${backend}/${lun}; then
-    targetcli /backstores/${backend} create ${lun} ${name}
+    echo "Ready to targetcli /backstores/${backend} create ${lun} ${name} ${size}"
+    targetcli /backstores/${backend} create ${lun} ${name} ${size}
   fi
   for target in ${targets}; do
     targetcli /iscsi delete ${target}
@@ -74,12 +109,26 @@ wiscsi_create_block_scsi() {
   #  #  lvcreate iscsi_disk01 -l 100%FREE -n iscsi_lv01
   #  lvcreate -L 2G -n lv vg
   #  dev=/dev/vg/lv
-  wiscsi_create -t "iqn.2016-06.block.server:4g" -b block -c "$clienta $clientb" -l block1 -n /dev/vg/lv
+  local file=/tmp/loopbackfile.img
+  dd if=/dev/zero of=$file bs=100M count=20
+  local loopdev=`losetup -f`
+  losetup $loopdev $file
+  wiscsi_create -t "iqn.2016-06.block.server:4g" -b block -c "$clienta $clientb" -l block1 -n $loopdev
+
+  #losetup -d $loopdev
 
 }
 
-wiscsi_create_share10() {
-  wiscsi_create -t "iqn.2016-06.share.server:10g-a iqn.2016-06.share.server:10g-b" -b fileio -c "$clienta $clientb" -l disk1 -n /home/iscsi/share10g.img
+wiscsi_create_share() {
+  size=$1
+  if [[ "$size" == "" ]];then
+    size=10g
+  fi
+  #tmp folder have to small than 10g
+  [[ -d /home/iscsi ]] || mkdir -p /home/iscsi
+  local file=/home/iscsi/sharex.img
+  rm $file -rf
+  wiscsi_create -t "iqn.2016-06.share.server:10g-a iqn.2016-06.share.server:10g-b" -b fileio -c "$clienta $clientb" -l disk1 -n $file -s $size
 }
 
 wiscsi_create_share_old() {
@@ -106,7 +155,7 @@ wiscsi_create_share_old() {
 
 wiscsi_discover() {
 
-  local usage="usage: -t <targets> -n name -f filter"
+  local usage="usage: -t <targets> -n hostname -f filter"
   local targets name filter OPT OPTARG OPTIND
 
   port=3260

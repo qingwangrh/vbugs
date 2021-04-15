@@ -169,7 +169,7 @@ wclear() {
   fi
   echo "clean bashrc,auto login on $1"
   host=$1
-#   wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
+  #   wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
   wsshx ${host} "sed -i -e '/PS1=/d' -e '/PROMPT_COMMAND=/d' ~/.bashrc;yes|rm ~/.ssh/authorized_keys -rf"
   wsshx ${host} "tail -n 8 ~/.bashrc;ls ~/.ssh/"
 }
@@ -313,7 +313,7 @@ wloop() {
 
 wloopl() {
   local usage="wloopl file cmd"
-  local n f=$1
+  local Line file=$1
   shift
   local cmd="$@"
   if [[ "x$cmd" == "x" ]]; then
@@ -321,11 +321,9 @@ wloopl() {
     return 1
   fi
 
-  data=$(cat ${f})
-  echo "$data"
-  for n in $data; do
-    echo "- - - - - - - - - - -$n"
-    new_cmd="${cmd//@@/$n}"
+  cat ${file} | while read Line; do
+    echo "- - - - - - - - - - -${Line}"
+    new_cmd="${cmd//@@/${Line}}"
     echo -e "$new_cmd\n"
     #/bin/sh -c "$new_cmd"
     eval "$new_cmd"
@@ -349,7 +347,7 @@ wsetup() {
 }
 
 wyumsed() {
-  loca rp
+  local rp
   if [[ "x$1" == "x" ]]; then
     [[ -f /etc/yum.repos.d/beaker-Server.repo ]] && file=beaker-Server.repo || file=beaker-BaseOS.repo
     if cat /etc/yum.repos.d/${file} | egrep "RHEL-[0-9.]{3,}"; then
@@ -408,7 +406,7 @@ wbug() {
   shift
   log_dir="$@"
 
-  T=$(date "+%F-%H%M")
+  T=$(date "+%F")
   echo "$log_dir"
   for d in $target_dir; do
     bugdir=$d/${bugid}/${T}/

@@ -18,7 +18,7 @@
     -object iothread,id=iothread1 \
     -device pcie-root-port,id=pcie-root-port-2,port=0x2,addr=0x1.0x2,bus=pcie.0,chassis=3 \
     -device virtio-scsi-pci,id=virtio_scsi_pci0,bus=pcie-root-port-2,addr=0x0,iothread=iothread0 \
-    -blockdev node-name=file_image1,driver=file,aio=native,filename=/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
+    -blockdev node-name=file_image1,driver=file,aio=native,filename=/home/kvm_autotest_root/images/rhel840-64-virtio-scsi.qcow2,cache.direct=on,cache.no-flush=off \
     -blockdev node-name=drive_image1,driver=qcow2,cache.direct=on,cache.no-flush=off,file=file_image1 \
     -device scsi-hd,id=image1,drive=drive_image1,bootindex=0,write-cache=on \
     -device pcie-root-port,id=pcie-root-port-3,port=0x3,addr=0x1.0x3,bus=pcie.0,chassis=4 \
@@ -257,7 +257,8 @@ steps(){
 ;sleep 0.3
 "
 
-
+#100ok
+#not ok or 150
 
 }
 

@@ -2,12 +2,7 @@
 /usr/libexec/qemu-kvm \
   -name src_vm1 \
   -machine pc-q35-rhel8.3.0,accel=kvm,usb=off,dump-guest-core=off \
--m size=1024000k,slots=16,maxmem=1024000k \
--overcommit mem-lock=off \
--smp 14,maxcpus=16,sockets=16,dies=1,cores=1,threads=1 \
--object iothread,id=iothread1 \
--object memory-backend-ram,id=ram-node0,size=1024000k \
--numa node,nodeid=0,cpus=0-15,memdev=ram-node0 \
+  -m size=4024000k \
   -nodefaults \
   -vga qxl \
   -device pcie-root-port,id=pcie.0-root-port-2,slot=2,bus=pcie.0,multifunction=on \
@@ -24,14 +19,14 @@
   -object iothread,id=iothread0 \
   -device virtio-scsi-pci,id=scsi0,bus=pcie.0-root-port-2-2,addr=0x0,iothread=iothread0 \
   -blockdev \
-  driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel830-64-virtio-scsi.qcow2,node-name=drive_image1 \
+  driver=qcow2,file.driver=file,cache.direct=off,cache.no-flush=on,file.filename=/home/kvm_autotest_root/images/rhel840-64-virtio-scsi.qcow2,node-name=drive_image1 \
   -device scsi-hd,id=os1,drive=drive_image1,bootindex=0 \
   \
-  -object pr-manager-helper,id=pr-helper0,path=/var/run/qemu-pr-helper.sock \
+  \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
-  -blockdev '{"driver":"host_device","filename":"/dev/mapper/mpathc","aio":"native","pr-manager":"pr-helper0","node-name":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"driver":"host_device","filename":"/dev/sde","aio":"native","node-name":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
   -blockdev '{"node-name":"libvirt-1-format","read-only":false,"cache":{"direct":true,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
-  -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=25,share-rw=on,drive=libvirt-1-format,id=block1,werror=stop,rerror=stop \
+  -device scsi-block,bus=scsi1.0,drive=libvirt-1-format,id=block1,werror=stop,rerror=stop \
   -vnc \
   :5 \
   -qmp tcp:0:5955,server,nowait \
@@ -42,8 +37,24 @@
 
 
 steps() {
+
+  -overcommit mem-lock=off \
+
+-smp 14,maxcpus=16,sockets=16,dies=1,cores=1,threads=1 \
+-object iothread,id=iothread1 \
+-object memory-backend-ram,id=ram-node0,size=1024000k \
+-numa node,nodeid=0,cpus=0-15,memdev=ram-node0 \
+-object pr-manager-helper,id=pr-helper0,path=/var/run/qemu-pr-helper.sock \
+-blockdev '{"driver":"host_device","filename":"/dev/mapper/mpatha","aio":"native","pr-manager":"pr-helper0","node-name":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+-blockdev '{"node-name":"libvirt-1-format","read-only":false,"cache":{"direct":true,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
+  -device scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=25,share-rw=on,drive=libvirt-1-format,id=block1,werror=stop,rerror=stop \
+
   #cache writeback
   #host
+  lspci|grep -i Fibre
+  systool -c fc_remote_ports -v|more
+  file=/tmp/strace3.log;echo "">$file;apid=`pgrep qemu-kvm`;strace -tt -T -f  -o $file -s 32 -p $apid
+
   mpathconf --enable
   /bin/systemctl restart multipathd.service
 
@@ -69,7 +80,7 @@ steps() {
   while true; do echo "dd $(date "+%H:%M:%S")";dd if=/dev/urandom of=/dev/sdb oflag=direct bs=4k count=1000000;sleep 1; done
 
   host:
-  systemctl status qemu-pr-helper
+  systemctl status qemu-pr-helper;systemctl start qemu-pr-helper;
    strace -tt -T -v -f -o /tmp/strace.log -s 1024 -p
   iptables -A INPUT -p tcp --dport 3260 -j DROP;iptables -A INPUT -p tcp --sport 3260 -j DROP
 
