@@ -17,9 +17,9 @@
     <on_crash>restart</on_crash>
     <devices>
         <emulator>/usr/libexec/qemu-kvm</emulator>
-        <disk type='block' device='disk'>
+        <disk type='file' device='disk'>
             <driver name='qemu' type='qcow2' cache='none' io='native' discard='unmap'/>
-            <source dev='/home/images/rhel840.qcow2'/>
+            <source file='/home/images/rhel840.qcow2'/>
             <backingStore/>
             <target dev='sda' bus='scsi'/>
             <alias name='scsi0-0-0-0'/>

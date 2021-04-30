@@ -24,7 +24,7 @@
   \
   \
   -device virtio-scsi-pci,id=scsi1,bus=pcie.0-root-port-8,addr=0x0 \
-  -blockdev '{"driver":"host_device","filename":"/dev/sde","aio":"native","node-name":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"driver":"host_device","filename":"/dev/sdb","aio":"native","node-name":"libvirt-1-storage","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}' \
   -blockdev '{"node-name":"libvirt-1-format","read-only":false,"cache":{"direct":true,"no-flush":false},"driver":"raw","file":"libvirt-1-storage"}' \
   -device scsi-block,bus=scsi1.0,drive=libvirt-1-format,id=block1,werror=stop,rerror=stop \
   -vnc \

@@ -18,16 +18,27 @@
   -blockdev driver=qcow2,node-name=fmt1,read-only=off,cache.direct=on,cache.no-flush=off,file=file1,backing=fmt2 \
   -device virtio-blk-pci,iothread=iothread1,bus=pci.0,drive=fmt1,id=data1,write-cache=on,werror=enospc \
   \
+  -blockdev driver=host_device,filename=/dev/vg/lv4,aio=native,node-name=file4,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
+  -blockdev driver=qcow2,node-name=fmt4,read-only=on,cache.direct=on,cache.no-flush=off,file=file4 \
+  -blockdev driver=host_device,filename=/dev/vg/lv3,aio=native,node-name=file3,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
+  -blockdev driver=qcow2,node-name=fmt3,read-only=off,cache.direct=on,cache.no-flush=off,file=file3,backing=fmt4 \
+  -device virtio-blk-pci,iothread=iothread1,bus=pci.0,drive=fmt3,id=data2,write-cache=on,werror=enospc \
+  \
   -vnc \
   :5 \
   -vga qxl \
   -monitor stdio \
   -qmp tcp:0:5955,server,nowait \
   -usb -device usb-tablet \
-  -device virtio-net-pci,netdev=nic1,id=vnet0,mac=54:43:00:1a:11:32 \
+  -device virtio-net-pci,netdev=nic1,id=vnet0,mac=54:43:00:1a:11:33 \
   -netdev tap,id=nic1,vhost=on
 
 steps() {
+  -blockdev driver=host_device,filename=/dev/vg/lv4,aio=native,node-name=file4,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
+  -blockdev driver=qcow2,node-name=fmt4,read-only=on,cache.direct=on,cache.no-flush=off,file=file4 \
+  -blockdev driver=host_device,filename=/dev/vg/lv3,aio=native,node-name=file3,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
+  -blockdev driver=qcow2,node-name=fmt3,read-only=off,cache.direct=on,cache.no-flush=off,file=file3,backing=fmt4 \
+  -device virtio-blk-pci,iothread=iothread1,bus=pci.0,drive=fmt3,id=data2,write-cache=on,werror=enospc \
 
   -blockdev driver=host_device,filename=/dev/vg/lv1,aio=native,node-name=file1,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
   -blockdev driver=qcow2,node-name=fmt1,read-only=off,cache.direct=on,cache.no-flush=off,file=file1 \

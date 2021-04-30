@@ -88,21 +88,21 @@ wdu() {
   du --max-depth=$d -h
 }
 
-#wvncserver() {
-#  if [ "x$1" == "x" ]; then
-#    VNC_ID=86
-#  else
-#    VNC_ID=$1
-#  fi
-#  if [ "x$2" == "x" ]; then
-#    VNC_RES=1600x1000
-#  else
-#    VNC_RES=$2
-#  fi
-#  cmd="vncserver -kill :${VNC_ID};  vncserver :${VNC_ID} -SecurityTypes None -geometry ${VNC_RES}"
-#  echo "$cmd"
-#  eval $cmd
-#}
+wvncserver() {
+  if [ "x$1" == "x" ]; then
+    VNC_ID=86
+  else
+    VNC_ID=$1
+  fi
+  if [ "x$2" == "x" ]; then
+    VNC_RES=1600x920
+  else
+    VNC_RES=$2
+  fi
+  cmd="vncserver -kill :${VNC_ID};  vncserver :${VNC_ID} -SecurityTypes None -geometry ${VNC_RES}"
+  echo "$cmd"
+  eval $cmd
+}
 
 wview() {
   echo "Usage: wview host port protocol"
@@ -123,6 +123,7 @@ wview() {
 }
 
 wenv() {
+  local target
   echo "cp host gitconfig bashrc to target host"
   for target in "$@"; do
     echo "==>$target"
@@ -152,12 +153,14 @@ wsshx() {
     	"*IDENTIFICATION HAS CHANGED" { exit 168 }
         "*yes/no" { send "yes\r";exp_continue }
         "*password:" { send "kvmautotest\r"; }
+	#-re "\[\$\#\] ?$" { send "${cmd}\r";send "exit\r";expect eof; }
+	-re "\[\$\#\] ?$" { send "#\r"; }
     }
     
-    expect -re ".*\[\$#\]"
-    send "${cmd}\r"
-    expect -re ".*\[\$#\]"
-    send "exit\r"
+    expect -re ".*\[\$#\] ?$"
+    send "${cmd}\rexit\r"
+    #expect -re ".*\[\$#\]"
+    #send "exit\r"
     expect eof
 EOF
 }
@@ -170,8 +173,8 @@ wclear() {
   echo "clean bashrc,auto login on $1"
   host=$1
   #   wsshx ${host} "rm ~/.bashrc .ssh/* -rf"
-  wsshx ${host} "sed -i -e '/PS1=/d' -e '/PROMPT_COMMAND=/d' ~/.bashrc;yes|rm ~/.ssh/authorized_keys -rf"
-  wsshx ${host} "tail -n 8 ~/.bashrc;ls ~/.ssh/"
+  wsshx ${host} "sed -i -e '/PS1=/d' -e '/PROMPT_COMMAND=/d' ~/.bashrc;yes|rm ~/.ssh/authorized_keys;tail -n 8 ~/.bashrc"
+  #wsshx ${host} "tail -n 8 ~/.bashrc;ls ~/.ssh/"
 }
 
 winit() {
@@ -214,7 +217,7 @@ PBfjo24ivZf9Ky1PAAAAGnJvb3RAbG9jYWxob3N0LmxvY2FsZG9tYWlu
   if [[ ${ret} == 168 ]]; then
     rm -rf /root/.ssh/known_hosts
   fi
-  wsshx ${host} "mkdir -p ~/.ssh;echo '${id_rsa}' > ~/.ssh/id_rsa;echo '${id_rsa_pub}' > ~/.ssh/id_rsa.pub;yes|cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys;chmod 600 ~/.ssh/*"
+  wsshx ${host} "mkdir -p ~/.ssh;echo '${id_rsa}' > ~/.ssh/id_rsa;echo '${id_rsa_pub}' > ~/.ssh/id_rsa.pub;yes|cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys;chmod 600 ~/.ssh/*;"
   [[ $? == 0 ]] && wenv ${host}
 }
 

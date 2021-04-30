@@ -153,13 +153,8 @@ echo "${data_device}"
 echo "${mac}"
 echo ""
 
-if echo "${os}" | grep rhel; then
-  os_iso=$(readlink /home/kvm_autotest_root/iso/linux/RHEL8.4.0-BaseOS-x86_64.iso -f)
-  cds=" @
-  -blockdev node-name=file_cd1,driver=file,read-only=on,aio=threads,filename=${os_iso},cache.direct=on,cache.no-flush=off @
-  -blockdev node-name=drive_cd1,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd1 @
-  -device scsi-cd,id=cd1,drive=drive_cd1,write-cache=on,bus=scsi1.0 @"
-else
+if echo "${os}" | grep win; then
+
   os_iso=$(readlink /home/kvm_autotest_root/iso/ISO/Win2019/latest_x86_64/* -f)
   cds=" @
   -blockdev node-name=file_cd1,driver=file,read-only=on,aio=threads,filename=${os_iso},cache.direct=on,cache.no-flush=off @
@@ -171,8 +166,20 @@ else
   -blockdev node-name=file_cd3,driver=file,read-only=on,aio=threads,filename=/home/kvm_autotest_root/iso/windows/winutils.iso,cache.direct=on,cache.no-flush=off @
   -blockdev node-name=drive_cd3,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd3 @
   -device scsi-cd,id=cd3,drive=drive_cd3,write-cache=on,bus=scsi1.0 @"
+else
+  os_iso=$(readlink /home/kvm_autotest_root/iso/linux/RHEL8.4.0-BaseOS-x86_64.iso -f)
+  cds=" @
+  -blockdev node-name=file_cd1,driver=file,read-only=on,aio=threads,filename=${os_iso},cache.direct=on,cache.no-flush=off @
+  -blockdev node-name=drive_cd1,driver=raw,read-only=on,cache.direct=on,cache.no-flush=off,file=file_cd1 @
+  -device scsi-cd,id=cd1,drive=drive_cd1,write-cache=on,bus=scsi1.0 @"
+
 fi
 
+if lscpu |grep ^Vendor|grep AMD;then
+	cpuflag=svm
+else
+	cpuflag=vmx
+fi
 #-cpu 'Skylake-Server',+kvm_pv_unhalt @
 #-cpu host @
 #-cpu 'EPYC-Rome',+kvm_pv_unhalt @
@@ -184,7 +191,7 @@ cmd="
   -machine ${machine} @
   -m 8G @
   -smp 8 @
-  -cpu host,+kvm_pv_unhalt @
+  -cpu host,$cpuflag,+kvm_pv_unhalt @
   -device qemu-xhci,id=usb1 @
   -device usb-tablet,id=usb-tablet1,bus=usb1.0,port=1 @
   ${multi} @
