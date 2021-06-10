@@ -60,6 +60,7 @@ create_repo9() {
   #  curl -kL 'http://download.eng.bos.redhat.com/rel-eng/internal/rcm-tools-rhel-8-baseos.repo' -o /etc/yum.repos.d/rcm-tools-rhel-8.repo
   #  dnf install python3 brewkoji  git -y
   yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-8/packages/screen/4.6.2/4.el8/x86_64/screen-4.6.2-4.el8.x86_64.rpm
+  #yum install -y http://download.eng.bos.redhat.com/brewroot/vol/rhel-9/packages/screen/4.8.0/6.el9/x86_64/screen-4.8.0-6.el9.x86_64.rpm
   #  yum install python3 brewkoji git vim net-tools mlocate -y
   yum install -y nfs-utils git vim net-tools mlocate
   yum install -y qemu*
@@ -192,6 +193,7 @@ create_kar() {
     mv kar oldkar/kar${STAMP}
   }
   git clone https://gitlab.cee.redhat.com/kvm-qe/kar.git
+  [ -e kar ]  || { echo "Not kar";exit 1; }
   cd kar
 
   ./Bootstrap.sh $options
@@ -203,16 +205,18 @@ create_kar() {
   else
     ln -s ~/avocado/job-results workspace/job-results
   fi
-  ln -s $pathfix/var/lib/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
+  local file=`find ./ -name hello_world.py`
+  [[  -z "$file"  ]] && { echo "download tp-qemu failed"; }
+  ln -s $pathfix/root/avocado/data/avocado-vt/virttest/test-providers.d/downloads/io-github-autotest-qemu tp-qemu
   ln -s workspace/avocado-vt avocado-vt
-  ln -s $pathfix/var/lib/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
+  ln -s $pathfix/root/avocado/data/avocado-vt/backends/qemu/cfg output-cfg
 
   touch $venv${STAMP}
-  if uname -r | grep el9; then
-    #temp
-    wget http://fileshare.englab.nay.redhat.com/pub/section2/kvm/xuwei/rhel9_installation/RHEL-9-series.ks
-    cp -rf RHEL-9-series.ks internal_ks/RHEL-9-series.ks
-  fi
+#  if uname -r | grep el9; then
+#    #temp
+#    wget http://fileshare.englab.nay.redhat.com/pub/section2/kvm/xuwei/rhel9_installation/RHEL-9-series.ks
+#    cp -rf RHEL-9-series.ks internal_ks/RHEL-9-series.ks
+#  fi
   #git clone https://gitlab.cee.redhat.com/yhong/vmt.git
   cd ${DIR}
 }

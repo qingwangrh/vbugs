@@ -17,7 +17,7 @@ usage_help(){
   fi
 }
 
-
+export https_proxy=http://squid.corp.redhat.com:3128
 create_workdir
 create_cert
 create_component_manager

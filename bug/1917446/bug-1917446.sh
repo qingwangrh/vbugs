@@ -1,4 +1,4 @@
-#1917451,1921405,1921409,1917450,1921387
+#1917451,1921405,1921409,1917450,1921387,1917449
 
 qemu-img create -f qcow2 /home/kvm_autotest_root/images/ahci-cdrom.img 256M
 

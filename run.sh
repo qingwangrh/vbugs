@@ -140,11 +140,16 @@ fi
 if [[ "$drv" == "scsi" ]]; then
   diskbus1="scsi0.0"
   diskbus2="scsi0.0"
+  devicetype="scsi-hd"
 #  device_extra=",scsi-id=64"
+
+else
+  devicetype="virtio-blk-pci"
+  #blk
 fi
 
-os_device="-device scsi-hd,id=os,drive=drive_image1,bus=scsi0.0,bootindex=0,serial=OS_DISK  "
-data_device="-device scsi-hd,id=data1,drive=data_image1,bus=scsi0.0,bootindex=1${params},serial=DATA_DISK${device_extra}  "
+os_device="-device $devicetype,id=os,drive=drive_image1,bus=${diskbus1},bootindex=0,serial=OS_DISK  "
+data_device="-device $devicetype,id=data1,drive=data_image1,bus=${diskbus1},bootindex=1${params},serial=DATA_DISK${device_extra}  "
 
 echo "${params}"
 echo "${os_img}"
@@ -204,10 +209,10 @@ cmd="
   ${data_device} @
   -vnc :5 @
   -monitor stdio @
-  -qmp tcp:0:5955,server,nowait @
+  -qmp tcp:0:5955,server=on,wait=off @
   -device virtio-net-pci,mac=${mac},id=idMmq1jH,vectors=4,netdev=idxgXAlm,bus=${netbus} @
   -netdev tap,id=idxgXAlm @
-  -chardev socket,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server,nowait @
+  -chardev socket,id=qmp_id_qmpmonitor1,path=/var/tmp/monitor-qmp7.log,server=on,wait=off @
   -mon chardev=qmp_id_qmpmonitor1,mode=control @
   -chardev file,path=/var/tmp/monitor-serial7.log,id=serial_id_serial0 @
   -device isa-serial,chardev=serial_id_serial0 @

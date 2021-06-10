@@ -12,11 +12,10 @@
   -blockdev driver=qcow2,node-name=my,file=my_file \
   -device virtio-blk-pci,drive=my,id=virtio-blk0,bus=pci.0,bootindex=0 \
   \
-  -blockdev driver=host_device,filename=/dev/vg/lv2,aio=native,node-name=file2,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
-  -blockdev driver=qcow2,node-name=fmt2,read-only=on,cache.direct=on,cache.no-flush=off,file=file2 \
-  -blockdev driver=host_device,filename=/dev/vg/lv1,aio=native,node-name=file1,cache.direct=on,cache.no-flush=off,auto-read-only=off,discard=unmap \
-  -blockdev driver=qcow2,node-name=fmt1,read-only=off,cache.direct=on,cache.no-flush=off,file=file1,backing=fmt2 \
-  -device virtio-blk-pci,iothread=iothread1,bus=pci.0,drive=fmt1,id=data1,write-cache=on,werror=enospc \
+  \
+  -blockdev driver=host_device,filename=/dev/vg/lv1,node-name=file1 \
+  -blockdev driver=raw,node-name=fmt1,file=file1 \
+  -device virtio-blk-pci,iothread=iothread1,bus=pci.0,drive=fmt1,id=data1,write-cache=on,werror=stop \
   \
   -vnc \
   :5 \
