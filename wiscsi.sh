@@ -12,8 +12,8 @@ wiscsi_deploy() {
   systemctl start target
   systemctl enable targetcli
   systemctl start targetcli
-  dd if=/dev/zero of=/home/iscsi/share4g.img bs=1M count=4096
-  dd if=/dev/zero of=/home/iscsi/share10g.img bs=1M count=10240
+  #  dd if=/dev/zero of=/home/iscsi/share4g.img bs=1M count=4096
+  #  dd if=/dev/zero of=/home/iscsi/share10g.img bs=1M count=10240
   targetcli clearconfig confirm=True
 }
 
@@ -24,43 +24,46 @@ wiscsi_clear() {
   #iscsi iscsid
 }
 
-wiscsi_quit() {
+wiscsi_logout() {
   local file=/tmp/iscsi
-  local usage="wiscsi_quit [-t targets]"
-  if ! iscsiadm -m session > $file;then
-    echo "No session found"
-    return 1
-  fi
+  local usage="wiscsi_logout [-t targets]"
+
   while getopts 't:h' OPT; do
     case $OPT in
     t) targets="$OPTARG" ;;
-    h) echo -e ${usage} ;;
-    ?) echo -e ${usage} ;;
+    h) echo -e ${usage};return 0 ;;
+    ?) echo -e ${usage};return 0 ;;
     esac
   done
-  if [[ "$targets" == "" ]];then
-    targets=`cat $file`
+  if ! iscsiadm -m session >$file; then
+    echo "No session found"
+    return 1
   fi
-  cat $file  | while read LINE;do
-    echo $LINE;
-    portal=`echo $LINE |awk '{print $3}'|cut -f 1 -d ","`
-    target=`echo $LINE |awk '{print $4}'`
+  if [[ "$targets" == "" ]]; then
+    targets=$(cat $file)
+  fi
+  cat $file | while read LINE; do
+    echo $LINE
+    portal=$(echo $LINE | awk '{print $3}' | cut -f 1 -d ",")
+    target=$(echo $LINE | awk '{print $4}')
     echo "$portal"
     echo "$target"
-    if echo "$targets"|grep $target;then
-    iscsiadm -m node -T $target  -p $portal -u
-    iscsiadm -m node -T $target  -p $portal -o delete
+    if echo "$targets" | grep $target; then
+      iscsiadm -m node -T $target -p $portal -u
+      iscsiadm -m node -T $target -p $portal -o delete
     fi
   done
   iscsiadm -m session
 }
 
 wiscsi_create() {
-  local usage="usage: -l lun_name -n [dev/file] name -t targets -b backend [block/fileio] -c clients
+  local usage="usage: -l lun_name -n [dev/file] name -t targets -b backend [block/fileio] -c clients -s size [ -a attrs]
 example: -l disk0 -n /home/iscsi/share4g.img -t iqn.2016-06.one.server:4g -b fileio -c iqn.1994-05.com.redhat:clienta"
-  local backend="fileio"
-  local targets name lun clients OPT OPTARG OPTIND
-  while getopts 't:l:b:c:s:n:h' OPT; do
+  local OPT OPTARG OPTIND
+  #  local backend="fileio"
+  local attrs
+  echo "Params:$#: $@"
+  while getopts 't:a:l:b:c:s:n:h' OPT; do
     case $OPT in
     t) targets="$OPTARG" ;;
     n) name="$OPTARG" ;;
@@ -68,20 +71,35 @@ example: -l disk0 -n /home/iscsi/share4g.img -t iqn.2016-06.one.server:4g -b fil
     c) clients="$OPTARG" ;;
     b) backend="$OPTARG" ;;
     s) size="$OPTARG" ;;
-    h) echo -e ${usage} ;;
-    ?) echo -e ${usage} ;;
+    a) attrs="$OPTARG" ;;
+    h)
+      echo -e ${usage}
+      return 0
+      ;;
+    ?)
+      echo -e ${usage}
+      return 0
+      ;;
     esac
   done
 
-  [[ "${targets}" == "" ]] && echo -e "targets:${usage}" && return 0
-  [[ "${lun}" == "" ]] && echo -e "lun:${usage}" && return 0
-  [[ "${name}" == "" ]] && echo -e "name:${usage}" && return 0
-  [[ "${backend}" == "" ]] && echo -e "backend:${usage}" && return 0
-  [[ "${clients}" == "" ]] && echo -e "clients:${usage}" && return 0
+  [[ "${targets}" == "" ]] && { echo -e "No targets:\n${usage}" && return 0; }
+  [[ "${lun}" == "" ]] && { echo -e "No lun:\n${usage}" && return 0; }
+  [[ "${name}" == "" ]] && { echo -e "No name:\n${usage}" && return 0; }
+  [[ "${backend}" == "" ]] && { echo -e "No backend:\n${usage}" && return 0; }
+  [[ "${clients}" == "" ]] && { echo -e "No clients:\n${usage}" && return 0; }
+  [[ "${backend}" == "fileio" ]] && rm ${name} -rf
+  echo -e "T: ${targets} \nL: ${lun} \nN: ${name} \nB: ${backend} \nC: ${clients} \nS: ${size} \nA: ${attrs} \n"
 
   if ! targetcli / ls /backstores/${backend}/${lun}; then
     echo "Ready to targetcli /backstores/${backend} create ${lun} ${name} ${size}"
     targetcli /backstores/${backend} create ${lun} ${name} ${size}
+    #Fixme set attribute for backstores
+    for attr in ${attrs}; do
+      echo "set attribute ${attr}"
+      targetcli /backstores/${backend}/${lun} set attribute ${attr}
+    done
+
   fi
   for target in ${targets}; do
     targetcli /iscsi delete ${target}
@@ -111,24 +129,35 @@ wiscsi_create_block_scsi() {
   #  dev=/dev/vg/lv
   local file=/tmp/loopbackfile.img
   dd if=/dev/zero of=$file bs=100M count=20
-  local loopdev=`losetup -f`
+  local loopdev=$(losetup -f)
   losetup $loopdev $file
   wiscsi_create -t "iqn.2016-06.block.server:4g" -b block -c "$clienta $clientb" -l block1 -n $loopdev
 
   #losetup -d $loopdev
 
 }
+wiscsi_create_one() {
+  local targets name lun clients backend size attrs
+  size=3g
+  targets="iqn.2016-06.one.server:one-a"
+  backend="fileio"
+  clients="$clienta $clientb"
+  lun="disk1"
+  name=/home/iscsi/onex.img
+  wiscsi_create "$@"
+
+}
 
 wiscsi_create_share() {
-  size=$1
-  if [[ "$size" == "" ]];then
-    size=10g
-  fi
-  #tmp folder have to small than 10g
-  [[ -d /home/iscsi ]] || mkdir -p /home/iscsi
-  local file=/home/iscsi/sharex.img
-  rm $file -rf
-  wiscsi_create -t "iqn.2016-06.share.server:10g-a iqn.2016-06.share.server:10g-b" -b fileio -c "$clienta $clientb" -l disk1 -n $file -s $size
+  local targets name lun clients backend size attrs
+  size=10g
+  targets="iqn.2016-06.share.server:10g-a iqn.2016-06.share.server:10g-b"
+  backend="fileio"
+  clients="$clienta $clientb"
+  lun="disk2"
+  name=/home/iscsi/sharex.img
+  wiscsi_create "$@"
+
 }
 
 wiscsi_create_share_old() {
@@ -159,7 +188,8 @@ wiscsi_discover() {
   local targets name filter OPT OPTARG OPTIND
 
   port=3260
-  name=10.66.8.105
+  #  name=10.66.8.105
+  name=127.0.0.1
   targets=$(targetcli /iscsi ls depth=1 | grep iqn | awk '{print $2}')
   while getopts 'f:t:n:h' OPT; do
     case $OPT in
@@ -188,6 +218,9 @@ wiscsi_discover() {
 
 }
 
+wiscsi_restart() {
+  systemctl restart target iscsi iscsid
+}
 #libiscsi windows guest inititorname
 #uuid=ea78071a-f6e4-4347-8077-9cb9f7959e66
 #uuid=ea78071a-f6e4-4347-8077-9cb9f7959e88
