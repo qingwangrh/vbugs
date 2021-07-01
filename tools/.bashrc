@@ -22,7 +22,7 @@ alias wfind='find ./ -not \( -name .svn -a -prune \) -name'
 alias wmqing='if ! rpm -qa|grep nfs-utils > /dev/null;then yum install nfs-utils -y;fi;mkdir -p /home/vbugs;if [ ! -e /home/vbugs/setup.sh ];then mount 10.66.8.105:/home/vbugs /home/vbugs; else echo "already mount"; fi'
 alias wconsole='console -l qinwang -M conserver-01.eng.pek2.redhat.com '
 alias wversion="{ cat /etc/redhat-release;uname -r;rpm -qa|grep -E kvm-common-\"(rhev|[0-9])\";rpm -qa|grep seabios-[0-9];rpm -qa|grep edk2;readlink /home/kvm_autotest_root/iso/windows/virtio-win-latest-prewhql.iso; } > /tmp/wversion.txt;cat /tmp/wversion.txt"
-
+alias wproxy="export https_proxy=http://squid.corp.redhat.com:3128"
 if [[ -f /usr/bin/vim ]]; then
   alias vi=vim
 fi
@@ -47,6 +47,8 @@ else
   fi
 
 fi
+
+wmyip() { ip addr | grep inet | grep '10\.' | awk '{print $2}' | cut -f 1 -d '/'; }
 
 wscreen() {
   echo "usage:create screen session"
@@ -390,7 +392,7 @@ wbug() {
   local target_dir
 
   if (($# < 2)); then
-    echo -e "Usage: wbug 123 job-xxx"
+    echo -e "Usage: wbug 123 dir1 dir2"
     return 1
   fi
 

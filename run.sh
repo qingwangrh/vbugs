@@ -124,9 +124,13 @@ fi
 
 if [[ ! -e ${img_dir}/${os_img_name} ]]; then
   echo "Can not find os image ${img_dir}/${os_img_name}"
-  exit 1
-  echo "Create install disk"
-  qemu-img create -f ${fmt} ${img_dir}/${os_img_name} 25G
+  if [[ "$install" == "1" ]]; then
+    echo "Create install disk"
+    qemu-img create -f ${fmt} ${img_dir}/${os_img_name} 25G
+  else
+    exit 1
+  fi
+
 fi
 
 if [[ "$mode" == "drive" ]]; then
@@ -180,10 +184,10 @@ else
 
 fi
 
-if lscpu |grep ^Vendor|grep AMD;then
-	cpuflag=svm
+if lscpu | grep ^Vendor | grep AMD; then
+  cpuflag=svm
 else
-	cpuflag=vmx
+  cpuflag=vmx
 fi
 #-cpu 'Skylake-Server',+kvm_pv_unhalt @
 #-cpu host @

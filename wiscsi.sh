@@ -142,7 +142,7 @@ wiscsi_create_one() {
   targets="iqn.2016-06.one.server:one-a"
   backend="fileio"
   clients="$clienta $clientb"
-  lun="disk1"
+  lun="one"
   name=/home/iscsi/onex.img
   wiscsi_create "$@"
 
@@ -151,11 +151,11 @@ wiscsi_create_one() {
 wiscsi_create_share() {
   local targets name lun clients backend size attrs
   size=10g
-  targets="iqn.2016-06.share.server:10g-a iqn.2016-06.share.server:10g-b"
+  targets="iqn.2016-06.share.server:share-a iqn.2016-06.share.server:share-b"
   backend="fileio"
   clients="$clienta $clientb"
-  lun="disk2"
-  name=/home/iscsi/sharex.img
+  lun="share"
+  name=/home/iscsi/share.img
   wiscsi_create "$@"
 
 }
